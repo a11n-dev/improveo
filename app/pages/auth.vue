@@ -3,7 +3,6 @@ import type { AuthMode, AuthStep } from "~/types/auth";
 import { formatCountdown } from "~/utils/format";
 
 definePageMeta({
-  layout: "auth",
   middleware: "auth",
 });
 
@@ -156,8 +155,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center p-6">
-    <div class="flex w-full max-w-sm flex-col gap-3">
+  <div class="flex min-h-screen items-center justify-center">
+    <div class="flex self-center w-full max-w-sm flex-col gap-3">
       <UCard>
         <template #header>
           <div class="relative flex items-center justify-center">
@@ -170,9 +169,7 @@ onBeforeUnmount(() => {
               class="absolute left-0 top-1/2 -translate-y-1/2"
               @click="handleBack"
             />
-            <span class="text-lg font-semibold text-highlighted"
-              >Improveme</span
-            >
+            <span class="text-lg font-semibold text-highlighted">Improveme</span>
           </div>
         </template>
 
@@ -181,14 +178,16 @@ onBeforeUnmount(() => {
           class="flex flex-col gap-4"
           @submit="handleSubmit"
         >
-          <USeparator class="mx-auto w-10" size="lg" />
-          <div v-if="step === 'request'" class="flex flex-col gap-4">
+          <USeparator
+            class="mx-auto w-10"
+            size="lg"
+          />
+          <div
+            v-if="step === 'request'"
+            class="flex flex-col gap-4"
+          >
             <p class="text-sm text-muted">
-              {{
-                isRegister
-                  ? "Create an account to get started."
-                  : "Sign in to continue."
-              }}
+              {{ isRegister ? "Create an account to get started." : "Sign in to continue." }}
             </p>
             <UFormField
               v-if="isRegister"
@@ -204,7 +203,11 @@ onBeforeUnmount(() => {
               />
             </UFormField>
 
-            <UFormField label="Email Address" name="email" required>
+            <UFormField
+              label="Email Address"
+              name="email"
+              required
+            >
               <UInput
                 v-model="formState.email"
                 class="w-full"
@@ -223,7 +226,10 @@ onBeforeUnmount(() => {
             />
           </div>
 
-          <div v-else class="flex flex-col gap-4">
+          <div
+            v-else
+            class="flex flex-col gap-4"
+          >
             <div class="text-sm text-muted">
               <p>Enter the 6-character code sent to:</p>
               <p class="font-medium text-highlighted">

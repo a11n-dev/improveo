@@ -20,6 +20,8 @@ const toasterConfig = computed(() => {
 <template>
   <UApp :toaster="toasterConfig">
     <NuxtRouteAnnouncer />
-    <NuxtPage />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </UApp>
 </template>

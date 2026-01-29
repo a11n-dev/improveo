@@ -42,6 +42,9 @@ Scope: Nuxt 4 app with Tailwind v4, Vitest, Playwright.
 - Playwright single file: `pnpm playwright test tests/foo.spec.ts`.
 - Playwright name filter: `pnpm playwright test -g "case name"`.
 
+## DB types generation
+- Supabase types: `pnpm run gen:supabase`.
+
 ## Code style guidelines
 
 - Follow Nuxt 4 conventions and auto-imports; prefer framework composables where available.

@@ -23,6 +23,7 @@ const otpValue = ref<string[]>([]);
 const resendSeconds = ref(0);
 
 const isRegister = computed(() => activeTab.value === "register");
+const colorMode = useColorMode();
 
 /** Normalize OTP input array into a single string token. */
 const otpToken = computed(() => otpValue.value.join(""));
@@ -156,39 +157,34 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="flex min-h-screen items-center justify-center">
-    <div class="flex self-center w-full max-w-sm flex-col gap-3">
-      <UCard>
-        <template #header>
-          <div class="relative flex items-center justify-center">
-            <UButton
-              v-if="step === 'verify'"
-              variant="ghost"
-              color="neutral"
-              icon="i-lucide-arrow-left"
-              aria-label="Back"
-              class="absolute left-0 top-1/2 -translate-y-1/2"
-              @click="handleBack"
-            />
-            <span class="text-lg font-semibold text-highlighted">Improveme</span>
-          </div>
-        </template>
+    <UContainer class="flex w-full max-w-md flex-col gap-3 text-left">
+      <div class="flex flex-col gap-3">
+        <img
+          :src="
+            colorMode.value === 'dark' ? '/logo-dark.svg' : '/logo-light.svg'
+          "
+          alt="Improveme Logo"
+          class="h-10 w-10"
+        />
+        <span class="text-lg text-highlighted">
+          {{ isRegister ? "Signup to Improveme" : "Login to Improveme" }}
+        </span>
+      </div>
 
-        <UForm
-          :state="formState"
-          class="flex flex-col gap-4"
-          @submit="handleSubmit"
-        >
-          <USeparator
-            class="mx-auto w-10"
-            size="lg"
-          />
-          <div
-            v-if="step === 'request'"
-            class="flex flex-col gap-4"
-          >
-            <p class="text-sm text-muted">
-              {{ isRegister ? "Create an account to get started." : "Sign in to continue." }}
-            </p>
+      <UForm
+        :state="formState"
+        class="flex flex-col gap-5"
+        @submit="handleSubmit"
+      >
+        <div v-if="step === 'request'" class="flex flex-col gap-5">
+          <p class="text-sm text-muted">
+            {{
+              isRegister
+                ? "Create an account to get started."
+                : "Build better habits with a focused tracker that keeps your streaks on track."
+            }}
+          </p>
+          <div class="flex flex-col gap-2">
             <UFormField
               v-if="isRegister"
               label="Display Name"
@@ -203,11 +199,7 @@ onBeforeUnmount(() => {
               />
             </UFormField>
 
-            <UFormField
-              label="Email Address"
-              name="email"
-              required
-            >
+            <UFormField label="Email Address" name="email" required>
               <UInput
                 v-model="formState.email"
                 class="w-full"
@@ -216,70 +208,76 @@ onBeforeUnmount(() => {
                 autocomplete="email"
               />
             </UFormField>
+          </div>
 
+          <UButton
+            type="submit"
+            :loading="isSending"
+            :disabled="!canSend"
+            :label="isRegister ? 'Sign Up' : 'Sign In'"
+            block
+          />
+        </div>
+
+        <div v-else class="flex flex-col gap-5">
+          <div class="text-sm text-muted">
+            <p>Enter the 6-character code sent to:</p>
+            <p class="font-medium text-highlighted">
+              {{ formState.email }}
+            </p>
+          </div>
+
+          <UPinInput
+            v-model="otpValue"
+            :length="6"
+            otp
+            size="xl"
+            placeholder="·"
+            autofocus
+            class="justify-between"
+            @complete="handleSubmit"
+          />
+
+          <div class="flex flex-col gap-3">
             <UButton
               type="submit"
-              :loading="isSending"
-              :disabled="!canSend"
-              :label="isRegister ? 'Sign Up' : 'Sign In'"
               block
+              :loading="isVerifying"
+              :disabled="!canVerify"
+              label="Verify & Continue"
             />
-          </div>
-
-          <div
-            v-else
-            class="flex flex-col gap-4"
-          >
-            <div class="text-sm text-muted">
-              <p>Enter the 6-character code sent to:</p>
-              <p class="font-medium text-highlighted">
-                {{ formState.email }}
-              </p>
-            </div>
-
-            <UPinInput
-              v-model="otpValue"
-              :length="6"
-              otp
-              size="lg"
-              placeholder="·"
-              autofocus
-              class="self-center"
+            <UButton
+              type="button"
+              color="neutral"
+              variant="soft"
+              block
+              label="Back"
+              @click="handleBack"
             />
-
-            <div class="space-y-3">
+            <p class="text-sm text-muted">
+              Didn't receive a code?
               <UButton
-                type="submit"
-                block
-                :loading="isVerifying"
-                :disabled="!canVerify"
-                label="Verify & Continue"
-              />
-              <p class="text-center text-sm text-muted">
-                Didn't receive a code?
-                <UButton
-                  type="button"
-                  variant="link"
-                  class="px-1 text-primary"
-                  :disabled="resendSeconds > 0 || isSending"
-                  @click="handleOtpRequest"
-                >
-                  Resend code
-                </UButton>
-                <span v-if="resendSeconds > 0">in {{ resendCountdown }}</span>
-              </p>
-            </div>
+                type="button"
+                variant="link"
+                class="px-1 text-primary"
+                :disabled="resendSeconds > 0 || isSending"
+                @click="handleOtpRequest"
+              >
+                Resend code
+              </UButton>
+              <span v-if="resendSeconds > 0">in {{ resendCountdown }}</span>
+            </p>
           </div>
-        </UForm>
-      </UCard>
+        </div>
+      </UForm>
 
-      <p class="text-center text-sm text-muted">
+      <p v-if="step === 'request'" class="text-sm text-muted">
         <template v-if="isRegister">
-          Already have an account?
+          <span>Already have an account?</span>
           <UButton
             type="button"
             variant="link"
-            class="px-1 text-primary"
+            class="ml-0.5 px-0 py-0 text-primary"
             @click="toggleAuthMode"
           >
             Login Here
@@ -287,17 +285,17 @@ onBeforeUnmount(() => {
         </template>
 
         <template v-else>
-          Don't have an account?
+          <span>Don't have an account?</span>
           <UButton
             type="button"
             variant="link"
-            class="px-1 text-primary"
+            class="ml-0.5 px-0 py-0 text-primary"
             @click="toggleAuthMode"
           >
             Request Now
           </UButton>
         </template>
       </p>
-    </div>
+    </UContainer>
   </div>
 </template>

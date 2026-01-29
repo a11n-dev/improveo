@@ -35,6 +35,7 @@ export default defineAppConfig({
     input: {
       defaultVariants: {
         size: "lg",
+        variant: "subtle",
       },
     },
     empty: {

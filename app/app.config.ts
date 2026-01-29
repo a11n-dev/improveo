@@ -25,8 +25,16 @@ export default defineAppConfig({
       },
     },
     button: {
+      defaultVariants: {
+        size: "lg",
+      },
       slots: {
         base: "cursor-pointer",
+      },
+    },
+    input: {
+      defaultVariants: {
+        size: "lg",
       },
     },
     empty: {

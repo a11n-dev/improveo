@@ -23,6 +23,7 @@ Scope: Nuxt 4 app with Tailwind v4, Vitest, Playwright.
 - Lint: `pnpm lint` (ESLint via `@nuxt/eslint`).
 - Format: `pnpm format` (Prettier defaults; no custom config).
 - Type check: `pnpm type-check` (Nuxt type checker).
+- After implementation, run `pnpm lint`, `pnpm type-check` and `pnpm format` and report results (or note if skipped).
 
 ## Tests
 
@@ -59,7 +60,7 @@ Scope: Nuxt 4 app with Tailwind v4, Vitest, Playwright.
 - Keep props, emits, and slots typed; prefer `defineProps` and `defineEmits` generics.
 - Avoid implicit `any`; tighten types in composables and utilities.
 - Favor `const` and immutable data; reassign only when necessary.
-- Document complex logic with JSDoc/TSDoc comments.
+- Document non-obvious or complex logic with JSDoc/TSDoc comments, focusing on intent, assumptions, edge cases, and side effects. Avoid comments that merely restate the code or types.
 
 ## Error handling and logging
 
@@ -80,6 +81,7 @@ Scope: Nuxt 4 app with Tailwind v4, Vitest, Playwright.
 - Tailwind v4 is enabled via `@tailwindcss/vite`; keep global CSS in `app/assets/css/main.css`.
 - Prefer utility classes for layout/spacing; create components for repeated patterns.
 - Use CSS variables for theming when needed; avoid inline styles unless dynamic.
+- Prefer Nuxt UI semantic colors (`text-muted`, `text-highlighted`, `bg-default`, `text-error`) over hard-coded color classes.
 
 ## Testing conventions
 
@@ -110,6 +112,13 @@ Scope: Nuxt 4 app with Tailwind v4, Vitest, Playwright.
 - Use `as const` to preserve literal types for config objects.
 - Avoid `any`; use `unknown` and narrow with type guards.
 - Keep runtime validation at boundaries (API responses, form input).
+
+## Types Organization
+
+- Shared, cross-runtime types (DTOs, API contracts, domain models) live in `shared/types/` and are auto-imported in both client and server.
+- Server-only types (Nitro handlers/services, server context, server config) live in `server/types/` and are only available in server context. Should be imported manually.
+- UI/client-only types (component/view models, chart configs, browser-related types) live in `app/types/` and are only available in client context. Should be imported manually.
+- Prefer grouping by domain (e.g. `shared/types/user.ts`, `shared/types/trading.ts`) over dumping into a single `types.ts`.
 
 ## Naming conventions
 

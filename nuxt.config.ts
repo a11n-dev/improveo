@@ -1,29 +1,19 @@
-import tailwindcss from "@tailwindcss/vite";
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: [
-    "@nuxt/eslint",
-    "@nuxt/test-utils",
-    "shadcn-nuxt",
-    "@nuxtjs/supabase",
-    "@vite-pwa/nuxt",
-  ],
+  
+  modules: ["@nuxt/eslint", "@nuxt/test-utils", "@nuxtjs/supabase", "@vite-pwa/nuxt", "@nuxt/ui"],
+
   css: ["~/assets/css/main.css"],
 
-  vite: {
-    plugins: [tailwindcss()],
+  colorMode: {
+    preference: "system",
+    fallback: "light",
   },
 
-  shadcn: {
-    /**
-     * Directory that the component lives in.
-     * Will respect the Nuxt aliases.
-     * @link https://nuxt.com/docs/api/nuxt-config#alias
-     * @default "@/components/ui"
-     */
-    componentDir: "@/components/ui",
+  supabase: {
+    redirect: false,
+    types: "~~/shared/types/database.types.ts",
   },
 });

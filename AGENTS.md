@@ -8,7 +8,6 @@ Scope: Nuxt 4 app with Tailwind v4, Vitest, Playwright.
 - `app/` holds the Nuxt app entrypoint and assets.
 - `app/app.vue` is the root component.
 - `app/assets/css/main.css` is the Tailwind v4 entry (`@import "tailwindcss"`).
-- `components/ui` is reserved for shadcn-vue components (configured in `nuxt.config.ts`).
 - `test/unit` and `test/nuxt` are Vitest roots (see `vitest.config.ts`).
 - `tests/` is the Playwright test directory (see `playwright.config.ts`).
 
@@ -43,6 +42,7 @@ Scope: Nuxt 4 app with Tailwind v4, Vitest, Playwright.
 - Playwright name filter: `pnpm playwright test -g "case name"`.
 
 ## DB types generation
+
 - Supabase types: `pnpm run gen:supabase`.
 
 ## Code style guidelines
@@ -98,11 +98,10 @@ Scope: Nuxt 4 app with Tailwind v4, Vitest, Playwright.
 - Use `server/api/` for REST API endpoints.
 - Keep server handlers stateless and return JSON-serializable data.
 
-## shadcn usage
+## Nuxt UI usage
 
-- UI components are generated into `components/ui` by default.
-- Keep generated components close to upstream; avoid heavy edits unless necessary.
-- Wrap UI components in feature-level components for app-specific behavior.
+- Use Nuxt UI components as the primary UI primitives.
+- Keep component overrides minimal; prefer theming via Nuxt UI config and CSS variables.
 
 ## TypeScript guidance
 

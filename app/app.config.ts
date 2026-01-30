@@ -1,19 +1,9 @@
 export default defineAppConfig({
   ui: {
-    drawer: {
-      compoundVariants: [
-        {
-          direction: ["top", "bottom"],
-          class: {
-            content: "h-auto max-h-[65dvh]",
-          },
-        },
-      ],
-    },
     modal: {
       slots: {
+        header: "pb-0!",
         content: "divide-y-0",
-        footer: "pt-0",
       },
     },
     card: {
@@ -35,6 +25,11 @@ export default defineAppConfig({
     input: {
       defaultVariants: {
         size: "lg",
+        variant: "subtle",
+      },
+    },
+    textarea: {
+      defaultVariants: {
         variant: "subtle",
       },
     },

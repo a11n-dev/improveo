@@ -4,6 +4,7 @@ import { formatCountdown } from "~/utils/format";
 
 definePageMeta({
   middleware: "auth",
+  layout: "auth",
 });
 
 const { clearError, isSending, isVerifying, requestOtp, verifyOtp } = useAuth();

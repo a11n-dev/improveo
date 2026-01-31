@@ -8,6 +8,8 @@ export interface Habit {
   streak?: StreakGoal;
   /** Current streak count (consecutive completions) */
   currentStreakCount: number;
+  /** Best streak count (longest consecutive completions) */
+  bestStreakCount: number;
   /** Completion map: date (YYYY-MM-DD) -> completed */
   completions: Record<string, boolean>;
 }

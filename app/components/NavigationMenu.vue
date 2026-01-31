@@ -1,5 +1,11 @@
+<script setup lang="ts">
+const { openOverlay } = useHabitCreateOverlay();
+</script>
+
 <template>
-  <div class="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 px-4">
+  <div
+    class="fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 px-4"
+  >
     <UNavigationMenu
       :items="navigationLinks"
       variant="link"
@@ -10,6 +16,15 @@
         link: 'px-2 py-1 flex items-center gap-2',
         linkLeadingIcon: 'size-4',
       }"
+    />
+
+    <UButton
+      icon="i-lucide-plus"
+      square
+      size="xl"
+      class="hidden rounded-full shadow-lg md:inline-flex"
+      aria-label="Create habit"
+      @click="openOverlay"
     />
   </div>
 </template>

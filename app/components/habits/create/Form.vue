@@ -43,12 +43,9 @@ const selectIcon = (icon: string) => {
 
     <!-- Description -->
     <UFormField label="Description" name="description">
-      <UTextarea
+      <UInput
         v-model="draft.description"
         placeholder="Optional description..."
-        :rows="2"
-        :maxrows="4"
-        autoresize
         class="w-full"
       />
     </UFormField>

@@ -28,11 +28,6 @@ export default defineAppConfig({
         variant: "subtle",
       },
     },
-    textarea: {
-      defaultVariants: {
-        variant: "subtle",
-      },
-    },
     empty: {
       slots: {
         root: "sm:p-4 lg:p-4",

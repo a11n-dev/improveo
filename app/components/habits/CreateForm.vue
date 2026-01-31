@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { habitColorPresets } from "~/utils/colors";
-import { habitIconPresets } from "~/utils/icons";
-
 const { draft, streakLabel } = useHabitDraft();
 
 /** Streak editor open state */

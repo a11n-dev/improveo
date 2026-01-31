@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { AuthMode, AuthStep } from "~/types/auth";
-import { formatCountdown } from "~/utils/format";
 
 definePageMeta({
   middleware: "auth",

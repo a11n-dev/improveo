@@ -1,5 +1,3 @@
-import type { HabitColor } from "~/utils/colors";
-
 /** Streak interval options */
 export type StreakInterval = "daily" | "weekly" | "monthly";
 

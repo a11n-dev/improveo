@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { navigationLinks } from "~/utils/links";
-</script>
-
 <template>
   <div class="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 px-4">
     <UNavigationMenu

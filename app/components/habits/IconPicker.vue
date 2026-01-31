@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { createReusableTemplate, useInfiniteScroll } from "@vueuse/core";
 
-import { lucideIconClasses } from "~/utils/icons";
-
 const isDesktop = useIsDesktop();
 const { draft } = useHabitDraft();
 

@@ -31,5 +31,5 @@ export const habitCompletions: Record<string, boolean> = {
   "2025-12-24": true,
   "2026-01-05": true,
   "2026-01-14": true,
-  "2026-01-29": true,
+  "2026-01-31": true,
 };

@@ -20,29 +20,29 @@ interface Props {
   todayOpacity?: number;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  weekStart: "mon",
-  endDate: () => new Date(),
-  daysCount: 365,
-  showLegend: true,
-  showTotals: true,
-  todayOpacity: 0.45,
-});
+const {
+  color,
+  completions,
+  weekStart = "mon",
+  endDate = new Date(),
+  daysCount = 365,
+  showLegend = true,
+  showTotals = true,
+  todayOpacity = 0.45,
+} = defineProps<Props>();
 
 /** Today's date in ISO format for comparison */
-const todayStr = computed(() => formatDate(props.endDate));
+const todayStr = computed(() => formatDate(endDate));
 
-const isTodayCompleted = computed(
-  () => props.completions[todayStr.value] ?? false,
-);
+const isTodayCompleted = computed(() => completions[todayStr.value] ?? false);
 
 /** Build grid data */
 const weeks = computed(() =>
   buildContributionGrid({
-    endDate: props.endDate,
-    daysCount: props.daysCount,
-    weekStart: props.weekStart,
-    completions: props.completions,
+    endDate,
+    daysCount,
+    weekStart,
+    completions,
   }),
 );
 
@@ -71,7 +71,7 @@ const monthLabelByWeekIndex = computed(() => {
 /** Day labels - only show Tue, Thu, Sat based on week start */
 const dayLabels = computed(() => {
   const labels = ["", "", "", "", "", "", ""];
-  if (props.weekStart === "mon") {
+  if (weekStart === "mon") {
     labels[1] = "Tue";
     labels[3] = "Thu";
     labels[5] = "Sat";
@@ -173,37 +173,12 @@ watch(containerWidth, () => {
       </div>
     </div>
 
-    <!-- Legend and totals row -->
-    <div
-      v-if="showLegend || showTotals"
-      class="flex items-center justify-between text-xs text-muted"
-    >
-      <!-- Totals (left side) -->
-      <div v-if="showTotals">{{ totalCompleted }} completed</div>
-      <div v-else />
-
-      <!-- Legend (right side) -->
-      <div v-if="showLegend" class="flex items-center gap-3">
-        <div class="flex items-center gap-1">
-          <div class="flex items-center gap-1">
-            <div class="size-3 rounded-xs bg-(--habit-color) opacity-[0.15]" />
-            <div class="size-3 rounded-xs bg-(--habit-color)" />
-          </div>
-          <span>Completion</span>
-        </div>
-
-        <div class="flex items-center gap-1">
-          <div
-            class="relative size-3 rounded-xs bg-(--habit-color)"
-            :style="isTodayCompleted ? undefined : { opacity: todayOpacity }"
-          >
-            <span
-              class="absolute left-1/2 top-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-default"
-            />
-          </div>
-          <span>Today</span>
-        </div>
-      </div>
-    </div>
+    <HabitsGraphLegend
+      :total-completed="totalCompleted"
+      :is-today-completed="isTodayCompleted"
+      :today-opacity="todayOpacity"
+      :show-legend="showLegend"
+      :show-totals="showTotals"
+    />
   </div>
 </template>

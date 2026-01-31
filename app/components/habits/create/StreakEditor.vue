@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import type { RadioGroupItem } from "@nuxt/ui";
 
-import { createReusableTemplate } from "@vueuse/core";
-
-const isDesktop = useIsDesktop();
 const { draft } = useHabitDraft();
 
 const open = defineModel<boolean>("open", { default: false });
@@ -88,89 +85,71 @@ const save = () => {
 
 const title = "Streak Goal";
 
-const [DefineBodyTemplate, ReuseBodyTemplate] = createReusableTemplate();
-const [DefineFooterTemplate, ReuseFooterTemplate] = createReusableTemplate();
+const drawerProps = {
+  nested: true,
+};
 </script>
 
 <template>
-  <!-- Define reusable body template -->
-  <DefineBodyTemplate>
-    <div class="flex flex-col gap-4">
-      <UFormField label="Interval" name="interval">
-        <URadioGroup
-          v-model="selectedInterval"
-          :items="intervalItems"
-          variant="table"
-          color="neutral"
-        />
-      </UFormField>
+  <HabitsOverlayResponsive
+    v-model:open="open"
+    :title="title"
+    :drawer-props="drawerProps"
+  >
+    <template #body>
+      <div class="flex flex-col gap-4">
+        <UFormField label="Interval" name="interval">
+          <URadioGroup
+            v-model="selectedInterval"
+            :items="intervalItems"
+            variant="table"
+            color="neutral"
+          />
+        </UFormField>
 
-      <UFormField
-        v-if="showCompletions"
-        label="Completions per interval"
-        name="completions"
-      >
-        <div class="flex items-center gap-2">
-          <div
-            class="flex h-10 flex-1 items-center justify-center rounded-md border border-default bg-muted px-3 text-sm"
-          >
-            {{ completionsCount }} / {{ periodLabel }}
+        <UFormField
+          v-if="showCompletions"
+          label="Completions per interval"
+          name="completions"
+        >
+          <div class="flex items-center gap-2">
+            <div
+              class="flex h-10 flex-1 items-center justify-center rounded-md border border-default bg-muted px-3 text-sm"
+            >
+              {{ completionsCount }} / {{ periodLabel }}
+            </div>
+            <UButton
+              icon="i-lucide-minus"
+              color="neutral"
+              variant="outline"
+              :disabled="completionsCount <= 1"
+              aria-label="Decrease"
+              @click="decrement"
+            />
+            <UButton
+              icon="i-lucide-plus"
+              color="neutral"
+              variant="outline"
+              :disabled="completionsCount >= maxCompletions"
+              aria-label="Increase"
+              @click="increment"
+            />
           </div>
-          <UButton
-            icon="i-lucide-minus"
-            color="neutral"
-            variant="outline"
-            :disabled="completionsCount <= 1"
-            aria-label="Decrease"
-            @click="decrement"
-          />
-          <UButton
-            icon="i-lucide-plus"
-            color="neutral"
-            variant="outline"
-            :disabled="completionsCount >= maxCompletions"
-            aria-label="Increase"
-            @click="increment"
-          />
-        </div>
-      </UFormField>
-    </div>
-  </DefineBodyTemplate>
-
-  <!-- Define reusable footer template -->
-  <DefineFooterTemplate>
-    <UButton
-      label="Save"
-      color="neutral"
-      block
-      class="justify-center"
-      @click="save"
-    />
-    <UButton
-      label="Cancel"
-      color="neutral"
-      variant="subtle"
-      block
-      class="justify-center"
-      @click="open = false"
-    />
-  </DefineFooterTemplate>
-
-  <UModal v-if="isDesktop" v-model:open="open" :title="title">
-    <template #body>
-      <ReuseBodyTemplate />
+        </UFormField>
+      </div>
     </template>
+
     <template #footer>
-      <ReuseFooterTemplate />
+      <div class="flex w-full flex-col gap-2">
+        <UButton label="Save" color="neutral" block @click="save" />
+        <UButton
+          label="Cancel"
+          color="neutral"
+          variant="subtle"
+          block
+          @click="open = false"
+        />
+      </div>
     </template>
-  </UModal>
-
-  <UDrawer v-else v-model:open="open" nested :title="title">
-    <template #body>
-      <ReuseBodyTemplate />
-    </template>
-    <template #footer>
-      <ReuseFooterTemplate />
-    </template>
-  </UDrawer>
+  </HabitsOverlayResponsive>
 </template>

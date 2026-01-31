@@ -7,9 +7,7 @@ interface Props {
   completed?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  completed: false,
-});
+const { habit, completed = false } = defineProps<Props>();
 
 const emit = defineEmits<{
   "update:completed": [value: boolean];
@@ -18,7 +16,7 @@ const emit = defineEmits<{
 
 /** Local checked state synced with prop */
 const isChecked = computed({
-  get: () => props.completed,
+  get: () => completed,
   set: (value: boolean) => emit("update:completed", value),
 });
 

@@ -67,7 +67,7 @@ const selectIcon = (icon: string) => {
     </UFormField>
 
     <!-- Nested streak editor -->
-    <HabitsStreakEditor v-model:open="streakEditorOpen" />
+    <HabitsCreateStreakEditor v-model:open="streakEditorOpen" />
 
     <!-- Icon -->
     <UFormField label="Icon" name="icon" required>
@@ -125,7 +125,7 @@ const selectIcon = (icon: string) => {
     </UFormField>
 
     <!-- Nested icon picker -->
-    <HabitsIconPicker v-model:open="iconPickerOpen" />
+    <HabitsCreateIconPicker v-model:open="iconPickerOpen" />
 
     <!-- Color -->
     <UFormField label="Color" name="color" required>

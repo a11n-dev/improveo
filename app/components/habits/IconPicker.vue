@@ -164,7 +164,7 @@ const [DefineFooterTemplate, ReuseFooterTemplate] = createReusableTemplate();
     v-if="isDesktop"
     v-model:open="open"
     :title="title"
-    :ui="{ footer: 'justify-end' }"
+    :ui="{ footer: 'justify-end pt-0' }"
   >
     <template #body>
       <ReuseBodyTemplate />

@@ -2,7 +2,6 @@
   <div class="min-h-screen px-6">
     <div class="flex min-h-screen items-center justify-center">
       <UEmpty
-        variant="naked"
         title="Coming soon"
         description="Analytics is on the way."
       >

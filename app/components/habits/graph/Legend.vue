@@ -1,30 +1,69 @@
 <script setup lang="ts">
 interface Props {
-  totalCompleted: number;
   isTodayCompleted: boolean;
   todayOpacity?: number;
-  showLegend?: boolean;
-  showTotals?: boolean;
+  /** Current streak count (only shown if streakInterval is set) */
+  currentStreak?: number;
+  /** Whether streak tracking is enabled */
+  hasStreak?: boolean;
+  /** Streak goal label (e.g., "Daily", "3 / week") */
+  streakGoalLabel?: string;
 }
 
 const {
-  totalCompleted,
   isTodayCompleted,
   todayOpacity = 0.45,
-  showLegend = true,
-  showTotals = true,
+  currentStreak = 0,
+  hasStreak = false,
+  streakGoalLabel = "",
 } = defineProps<Props>();
+
+const badgeStyle = {
+  backgroundColor: "color-mix(in srgb, var(--habit-color) 16%, transparent)",
+  borderColor: "color-mix(in srgb, var(--habit-color) 35%, transparent)",
+  color: "var(--habit-color)",
+};
 </script>
 
 <template>
-  <div
-    v-if="showLegend || showTotals"
-    class="flex items-center justify-between text-xs text-muted"
-  >
-    <div v-if="showTotals">{{ totalCompleted }} completed</div>
-    <div v-else />
+  <div class="flex items-center justify-between text-xs text-muted">
+    <!-- Left: Streak info (only if streak tracking is enabled) -->
+    <div v-if="hasStreak" class="flex items-center gap-1">
+      <UBadge
+        color="neutral"
+        variant="soft"
+        size="sm"
+        icon="i-lucide-flame"
+        class="border"
+        :style="badgeStyle"
+        :ui="{ leadingIcon: 'text-current' }"
+      >
+        {{ currentStreak }}
+      </UBadge>
+      <UBadge
+        color="neutral"
+        variant="soft"
+        size="sm"
+        class="border"
+        :style="badgeStyle"
+      >
+        {{ streakGoalLabel }}
+      </UBadge>
+    </div>
+    <div v-else>
+      <UBadge
+        color="neutral"
+        variant="soft"
+        size="sm"
+        class="border"
+        :style="badgeStyle"
+      >
+        No goal
+      </UBadge>
+    </div>
 
-    <div v-if="showLegend" class="flex items-center gap-3">
+    <!-- Right: Legend items -->
+    <div class="flex items-center gap-3">
       <div class="flex items-center gap-1">
         <div class="flex items-center gap-1">
           <div class="size-3 rounded-xs bg-(--habit-color) opacity-[0.15]" />

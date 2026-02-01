@@ -33,3 +33,25 @@ export const formatDateWithWeekday = (isoDate: string): string => {
 
   return `${weekday}, ${day}-${month}-${year}`;
 };
+
+/**
+ * Format streak goal for display (e.g., "Daily", "3 / week").
+ */
+export const formatStreakGoalLabel = (
+  streakInterval: StreakInterval | null,
+  streakCount: number,
+): string => {
+  if (!streakInterval) return "";
+
+  const intervalMap: Record<StreakInterval, string> = {
+    daily: "day",
+    weekly: "week",
+    monthly: "month",
+  };
+  const interval = intervalMap[streakInterval];
+
+  if (streakCount === 1 && streakInterval === "daily") {
+    return "Daily";
+  }
+  return `${streakCount} / ${interval}`;
+};

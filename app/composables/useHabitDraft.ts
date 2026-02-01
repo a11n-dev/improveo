@@ -1,6 +1,3 @@
-/** Streak interval options */
-export type StreakInterval = "daily" | "weekly" | "monthly";
-
 /** Streak goal: interval + completions per interval */
 export interface StreakGoal {
   interval: StreakInterval;
@@ -42,7 +39,7 @@ export const useHabitDraft = () => {
     const { streak } = draft.value;
 
     if (!streak) {
-      return "Set streak goal";
+      return "None";
     }
 
     switch (streak.interval) {
@@ -53,11 +50,11 @@ export const useHabitDraft = () => {
       case "monthly":
         return `${streak.count} / Month`;
       default:
-        return "Set streak goal";
+        return "None";
     }
   });
 
-  /** Check if all required fields are filled */
+  /** Check if all required fields are filled (streak is now optional) */
   const isValid = computed(() => {
     const { name, icon, color } = draft.value;
     return name.trim().length > 0 && icon !== null && color !== null;

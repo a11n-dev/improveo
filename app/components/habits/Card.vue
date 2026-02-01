@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { Habit } from "~/types/habit";
-
 interface Props {
   habit: Habit;
+  /** Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday) */
+  weekStart?: WeekStartDay;
   /** Whether the habit is completed for today */
   completed?: boolean;
 }
 
-const { habit, completed = false } = defineProps<Props>();
+const { habit, weekStart = 0, completed = false } = defineProps<Props>();
 
 const emit = defineEmits<{
   "update:completed": [value: boolean];
@@ -19,6 +19,11 @@ const isChecked = computed({
   get: () => completed,
   set: (value: boolean) => emit("update:completed", value),
 });
+
+/** Streak goal label for legend */
+const streakGoalLabel = computed(() =>
+  formatStreakGoalLabel(habit.streakInterval, habit.streakCount),
+);
 
 /** Handle card click */
 const handleInfoClick = () => {
@@ -58,8 +63,8 @@ const handleCheckboxClick = (event: Event) => {
             <span class="truncate font-medium">
               {{ habit.title }}
             </span>
-            <span v-if="habit.description" class="truncate text-sm text-muted">
-              {{ habit.description }}
+            <span class="truncate text-sm text-muted">
+              {{ habit.description || "No description" }}
             </span>
           </div>
         </div>
@@ -92,6 +97,13 @@ const handleCheckboxClick = (event: Event) => {
     </template>
 
     <!-- Body: Contribution graph -->
-    <HabitsGraph :color="habit.color" :completions="habit.completions" />
+    <HabitsGraph
+      :color="habit.color"
+      :completions="habit.completions"
+      :week-start="weekStart"
+      :current-streak="habit.currentStreak"
+      :has-streak="habit.streakInterval !== null"
+      :streak-goal-label="streakGoalLabel"
+    />
   </UCard>
 </template>

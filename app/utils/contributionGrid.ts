@@ -3,8 +3,6 @@
  * Generates days organized into weeks (7-row grid).
  */
 
-export type WeekStart = "mon" | "sun";
-
 export interface GridDay {
   /** ISO date string YYYY-MM-DD */
   date: string;
@@ -19,23 +17,19 @@ export interface ContributionGridOptions {
   endDate?: Date;
   /** Number of days to display (defaults to 365) */
   daysCount?: number;
-  /** Week start day */
-  weekStart: WeekStart;
+  /** Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday) */
+  weekStart: WeekStartDay;
   /** Completion map: date (YYYY-MM-DD) -> completed */
   completions: Record<string, boolean>;
 }
 
 /**
  * Get the day of week index (0-6) based on week start preference.
- * For Monday start: Mon=0, Tue=1, ..., Sun=6
- * For Sunday start: Sun=0, Mon=1, ..., Sat=6
+ * Returns position within the week (0 = first day of week).
  */
-function getDayIndex(date: Date, weekStart: WeekStart): number {
+function getDayIndex(date: Date, weekStart: WeekStartDay): number {
   const jsDay = date.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-  if (weekStart === "mon") {
-    return jsDay === 0 ? 6 : jsDay - 1;
-  }
-  return jsDay;
+  return (jsDay - weekStart + 7) % 7;
 }
 
 /**
@@ -158,6 +152,26 @@ export function getMonthLabels(
       }
     }
   });
+
+  return labels;
+}
+
+/**
+ * Get day labels for the graph based on week start.
+ * Labels are shown at positions 1, 3, 5 (every other day starting from second).
+ */
+export function getDayLabelsForGraph(weekStart: WeekStartDay): string[] {
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const labels: string[] = ["", "", "", "", "", "", ""];
+
+  // Fixed label positions: 1, 3, 5 (0-indexed: showing 2nd, 4th, 6th days)
+  const labelPositions = [1, 3, 5];
+
+  for (const pos of labelPositions) {
+    // Calculate which actual day of week this position represents
+    const actualDayIndex = (weekStart + pos) % 7;
+    labels[pos] = dayNames[actualDayIndex]!;
+  }
 
   return labels;
 }

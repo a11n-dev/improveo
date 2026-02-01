@@ -6,32 +6,38 @@ interface Props {
   color: string;
   /** Completion map: date (YYYY-MM-DD) -> completed */
   completions: Record<string, boolean>;
-  /** Week start day */
-  weekStart?: "mon" | "sun";
+  /** Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday) */
+  weekStart?: WeekStartDay;
   /** End date (defaults to today) */
   endDate?: Date;
   /** Number of days to display (defaults to 365) */
   daysCount?: number;
   /** Show legend below the graph */
   showLegend?: boolean;
-  /** Show totals below the graph */
-  showTotals?: boolean;
   /** Opacity for today's cell (0-1) */
   todayOpacity?: number;
   /** Show tooltips on hover */
   showTooltips?: boolean;
+  /** Current streak count (for legend display) */
+  currentStreak?: number;
+  /** Whether streak tracking is enabled */
+  hasStreak?: boolean;
+  /** Streak goal label (e.g., "Daily", "3 / week") */
+  streakGoalLabel?: string;
 }
 
 const {
   color,
   completions,
-  weekStart = "mon",
+  weekStart = 1, // Default to Monday (1)
   endDate = new Date(),
   daysCount = 365,
   showLegend = true,
-  showTotals = true,
   todayOpacity = 0.45,
   showTooltips = true,
+  currentStreak = 0,
+  hasStreak = false,
+  streakGoalLabel = "",
 } = defineProps<Props>();
 
 /** Today's date in ISO format for comparison */
@@ -48,17 +54,6 @@ const weeks = computed(() =>
     completions,
   }),
 );
-
-/** Count total completed days */
-const totalCompleted = computed(() => {
-  let count = 0;
-  for (const week of weeks.value) {
-    for (const day of week) {
-      if (day.inRange && day.completed) count++;
-    }
-  }
-  return count;
-});
 
 /** Month labels for header */
 const monthLabels = computed(() => getMonthLabels(weeks.value));
@@ -108,20 +103,8 @@ watch(
   },
 );
 
-/** Day labels - only show Tue, Thu, Sat based on week start */
-const dayLabels = computed(() => {
-  const labels = ["", "", "", "", "", "", ""];
-  if (weekStart === "mon") {
-    labels[1] = "Tue";
-    labels[3] = "Thu";
-    labels[5] = "Sat";
-  } else {
-    labels[2] = "Tue";
-    labels[4] = "Thu";
-    labels[6] = "Sat";
-  }
-  return labels;
-});
+/** Day labels based on week start */
+const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
 
 /** Scroll container ref */
 const scrollContainerRef = ref<HTMLElement | null>(null);
@@ -161,12 +144,12 @@ watch(containerWidth, () => {
       <div class="flex w-7 shrink-0 flex-col gap-1">
         <!-- Spacer for month labels row -->
         <div class="h-4" />
-        <!-- Day labels: 7 rows, each 12px with 3px gap = 7*12 + 6*3 = 102px -->
-        <div class="flex h-25.5 flex-col justify-between">
+        <!-- Day labels: 7 rows matching grid (size-3 = 12px with gap-0.75 = 3px) -->
+        <div class="grid grid-rows-7 gap-0.75">
           <span
             v-for="(label, index) in dayLabels"
             :key="index"
-            class="h-3 text-xs leading-3 text-muted"
+            class="flex h-3 items-center text-xs leading-none text-muted"
           >
             {{ label }}
           </span>
@@ -222,11 +205,12 @@ watch(containerWidth, () => {
     </div>
 
     <HabitsGraphLegend
-      :total-completed="totalCompleted"
+      v-if="showLegend"
       :is-today-completed="isTodayCompleted"
       :today-opacity="todayOpacity"
-      :show-legend="showLegend"
-      :show-totals="showTotals"
+      :current-streak="currentStreak"
+      :has-streak="hasStreak"
+      :streak-goal-label="streakGoalLabel"
     />
   </div>
 </template>

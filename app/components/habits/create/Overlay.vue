@@ -1,29 +1,59 @@
 <script setup lang="ts">
 const { isOpen, closeOverlay } = useHabitCreateOverlay();
-const { isValid } = useHabitDraft();
-
-const title = "Create Habit";
-const description = "Add a new habit to track.";
+const { draft, isValid, resetDraft } = useHabitDraft();
+const { createHabit } = useHabits();
 
 const modalProps = {
-  close: { onClick: closeOverlay },
+  close: false,
 };
 
-/** Handle create (UI only for now) */
-const handleCreate = () => {
-  if (!isValid.value) return;
-  // TODO: Actually create the habit
-  closeOverlay();
+/** Loading state for create action */
+const isCreating = ref(false);
+
+/** Handle create */
+const handleCreate = async () => {
+  if (!isValid.value || isCreating.value) return;
+
+  isCreating.value = true;
+
+  try {
+    // When streak is not set (None selected), send null for interval and 0 for count
+    const hasStreak = draft.value.streak !== null;
+
+    const payload: HabitCreatePayload = {
+      title: draft.value.name,
+      description: draft.value.description || undefined,
+      icon: draft.value.icon!,
+      color: draft.value.color!,
+      streakInterval: hasStreak ? draft.value.streak!.interval : null,
+      streakCount: hasStreak ? draft.value.streak!.count : 0,
+    };
+
+    const created = await createHabit(payload);
+
+    if (created) {
+      resetDraft();
+      closeOverlay();
+    }
+  } finally {
+    isCreating.value = false;
+  }
 };
+
+/** Reset draft when overlay closes */
+watch(isOpen, (open) => {
+  if (!open) {
+    resetDraft();
+  }
+});
 </script>
 
 <template>
-  <HabitsOverlayResponsive
-    v-model:open="isOpen"
-    :title="title"
-    :description="description"
-    :modal-props="modalProps"
-  >
+  <HabitsOverlayResponsive v-model:open="isOpen" :modal-props="modalProps">
+    <template #header>
+      <HabitsCreateHeader @close="closeOverlay" />
+    </template>
+
     <template #body>
       <HabitsCreateForm />
     </template>
@@ -35,6 +65,7 @@ const handleCreate = () => {
           color="primary"
           block
           :disabled="!isValid"
+          :loading="isCreating"
           @click="handleCreate"
         />
         <UButton
@@ -42,6 +73,7 @@ const handleCreate = () => {
           color="neutral"
           variant="subtle"
           block
+          :disabled="isCreating"
           @click="closeOverlay"
         />
       </div>

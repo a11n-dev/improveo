@@ -14,6 +14,86 @@ export type Database = {
   };
   public: {
     Tables: {
+      completions: {
+        Row: {
+          completed_on: string;
+          created_at: string | null;
+          habit_id: string;
+          id: string;
+          user_id: string;
+        };
+        Insert: {
+          completed_on: string;
+          created_at?: string | null;
+          habit_id: string;
+          id?: string;
+          user_id?: string;
+        };
+        Update: {
+          completed_on?: string;
+          created_at?: string | null;
+          habit_id?: string;
+          id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "completions_habit_id_fkey";
+            columns: ["habit_id"];
+            isOneToOne: false;
+            referencedRelation: "habits";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      habits: {
+        Row: {
+          best_streak: number;
+          color: string;
+          created_at: string | null;
+          current_streak: number;
+          description: string | null;
+          icon: string;
+          id: string;
+          last_completed_on: string | null;
+          streak_count: number;
+          streak_interval: string | null;
+          title: string;
+          updated_at: string | null;
+          user_id: string;
+        };
+        Insert: {
+          best_streak?: number;
+          color: string;
+          created_at?: string | null;
+          current_streak?: number;
+          description?: string | null;
+          icon: string;
+          id?: string;
+          last_completed_on?: string | null;
+          streak_count: number;
+          streak_interval?: string | null;
+          title: string;
+          updated_at?: string | null;
+          user_id?: string;
+        };
+        Update: {
+          best_streak?: number;
+          color?: string;
+          created_at?: string | null;
+          current_streak?: number;
+          description?: string | null;
+          icon?: string;
+          id?: string;
+          last_completed_on?: string | null;
+          streak_count?: number;
+          streak_interval?: string | null;
+          title?: string;
+          updated_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           created_at: string;
@@ -21,6 +101,7 @@ export type Database = {
           id: string;
           name: string | null;
           updated_at: string;
+          week_start: number;
         };
         Insert: {
           created_at?: string;
@@ -28,6 +109,7 @@ export type Database = {
           id: string;
           name?: string | null;
           updated_at?: string;
+          week_start?: number;
         };
         Update: {
           created_at?: string;
@@ -35,6 +117,7 @@ export type Database = {
           id?: string;
           name?: string | null;
           updated_at?: string;
+          week_start?: number;
         };
         Relationships: [];
       };

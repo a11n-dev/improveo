@@ -76,7 +76,7 @@ const save = () => {
     draft.value.streak = null;
   } else {
     draft.value.streak = {
-      interval: selectedInterval.value as "daily" | "weekly" | "monthly",
+      interval: selectedInterval.value as StreakInterval,
       count: selectedInterval.value === "daily" ? 1 : completionsCount.value,
     };
   }
@@ -114,14 +114,14 @@ const drawerProps = {
         >
           <div class="flex items-center gap-2">
             <div
-              class="flex h-10 flex-1 items-center justify-center rounded-md border border-default bg-muted px-3 text-sm"
+              class="flex h-10 flex-1 items-center rounded-md border border-muted bg-muted/50 px-3 text-sm text-muted"
             >
               {{ completionsCount }} / {{ periodLabel }}
             </div>
             <UButton
               icon="i-lucide-minus"
               color="neutral"
-              variant="outline"
+              variant="subtle"
               :disabled="completionsCount <= 1"
               aria-label="Decrease"
               @click="decrement"
@@ -129,7 +129,7 @@ const drawerProps = {
             <UButton
               icon="i-lucide-plus"
               color="neutral"
-              variant="outline"
+              variant="subtle"
               :disabled="completionsCount >= maxCompletions"
               aria-label="Increase"
               @click="increment"

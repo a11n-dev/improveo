@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import type { Habit } from "~/types/habit";
-
 interface Props {
   habit: Habit;
+  /** Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday) */
+  weekStart?: WeekStartDay;
+  /** Whether deletion is in progress */
+  isDeleting?: boolean;
 }
 
-const { habit } = defineProps<Props>();
+const { habit, weekStart = 1, isDeleting = false } = defineProps<Props>();
 
 const emit = defineEmits<{
   "toggle-date": [date: string];
   edit: [];
+  delete: [];
 }>();
 
 const open = defineModel<boolean>("open", { default: false });
@@ -19,9 +22,32 @@ const modalProps = {
   ui: { footer: "flex-col gap-2" },
 };
 
+/** Streak goal label for legend */
+const streakGoalLabel = computed(() =>
+  formatStreakGoalLabel(habit.streakInterval, habit.streakCount),
+);
+
+/** Delete confirmation state */
+const showDeleteConfirm = ref(false);
+
 /** Handle edit button click */
 const handleEdit = () => {
   emit("edit");
+};
+
+/** Handle delete button click */
+const handleDelete = () => {
+  showDeleteConfirm.value = true;
+};
+
+/** Confirm delete */
+const confirmDelete = () => {
+  emit("delete");
+};
+
+/** Cancel delete */
+const cancelDelete = () => {
+  showDeleteConfirm.value = false;
 };
 
 /** Close overlay */
@@ -48,14 +74,16 @@ const handleClose = () => {
         <HabitsGraph
           :color="habit.color"
           :completions="habit.completions"
+          :week-start="weekStart"
           :show-legend="true"
-          :show-totals="true"
+          :current-streak="habit.currentStreak"
+          :has-streak="habit.streakInterval !== null"
+          :streak-goal-label="streakGoalLabel"
         />
-
-        <HabitsInfoSummary :habit="habit" />
 
         <HabitsInfoCalendar
           :habit="habit"
+          :week-start="weekStart"
           :open="open"
           @toggle-date="emit('toggle-date', $event)"
         />
@@ -63,22 +91,59 @@ const handleClose = () => {
     </template>
 
     <template #footer>
-      <UButton
-        label="Edit"
-        color="neutral"
-        variant="outline"
-        block
-        class="justify-center"
-        @click="handleEdit"
-      />
-      <UButton
-        label="Close"
-        color="neutral"
-        variant="subtle"
-        block
-        class="justify-center"
-        @click="handleClose"
-      />
+      <!-- Delete confirmation -->
+      <template v-if="showDeleteConfirm">
+        <p class="mb-2 text-center text-sm text-muted">
+          Are you sure you want to delete "{{ habit.title }}"? <br />
+          This action cannot be undone.
+        </p>
+        <UButton
+          label="Delete Habit"
+          color="error"
+          block
+          class="justify-center"
+          :loading="isDeleting"
+          :disabled="isDeleting"
+          @click="confirmDelete"
+        />
+        <UButton
+          label="Cancel"
+          color="neutral"
+          variant="subtle"
+          block
+          class="justify-center"
+          :disabled="isDeleting"
+          @click="cancelDelete"
+        />
+      </template>
+
+      <!-- Normal actions -->
+      <template v-else>
+        <UButton
+          label="Edit"
+          color="neutral"
+          variant="outline"
+          block
+          class="justify-center"
+          @click="handleEdit"
+        />
+        <UButton
+          label="Delete"
+          color="error"
+          variant="subtle"
+          block
+          class="justify-center"
+          @click="handleDelete"
+        />
+        <UButton
+          label="Close"
+          color="neutral"
+          variant="subtle"
+          block
+          class="justify-center"
+          @click="handleClose"
+        />
+      </template>
     </template>
   </HabitsOverlayResponsive>
 </template>

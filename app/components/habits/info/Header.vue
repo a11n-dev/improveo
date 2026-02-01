@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { Habit } from "~/types/habit";
-
 interface Props {
   habit: Habit;
 }

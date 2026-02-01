@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { DateValue } from "@internationalized/date";
-import type { Habit } from "~/types/habit";
 
 import {
   CalendarDate,
@@ -10,10 +9,12 @@ import {
 
 interface Props {
   habit: Habit;
+  /** Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday) */
+  weekStart?: WeekStartDay;
   open?: boolean;
 }
 
-const { habit, open = true } = defineProps<Props>();
+const { habit, weekStart = 1, open = true } = defineProps<Props>();
 
 const emit = defineEmits<{
   "toggle-date": [date: string];
@@ -144,7 +145,7 @@ const monthYearLabel = computed(() => {
       multiple
       :month-controls="false"
       :year-controls="false"
-      :week-starts-on="1"
+      :week-starts-on="weekStart"
       :max-value="todayDate"
       :is-date-disabled="isDateDisabled"
       :ui="{
@@ -166,10 +167,14 @@ const monthYearLabel = computed(() => {
       class="w-full"
       @update:model-value="
         (v: unknown) => {
-          if (Array.isArray(v))
+          if (Array.isArray(v)) {
             localSelectedDates = v.map(
               (d: DateValue) => new CalendarDate(d.year, d.month, d.day),
             );
+          } else if (v === undefined || v === null) {
+            // Handle unchecking the last date - calendar may return undefined/null
+            localSelectedDates = [];
+          }
         }
       "
       @update:placeholder="

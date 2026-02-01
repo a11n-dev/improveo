@@ -21,13 +21,29 @@ const scrollContainerRef = ref<HTMLElement | null>(null);
 /** Whether there are more icons to load */
 const canLoadMore = ref(true);
 
+/** Loaded icon list (lazy) */
+const iconClasses = ref<string[]>([]);
+const isLoadingIcons = ref(false);
+
+const loadIconsIfNeeded = async () => {
+  if (iconClasses.value.length > 0 || isLoadingIcons.value) {
+    return;
+  }
+  isLoadingIcons.value = true;
+  try {
+    iconClasses.value = await loadLucideIconClasses();
+  } finally {
+    isLoadingIcons.value = false;
+  }
+};
+
 /** All filtered icons (based on search) */
 const allFilteredIcons = computed(() => {
   if (!iconSearch.value.trim()) {
-    return lucideIconClasses;
+    return iconClasses.value;
   }
   const search = iconSearch.value.toLowerCase();
-  return lucideIconClasses.filter((icon) =>
+  return iconClasses.value.filter((icon) =>
     icon.toLowerCase().includes(search),
   );
 });
@@ -62,8 +78,9 @@ const selectIcon = (icon: string) => {
 };
 
 /** Reset state when opening or search changes */
-watch(open, (isOpen) => {
+watch(open, async (isOpen) => {
   if (isOpen) {
+    await loadIconsIfNeeded();
     iconSearch.value = "";
     loadedCount.value = BATCH_SIZE;
     canLoadMore.value = true;
@@ -127,15 +144,12 @@ const drawerProps = {
             />
           </div>
 
-          <p
-            v-if="canLoadMore && displayedIcons.length > 0"
-            class="py-4 text-center text-xs text-muted"
-          >
-            Scroll for more...
+          <p v-if="isLoadingIcons" class="py-8 text-center text-sm text-muted">
+            Loading icons...
           </p>
 
           <p
-            v-if="displayedIcons.length === 0"
+            v-else-if="displayedIcons.length === 0"
             class="py-8 text-center text-sm text-muted"
           >
             No icons found

@@ -1,13 +1,3 @@
-import { icons } from "@iconify-json/lucide";
-
-/**
- * List of Lucide icon class names for use with Nuxt UI / UnoCSS.
- * Format: `i-lucide-{icon-name}`
- */
-export const lucideIconClasses = Object.keys(icons.icons).map(
-  (name) => `i-lucide-${name}`,
-);
-
 /**
  * Preset habit icons for quick selection.
  * 24 common icons for habits like fitness, learning, wellness, etc.
@@ -38,3 +28,11 @@ export const habitIconPresets = [
   "i-lucide-languages", // language learning
   "i-lucide-palette", // creative/art
 ] as const;
+
+/**
+ * Lazy-load the full Lucide icon class list for the icon picker.
+ */
+export const loadLucideIconClasses = async (): Promise<string[]> => {
+  const { icons } = await import("@iconify-json/lucide");
+  return Object.keys(icons.icons).map((name) => `i-lucide-${name}`);
+};

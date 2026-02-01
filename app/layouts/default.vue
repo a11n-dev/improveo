@@ -3,6 +3,6 @@
     <slot />
     <NavigationMenu />
     <HabitsCreateFab />
-    <HabitsCreateOverlay />
+    <LazyHabitsCreateOverlay />
   </div>
 </template>

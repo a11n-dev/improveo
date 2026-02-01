@@ -18,6 +18,8 @@ interface Props {
   showTotals?: boolean;
   /** Opacity for today's cell (0-1) */
   todayOpacity?: number;
+  /** Show tooltips on hover */
+  showTooltips?: boolean;
 }
 
 const {
@@ -29,6 +31,7 @@ const {
   showLegend = true,
   showTotals = true,
   todayOpacity = 0.45,
+  showTooltips = true,
 } = defineProps<Props>();
 
 /** Today's date in ISO format for comparison */
@@ -67,6 +70,43 @@ const monthLabelByWeekIndex = computed(() => {
   }
   return map;
 });
+
+const tooltipOpen = ref(false);
+const tooltipAnchor = ref<HTMLElement>();
+const tooltipText = ref("");
+
+const handleCellEnter = (event: MouseEvent, date: string) => {
+  if (!showTooltips) {
+    return;
+  }
+  const formatted = formatDateWithWeekday(date);
+  if (tooltipOpen.value && tooltipText.value === formatted) {
+    tooltipAnchor.value = event.currentTarget as HTMLElement;
+    return;
+  }
+  tooltipAnchor.value = event.currentTarget as HTMLElement;
+  tooltipText.value = formatted;
+  tooltipOpen.value = true;
+};
+
+const handleCellLeave = () => {
+  tooltipOpen.value = false;
+};
+
+const handleGraphScroll = () => {
+  tooltipOpen.value = false;
+  tooltipAnchor.value = undefined;
+};
+
+watch(
+  () => showTooltips,
+  (enabled) => {
+    if (!enabled) {
+      tooltipOpen.value = false;
+      tooltipAnchor.value = undefined;
+    }
+  },
+);
 
 /** Day labels - only show Tue, Thu, Sat based on week start */
 const dayLabels = computed(() => {
@@ -107,6 +147,14 @@ watch(containerWidth, () => {
 
 <template>
   <div class="flex w-full flex-col gap-2" :style="{ '--habit-color': color }">
+    <UTooltip
+      v-if="showTooltips"
+      :open="tooltipOpen"
+      :reference="tooltipAnchor"
+      :text="tooltipText"
+      :delay-duration="0"
+      :content="{ side: 'top' }"
+    />
     <!-- Graph area -->
     <div class="flex w-full gap-1">
       <!-- Fixed day labels column (pinned Y-axis) -->
@@ -129,6 +177,7 @@ watch(containerWidth, () => {
       <div
         ref="scrollContainerRef"
         class="no-scrollbar min-w-0 flex-1 overflow-x-auto overflow-y-hidden"
+        @scroll="handleGraphScroll"
       >
         <div class="inline-flex flex-col gap-1">
           <!-- Month labels row -->
@@ -143,30 +192,29 @@ watch(containerWidth, () => {
           </div>
 
           <!-- Grid of cells -->
-          <div class="grid grid-flow-col grid-rows-7 gap-0.75">
+          <div
+            class="grid grid-flow-col grid-rows-7 gap-0.75"
+            v-memo="[weeks, todayOpacity]"
+          >
             <template v-for="(week, weekIndex) in weeks" :key="weekIndex">
-              <UTooltip
+              <div
                 v-for="day in week"
                 :key="day.date"
-                :text="formatDateWithWeekday(day.date)"
-                :delay-duration="0"
-                :content="{ side: 'top' }"
+                class="relative size-3 rounded-xs bg-(--habit-color)"
+                :class="day.inRange && day.completed ? '' : 'opacity-[0.15]'"
+                :style="
+                  day.date === todayStr && !day.completed
+                    ? { opacity: todayOpacity }
+                    : undefined
+                "
+                @mouseenter="handleCellEnter($event, day.date)"
+                @mouseleave="handleCellLeave"
               >
-                <div
-                  class="relative size-3 rounded-xs bg-(--habit-color)"
-                  :class="day.inRange && day.completed ? '' : 'opacity-[0.15]'"
-                  :style="
-                    day.date === todayStr && !day.completed
-                      ? { opacity: todayOpacity }
-                      : undefined
-                  "
-                >
-                  <span
-                    v-if="day.date === todayStr"
-                    class="absolute left-1/2 top-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-default"
-                  />
-                </div>
-              </UTooltip>
+                <span
+                  v-if="day.date === todayStr"
+                  class="absolute left-1/2 top-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-default"
+                />
+              </div>
             </template>
           </div>
         </div>

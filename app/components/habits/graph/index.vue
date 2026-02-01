@@ -143,7 +143,7 @@ watch(containerWidth, () => {
       <!-- Fixed day labels column (pinned Y-axis) -->
       <div class="flex w-7 shrink-0 flex-col gap-1">
         <!-- Spacer for month labels row -->
-        <div class="h-4" />
+        <div class="h-5.25" />
         <!-- Day labels: 7 rows matching grid (size-3 = 12px with gap-0.75 = 3px) -->
         <div class="grid grid-rows-7 gap-0.75">
           <span

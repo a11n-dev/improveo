@@ -6,6 +6,15 @@
 import type { WeekStartDay } from "../types/habit";
 
 /**
+ * Convert ISO week start (Mon=0..Sun=6) to JS Date.getDay() index (Sun=0..Sat=6).
+ */
+export function toJsWeekStart(
+  weekStart: WeekStartDay,
+): 0 | 1 | 2 | 3 | 4 | 5 | 6 {
+  return ((weekStart + 1) % 7) as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+}
+
+/**
  * Get the day of week index (0-6) based on week start preference.
  * Returns position within the week (0 = first day of week, 6 = last day).
  *
@@ -18,8 +27,9 @@ export function getDayIndexForWeekStart(
   weekStart: WeekStartDay,
 ): number {
   const jsDay = date.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  const jsWeekStart = toJsWeekStart(weekStart);
   // Shift the day relative to week start
-  return (jsDay - weekStart + 7) % 7;
+  return (jsDay - jsWeekStart + 7) % 7;
 }
 
 /**
@@ -122,19 +132,20 @@ export function parseISODateString(dateStr: string): Date {
  * Get day labels for the contribution graph based on week start.
  * Returns labels for positions 2, 4, 6 (Tue, Thu, Sat or relative equivalents).
  *
- * @param weekStart - Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+ * @param weekStart - Week start day (0 = Monday, 1 = Tuesday, ..., 6 = Sunday) - ISO 8601
  * @returns Array of 7 labels (empty strings for unlabeled positions)
  */
 export function getDayLabels(weekStart: WeekStartDay): string[] {
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const labels: string[] = ["", "", "", "", "", "", ""];
+  const jsWeekStart = toJsWeekStart(weekStart);
 
   // Fixed label positions: 1, 3, 5 (0-indexed: showing 2nd, 4th, 6th days)
   const labelPositions = [1, 3, 5];
 
   for (const pos of labelPositions) {
     // Calculate which actual day of week this position represents
-    const actualDayIndex = (weekStart + pos) % 7;
+    const actualDayIndex = (jsWeekStart + pos) % 7;
     labels[pos] = dayNames[actualDayIndex]!;
   }
 
@@ -142,8 +153,8 @@ export function getDayLabels(weekStart: WeekStartDay): string[] {
 }
 
 /**
- * Convert weekStart number to the format used by date-fns and calendar components.
- * Both use 0=Sunday convention, so this is a passthrough with type safety.
+ * Convert ISO week start to the format used by date-fns and calendar components.
+ * They use 0=Sunday convention.
  *
  * @param weekStart - Week start day from DB/DTO
  * @returns Week start for calendar components
@@ -151,5 +162,5 @@ export function getDayLabels(weekStart: WeekStartDay): string[] {
 export function toCalendarWeekStart(
   weekStart: WeekStartDay,
 ): 0 | 1 | 2 | 3 | 4 | 5 | 6 {
-  return weekStart;
+  return toJsWeekStart(weekStart);
 }

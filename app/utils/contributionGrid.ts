@@ -3,6 +3,8 @@
  * Generates days organized into weeks (7-row grid).
  */
 
+import { toJsWeekStart } from "~~/shared/utils/weekStart";
+
 export interface GridDay {
   /** ISO date string YYYY-MM-DD */
   date: string;
@@ -25,7 +27,8 @@ export interface ContributionGridOptions {
  */
 function getDayIndex(date: Date, weekStart: WeekStartDay): number {
   const jsDay = date.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-  return (jsDay - weekStart + 7) % 7;
+  const jsWeekStart = toJsWeekStart(weekStart);
+  return (jsDay - jsWeekStart + 7) % 7;
 }
 
 /**
@@ -170,13 +173,14 @@ export function getMonthLabels(
 export function getDayLabelsForGraph(weekStart: WeekStartDay): string[] {
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const labels: string[] = ["", "", "", "", "", "", ""];
+  const jsWeekStart = toJsWeekStart(weekStart);
 
   // Fixed label positions: 1, 3, 5 (0-indexed: showing 2nd, 4th, 6th days)
   const labelPositions = [1, 3, 5];
 
   for (const pos of labelPositions) {
     // Calculate which actual day of week this position represents
-    const actualDayIndex = (weekStart + pos) % 7;
+    const actualDayIndex = (jsWeekStart + pos) % 7;
     labels[pos] = dayNames[actualDayIndex]!;
   }
 

@@ -7,6 +7,8 @@ import {
   today as getToday,
 } from "@internationalized/date";
 
+import { toCalendarWeekStart } from "~~/shared/utils/weekStart";
+
 interface Props {
   habit: Habit;
   weekStart?: WeekStartDay;
@@ -155,7 +157,7 @@ const monthYearLabel = computed(() => {
       multiple
       :month-controls="false"
       :year-controls="false"
-      :week-starts-on="weekStart"
+      :week-starts-on="toCalendarWeekStart(weekStart)"
       :max-value="todayDate"
       :is-date-disabled="isDateDisabled"
       :ui="{

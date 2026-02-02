@@ -8,7 +8,7 @@ export interface UseProfileReturn {
   pending: Ref<boolean>;
   /** Error message if fetch/update failed. */
   error: Ref<string | null>;
-  /** Update the week start preference (0 = Sunday, 6 = Saturday). */
+  /** Update the week start preference (0 = Monday, 6 = Sunday). */
   updateWeekStart: (value: number) => Promise<boolean>;
   /** Refresh profile data from the database. */
   refresh: () => Promise<void>;

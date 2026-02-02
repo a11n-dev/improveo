@@ -33,8 +33,8 @@ export default defineAppConfig({
         root: "sm:p-4 lg:p-4",
       },
       defaultVariants: {
-        variant: "naked"
-      }
+        variant: "naked",
+      },
     },
   },
 });

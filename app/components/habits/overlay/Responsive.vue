@@ -18,39 +18,41 @@ const isDesktop = useIsDesktop();
 </script>
 
 <template>
-  <UModal
-    v-if="isDesktop"
-    v-model:open="open"
-    :title="title"
-    :description="description"
-    v-bind="modalProps"
-  >
-    <template v-if="$slots.header" #header>
-      <slot name="header" />
-    </template>
-    <template #body>
-      <slot name="body" />
-    </template>
-    <template v-if="$slots.footer" #footer>
-      <slot name="footer" />
-    </template>
-  </UModal>
+  <ClientOnly>
+    <UModal
+      v-if="isDesktop"
+      v-model:open="open"
+      :title="title"
+      :description="description"
+      v-bind="modalProps"
+    >
+      <template v-if="$slots.header" #header>
+        <slot name="header" />
+      </template>
+      <template #body>
+        <slot name="body" />
+      </template>
+      <template v-if="$slots.footer" #footer>
+        <slot name="footer" />
+      </template>
+    </UModal>
 
-  <UDrawer
-    v-else
-    v-model:open="open"
-    :title="title"
-    :description="description"
-    v-bind="drawerProps"
-  >
-    <template v-if="$slots.header" #header>
-      <slot name="header" />
-    </template>
-    <template #body>
-      <slot name="body" />
-    </template>
-    <template v-if="$slots.footer" #footer>
-      <slot name="footer" />
-    </template>
-  </UDrawer>
+    <UDrawer
+      v-else
+      v-model:open="open"
+      :title="title"
+      :description="description"
+      v-bind="drawerProps"
+    >
+      <template v-if="$slots.header" #header>
+        <slot name="header" />
+      </template>
+      <template #body>
+        <slot name="body" />
+      </template>
+      <template v-if="$slots.footer" #footer>
+        <slot name="footer" />
+      </template>
+    </UDrawer>
+  </ClientOnly>
 </template>

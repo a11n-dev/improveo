@@ -68,9 +68,14 @@ const handleEdit = () => {
 
 <template>
   <UContainer class="py-8">
+    <!-- Loading state -->
+    <div v-if="pending" class="fixed inset-0 flex items-center justify-center">
+      <LoadingState />
+    </div>
+
     <!-- Empty state -->
     <div
-      v-if="habits.length === 0"
+      v-else-if="habits.length === 0"
       class="fixed inset-0 flex items-center justify-center"
     >
       <UEmpty

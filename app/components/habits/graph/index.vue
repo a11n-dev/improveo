@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useElementSize } from "@vueuse/core";
-
 interface Props {
   /** Hex color for completed days */
   color: string;
@@ -105,27 +103,6 @@ watch(
 
 /** Day labels based on week start */
 const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
-
-/** Scroll container ref */
-const scrollContainerRef = ref<HTMLElement | null>(null);
-
-/** Track container size for responsive behavior */
-const { width: containerWidth } = useElementSize(scrollContainerRef);
-
-/** Scroll to right (current month) on mount and when container resizes */
-const scrollToEnd = () => {
-  if (scrollContainerRef.value) {
-    scrollContainerRef.value.scrollLeft = scrollContainerRef.value.scrollWidth;
-  }
-};
-
-onMounted(() => {
-  nextTick(scrollToEnd);
-});
-
-watch(containerWidth, () => {
-  nextTick(scrollToEnd);
-});
 </script>
 
 <template>
@@ -158,11 +135,10 @@ watch(containerWidth, () => {
 
       <!-- Scrollable area (month labels + grid) -->
       <div
-        ref="scrollContainerRef"
-        class="no-scrollbar min-w-0 flex-1 overflow-x-auto overflow-y-hidden"
+        class="no-scrollbar min-w-0 flex-1 overflow-x-auto overflow-y-hidden [direction:rtl]"
         @scroll="handleGraphScroll"
       >
-        <div class="inline-flex flex-col gap-1">
+        <div class="inline-flex flex-col gap-1 [direction:ltr]">
           <!-- Month labels row -->
           <div class="flex gap-0.75">
             <span

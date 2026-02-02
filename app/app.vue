@@ -1,6 +1,15 @@
 <script setup lang="ts">
+const isMounted = ref(false);
+const isDesktop = useIsDesktop();
+
+onMounted(() => {
+  isMounted.value = true;
+});
+
 const toasterConfig = computed(() => {
-  if (!useIsDesktop().value) {
+  const shouldUseDesktop = isMounted.value && isDesktop.value;
+
+  if (!shouldUseDesktop) {
     return {
       position: "bottom-center" as const,
       expand: false,
@@ -9,7 +18,6 @@ const toasterConfig = computed(() => {
     };
   }
 
-  // Desktop: top-right instead of bottom-center
   return {
     position: "bottom-right" as const,
     expand: true,

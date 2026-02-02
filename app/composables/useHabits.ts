@@ -11,7 +11,10 @@ export const useHabits = () => {
   // Main data fetcher
   const { data, status, error, refresh } = useAsyncData<HabitsListResponse>(
     HABITS_KEY,
-    () => $fetch<HabitsListResponse>("/api/habits"),
+    () =>
+      $fetch<HabitsListResponse>("/api/habits", {
+        headers: useRequestHeaders(["cookie"]),
+      }),
     {
       default: () => ({ habits: [], weekStart: 0 as WeekStartDay }),
     },

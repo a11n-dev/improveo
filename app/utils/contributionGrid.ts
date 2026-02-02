@@ -13,13 +13,9 @@ export interface GridDay {
 }
 
 export interface ContributionGridOptions {
-  /** End date of the range (defaults to today) */
   endDate?: Date;
-  /** Number of days to display (defaults to 365) */
   daysCount?: number;
-  /** Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday) */
   weekStart: WeekStartDay;
-  /** Completion map: date (YYYY-MM-DD) -> completed */
   completions: Record<string, boolean>;
 }
 

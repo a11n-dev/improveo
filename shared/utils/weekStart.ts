@@ -10,7 +10,7 @@ import type { WeekStartDay } from "../types/habit";
  * Returns position within the week (0 = first day of week, 6 = last day).
  *
  * @param date - The date to get the day index for
- * @param weekStart - Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+ * @param weekStart - Week start day (0 = Monday, 1 = Tuesday, ..., 6 = Sunday) - ISO 8601
  * @returns Day index within the week (0-6)
  */
 export function getDayIndexForWeekStart(
@@ -26,7 +26,7 @@ export function getDayIndexForWeekStart(
  * Get the start of the week for a given date.
  *
  * @param date - The date to get the week start for
- * @param weekStart - Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+ * @param weekStart - Week start day (0 = Monday, 1 = Tuesday, ..., 6 = Sunday) - ISO 8601
  * @returns Date object set to the start of the week (00:00:00)
  */
 export function getWeekStartDate(date: Date, weekStart: WeekStartDay): Date {
@@ -41,7 +41,7 @@ export function getWeekStartDate(date: Date, weekStart: WeekStartDay): Date {
  * Get the end of the week for a given date.
  *
  * @param date - The date to get the week end for
- * @param weekStart - Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+ * @param weekStart - Week start day (0 = Monday, 1 = Tuesday, ..., 6 = Sunday) - ISO 8601
  * @returns Date object set to the end of the week (23:59:59.999)
  */
 export function getWeekEndDate(date: Date, weekStart: WeekStartDay): Date {
@@ -57,7 +57,7 @@ export function getWeekEndDate(date: Date, weekStart: WeekStartDay): Date {
  * Format: YYYY-WW where WW is calculated based on weekStart.
  *
  * @param date - The date to get the week key for
- * @param weekStart - Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+ * @param weekStart - Week start day (0 = Monday, 1 = Tuesday, ..., 6 = Sunday) - ISO 8601
  * @returns Week key string (e.g., "2025-01" for first week of 2025)
  */
 export function getWeekKey(date: Date, weekStart: WeekStartDay): string {

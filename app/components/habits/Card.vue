@@ -1,9 +1,7 @@
 <script setup lang="ts">
 interface Props {
   habit: Habit;
-  /** Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday) */
   weekStart?: WeekStartDay;
-  /** Whether the habit is completed for today */
   completed?: boolean;
 }
 

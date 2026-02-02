@@ -1,13 +1,11 @@
 <script setup lang="ts">
 interface Props {
   habit: Habit;
-  /** Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday) */
   weekStart?: WeekStartDay;
-  /** Whether deletion is in progress */
   isDeleting?: boolean;
 }
 
-const { habit, weekStart = 1, isDeleting = false } = defineProps<Props>();
+const { habit, weekStart = 0, isDeleting = false } = defineProps<Props>();
 
 const emit = defineEmits<{
   "toggle-date": [date: string];

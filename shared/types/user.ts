@@ -14,7 +14,7 @@ export interface Profile {
   email: string;
   /** Display name (null if not set) */
   name: string | null;
-  /** Week start day: 0 = Sunday, 1 = Monday, ..., 6 = Saturday */
+  /** Week start day: 0 = Monday, 1 = Tuesday, ..., 6 = Sunday - ISO 8601 standard */
   weekStart: number;
   /** Account creation timestamp */
   createdAt: string;

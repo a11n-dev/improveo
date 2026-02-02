@@ -1,10 +1,7 @@
 <script setup lang="ts">
 interface Props {
-  /** Hex color for completed days */
   color: string;
-  /** Completion map: date (YYYY-MM-DD) -> completed */
   completions: Record<string, boolean>;
-  /** Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday) */
   weekStart?: WeekStartDay;
   /** End date (defaults to today) */
   endDate?: Date;
@@ -27,7 +24,7 @@ interface Props {
 const {
   color,
   completions,
-  weekStart = 1, // Default to Monday (1)
+  weekStart = 0,
   endDate = new Date(),
   daysCount = 365,
   showLegend = true,

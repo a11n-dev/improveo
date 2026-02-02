@@ -84,12 +84,6 @@ export const useProfile = (): UseProfileReturn => {
     }
   };
 
-  /**
-   * Updates the week_start preference in the database.
-   *
-   * @param value - Week start day (0 = Sunday, 6 = Saturday).
-   * @returns True if update succeeded, false otherwise.
-   */
   const updateWeekStart = async (value: number): Promise<boolean> => {
     if (!profile.value) {
       notifyError("Update failed", "Profile not loaded");
@@ -97,10 +91,7 @@ export const useProfile = (): UseProfileReturn => {
     }
 
     if (value < 0 || value > 6) {
-      notifyError(
-        "Invalid value",
-        "Week start must be between 0 (Sunday) and 6 (Saturday)",
-      );
+      notifyError("Invalid value", "Week start must be between 0 and 6");
       return false;
     }
 
@@ -114,12 +105,8 @@ export const useProfile = (): UseProfileReturn => {
       return false;
     }
 
-    // Optimistically update local state
     profile.value.weekStart = value;
-
-    // Refresh habits data to reflect new weekStart in graphs
     await refreshNuxtData("habits");
-
     return true;
   };
 

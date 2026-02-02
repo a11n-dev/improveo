@@ -6,7 +6,7 @@
 /** Streak interval options for habits with streak tracking */
 export type StreakInterval = "daily" | "weekly" | "monthly";
 
-/** Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday) */
+/** Week start day (0 = Monday, 1 = Tuesday, ..., 6 = Sunday) - ISO 8601 standard */
 export type WeekStartDay = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 /**

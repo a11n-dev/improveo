@@ -46,38 +46,6 @@ export type Database = {
           },
         ];
       };
-      completions_log: {
-        Row: {
-          completed_on: string;
-          created_at: string | null;
-          habit_id: string;
-          id: string;
-          user_id: string;
-        };
-        Insert: {
-          completed_on: string;
-          created_at?: string | null;
-          habit_id: string;
-          id?: string;
-          user_id?: string;
-        };
-        Update: {
-          completed_on?: string;
-          created_at?: string | null;
-          habit_id?: string;
-          id?: string;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "completions_habit_id_fkey";
-            columns: ["habit_id"];
-            isOneToOne: false;
-            referencedRelation: "habits";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       habits: {
         Row: {
           best_streak: number;

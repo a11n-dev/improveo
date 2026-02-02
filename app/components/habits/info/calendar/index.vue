@@ -9,12 +9,11 @@ import {
 
 interface Props {
   habit: Habit;
-  /** Week start day (0 = Sunday, 1 = Monday, ..., 6 = Saturday) */
   weekStart?: WeekStartDay;
   open?: boolean;
 }
 
-const { habit, weekStart = 1, open = true } = defineProps<Props>();
+const { habit, weekStart = 0, open = true } = defineProps<Props>();
 
 const emit = defineEmits<{
   "toggle-date": [date: string];

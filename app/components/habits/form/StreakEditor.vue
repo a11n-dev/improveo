@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import type { RadioGroupItem } from "@nuxt/ui";
 
-const { draft } = useHabitDraft();
+interface Props {
+  streak: StreakGoal | null;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  "update:streak": [streak: StreakGoal | null];
+}>();
 
 const open = defineModel<boolean>("open", { default: false });
 
@@ -18,6 +26,9 @@ const selectedInterval = ref<string>("none");
 
 /** Completions count for weekly/monthly */
 const completionsCount = ref(1);
+
+/** Flag to skip resetting completions during initialization */
+const isInitializing = ref(false);
 
 /** Max completions based on interval */
 const maxCompletions = computed(() => {
@@ -52,33 +63,40 @@ const increment = () => {
   }
 };
 
-/** Sync local state from draft on open */
+/** Sync local state from props on open */
 watch(open, (isOpen) => {
   if (isOpen) {
-    if (draft.value.streak) {
-      selectedInterval.value = draft.value.streak.interval;
-      completionsCount.value = draft.value.streak.count;
+    isInitializing.value = true;
+    if (props.streak) {
+      selectedInterval.value = props.streak.interval;
+      completionsCount.value = props.streak.count;
     } else {
       selectedInterval.value = "none";
       completionsCount.value = 1;
     }
+    // Reset flag after Vue processes the interval change
+    nextTick(() => {
+      isInitializing.value = false;
+    });
   }
 });
 
-/** Reset completions when interval changes */
+/** Reset completions when interval changes (but not during initialization) */
 watch(selectedInterval, () => {
-  completionsCount.value = 1;
+  if (!isInitializing.value) {
+    completionsCount.value = 1;
+  }
 });
 
 /** Save selection and close */
 const save = () => {
   if (selectedInterval.value === "none") {
-    draft.value.streak = null;
+    emit("update:streak", null);
   } else {
-    draft.value.streak = {
+    emit("update:streak", {
       interval: selectedInterval.value as StreakInterval,
       count: selectedInterval.value === "daily" ? 1 : completionsCount.value,
-    };
+    });
   }
   open.value = false;
 };

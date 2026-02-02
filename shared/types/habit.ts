@@ -9,6 +9,12 @@ export type StreakInterval = "daily" | "weekly" | "monthly";
 /** Week start day (0 = Monday, 1 = Tuesday, ..., 6 = Sunday) - ISO 8601 standard */
 export type WeekStartDay = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
+/** Streak goal: interval + completions per interval */
+export interface StreakGoal {
+  interval: StreakInterval;
+  count: number;
+}
+
 /**
  * Habit DTO for client consumption.
  * Maps from DB row + completions to a client-friendly shape.
@@ -43,6 +49,21 @@ export interface HabitCreatePayload {
   streakInterval: StreakInterval | null;
   /** 0 when streakInterval is null */
   streakCount: number;
+}
+
+/**
+ * Payload for updating an existing habit.
+ * All fields are optional - only send changed fields.
+ */
+export interface HabitUpdatePayload {
+  title?: string;
+  description?: string | null;
+  icon?: string;
+  color?: string;
+  /** null means no streak tracking */
+  streakInterval?: StreakInterval | null;
+  /** 0 when streakInterval is null */
+  streakCount?: number;
 }
 
 /**

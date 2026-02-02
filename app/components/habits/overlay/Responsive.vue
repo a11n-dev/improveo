@@ -35,6 +35,8 @@ const isDesktop = useIsDesktop();
       <template v-if="$slots.footer" #footer>
         <slot name="footer" />
       </template>
+      <!-- Default slot for nested overlays -->
+      <slot />
     </UModal>
 
     <UDrawer
@@ -53,6 +55,8 @@ const isDesktop = useIsDesktop();
       <template v-if="$slots.footer" #footer>
         <slot name="footer" />
       </template>
+      <!-- Default slot for nested overlays -->
+      <slot />
     </UDrawer>
   </ClientOnly>
 </template>

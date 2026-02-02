@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { draft, streakLabel } = useHabitDraft();
+const { draft, streakLabel } = useHabitEditDraft();
 </script>
 
 <template>

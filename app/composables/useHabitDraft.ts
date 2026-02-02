@@ -1,9 +1,3 @@
-/** Streak goal: interval + completions per interval */
-export interface StreakGoal {
-  interval: StreakInterval;
-  count: number;
-}
-
 /** Draft state for creating a new habit */
 export interface HabitDraft {
   name: string;

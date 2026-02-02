@@ -59,11 +59,6 @@ const handleDelete = async () => {
     isDeleting.value = false;
   }
 };
-
-/** Handle edit from info overlay (stub for now) */
-const handleEdit = () => {
-  // TODO: Open edit overlay when ready
-};
 </script>
 
 <template>
@@ -115,7 +110,6 @@ const handleEdit = () => {
       :week-start="weekStart"
       :is-deleting="isDeleting"
       @toggle-date="handleToggleDate"
-      @edit="handleEdit"
       @delete="handleDelete"
     />
   </UContainer>

@@ -1,8 +1,17 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
 
+interface Props {
+  selectedIcon: string | null;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  select: [icon: string];
+}>();
+
 const isDesktop = useIsDesktop();
-const { draft } = useHabitDraft();
 
 const open = defineModel<boolean>("open", { default: false });
 
@@ -73,7 +82,7 @@ useInfiniteScroll(scrollContainerRef, loadMore, {
 
 /** Select an icon and close */
 const selectIcon = (icon: string) => {
-  draft.value.icon = icon;
+  emit("select", icon);
   open.value = false;
 };
 
@@ -137,7 +146,7 @@ const drawerProps = {
               variant="soft"
               class="flex size-8 items-center justify-center rounded-md p-0"
               :class="{
-                'ring-2 ring-primary': draft.icon === icon,
+                'ring-2 ring-primary': selectedIcon === icon,
               }"
               :aria-label="icon.replace('i-lucide-', '')"
               @click="selectIcon(icon)"

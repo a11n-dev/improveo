@@ -81,6 +81,36 @@ export const useHabits = () => {
   };
 
   /**
+   * Update an existing habit.
+   */
+  const updateHabit = async (
+    habitId: string,
+    payload: HabitUpdatePayload,
+  ): Promise<Habit | null> => {
+    try {
+      const updated = await $fetch<Habit>(`/api/habits/${habitId}`, {
+        method: "PATCH",
+        body: payload,
+      });
+
+      // Update cache with the returned habit
+      if (data.value) {
+        data.value = {
+          ...data.value,
+          habits: data.value.habits.map((h) =>
+            h.id === habitId ? updated : h,
+          ),
+        };
+      }
+
+      return updated;
+    } catch (err) {
+      notifyError("Failed to update habit", "Please try again.");
+      return null;
+    }
+  };
+
+  /**
    * Toggle a completion for a habit with optimistic update.
    */
   const toggleCompletion = async (
@@ -191,6 +221,7 @@ export const useHabits = () => {
     // Actions
     refresh,
     createHabit,
+    updateHabit,
     deleteHabit,
     toggleCompletion,
     getHabitById,

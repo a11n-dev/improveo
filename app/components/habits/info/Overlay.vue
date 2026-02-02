@@ -9,11 +9,12 @@ const { habit, weekStart = 0, isDeleting = false } = defineProps<Props>();
 
 const emit = defineEmits<{
   "toggle-date": [date: string];
-  edit: [];
   delete: [];
 }>();
 
 const open = defineModel<boolean>("open", { default: false });
+
+const { openOverlay: openEditOverlay } = useHabitEditOverlay();
 
 const modalProps = {
   close: false,
@@ -28,9 +29,9 @@ const streakGoalLabel = computed(() =>
 /** Delete confirmation state */
 const showDeleteConfirm = ref(false);
 
-/** Handle edit button click */
+/** Handle edit button click - opens nested edit overlay */
 const handleEdit = () => {
-  emit("edit");
+  openEditOverlay(habit);
 };
 
 /** Handle delete button click */
@@ -144,5 +145,8 @@ const handleClose = () => {
         />
       </template>
     </template>
+
+    <!-- Nested edit overlay (default slot for drawer context) -->
+    <HabitsEditOverlay :habit="habit" />
   </HabitsOverlayResponsive>
 </template>

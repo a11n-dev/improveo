@@ -22,10 +22,7 @@ export default defineNuxtConfig({
   },
 
   supabase: {
-    redirectOptions: {
-      login: "/auth",
-      callback: "/auth/confirm",
-    },
+    redirect: false, 
     types: "~~/shared/types/database.types.ts",
   },
 
@@ -33,5 +30,37 @@ export default defineNuxtConfig({
     families: [
       { name: "Space Grotesk", provider: "google", weights: [400, 500, 600] },
     ],
+  },
+
+  pwa: {
+    registerType: "autoUpdate",
+    manifest: {
+      name: "Improveme",
+      short_name: "Improveme",
+      description: "A modern habit tracking application.",
+      theme_color: "#ffffff",
+      background_color: "#ffffff",
+      display: "standalone",
+      icons: [
+        {
+          src: "pwa-192x192.png",
+          sizes: "192x192",
+          type: "image/png",
+        },
+        {
+          src: "pwa-512x512.png",
+          sizes: "512x512",
+          type: "image/png",
+        },
+      ],
+    },
+    workbox: {
+      navigateFallback: "/",
+    },
+    devOptions: {
+      enabled: true,
+      suppressWarnings: true,
+      type: "module",
+    },
   },
 });

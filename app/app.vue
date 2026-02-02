@@ -1,6 +1,20 @@
 <script setup lang="ts">
 const isMounted = ref(false);
 const isDesktop = useIsDesktop();
+const colorMode = useColorMode();
+
+const themeColor = computed(() =>
+  colorMode.value === "dark" ? "#020617" : "#ffffff",
+);
+
+useHead({
+  meta: [
+    {
+      name: "theme-color",
+      content: themeColor,
+    },
+  ],
+});
 
 onMounted(() => {
   isMounted.value = true;

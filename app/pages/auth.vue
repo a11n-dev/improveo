@@ -2,7 +2,6 @@
 import type { AuthMode, AuthStep } from "~/types/auth";
 
 definePageMeta({
-  middleware: "auth",
   layout: "auth",
 });
 
@@ -275,7 +274,7 @@ onBeforeUnmount(() => {
           <UButton
             type="button"
             variant="link"
-            class="ml-0.5 px-0 py-0 text-primary"
+            class="ml-1 px-0 py-0 text-primary"
             @click="toggleAuthMode"
           >
             Login Here
@@ -287,10 +286,10 @@ onBeforeUnmount(() => {
           <UButton
             type="button"
             variant="link"
-            class="ml-0.5 px-0 py-0 text-primary"
+            class="ml-1 px-0 py-0 text-primary"
             @click="toggleAuthMode"
           >
-            Request Now
+            Register Now
           </UButton>
         </template>
       </p>

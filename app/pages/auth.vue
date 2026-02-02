@@ -23,7 +23,6 @@ const otpValue = ref<string[]>([]);
 const resendSeconds = ref(0);
 
 const isRegister = computed(() => activeTab.value === "register");
-const colorMode = useColorMode();
 
 /** Normalize OTP input array into a single string token. */
 const otpToken = computed(() => otpValue.value.join(""));
@@ -103,7 +102,7 @@ const handleOtpRequest = async () => {
 
   if (step.value === "request") {
     step.value = "verify";
-    stopResendCountdown();
+    startResendCountdown();
     return;
   }
 
@@ -159,10 +158,9 @@ onBeforeUnmount(() => {
   <div class="flex min-h-screen items-center justify-center">
     <UContainer class="flex w-full max-w-md flex-col gap-3 text-left">
       <div class="flex flex-col gap-3">
-        <img
-          :src="
-            colorMode.value === 'dark' ? '/logo-dark.svg' : '/logo-light.svg'
-          "
+        <UColorModeImage
+          light="/logo-light.svg"
+          dark="/logo-dark.svg"
           alt="Improveme Logo"
           class="h-10 w-10"
         />

@@ -55,3 +55,28 @@ export const formatStreakGoalLabel = (
   }
   return `${streakCount} / ${interval}`;
 };
+
+const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+/**
+ * Format ISO timestamp to "Since Mmm YYYY" format.
+ */
+export const formatMemberSince = (timestamp: string): string => {
+  const date = new Date(timestamp);
+  const month = MONTH_NAMES[date.getMonth()];
+  const year = date.getFullYear();
+  return `Since ${month} ${year}`;
+};

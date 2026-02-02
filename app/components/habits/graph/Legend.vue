@@ -1,9 +1,9 @@
 <script setup lang="ts">
 interface Props {
-  isTodayCompleted: boolean;
-  todayOpacity?: number;
   /** Current streak count (only shown if streakInterval is set) */
   currentStreak?: number;
+  /** Best streak count */
+  bestStreak?: number;
   /** Whether streak tracking is enabled */
   hasStreak?: boolean;
   /** Streak goal label (e.g., "Daily", "3 / week") */
@@ -11,9 +11,8 @@ interface Props {
 }
 
 const {
-  isTodayCompleted,
-  todayOpacity = 0.45,
   currentStreak = 0,
+  bestStreak = 0,
   hasStreak = false,
   streakGoalLabel = "",
 } = defineProps<Props>();
@@ -27,39 +26,74 @@ const badgeStyle = {
 
 <template>
   <div class="flex items-center justify-between text-xs text-muted">
-    <!-- Left: Streak info (only if streak tracking is enabled) -->
+    <!-- Left: Streak info -->
     <div v-if="hasStreak" class="flex items-center gap-1">
-      <UBadge
-        color="neutral"
-        variant="soft"
-        size="sm"
-        icon="i-lucide-flame"
-        class="border"
-        :style="badgeStyle"
-        :ui="{ leadingIcon: 'text-current' }"
+      <UTooltip
+        text="Current streak"
+        :content="{ side: 'top' }"
+        :delay-duration="0"
       >
-        {{ currentStreak }}
-      </UBadge>
-      <UBadge
-        color="neutral"
-        variant="soft"
-        size="sm"
-        class="border"
-        :style="badgeStyle"
+        <UBadge
+          color="neutral"
+          variant="soft"
+          size="sm"
+          icon="i-lucide-flame"
+          class="border"
+          :style="badgeStyle"
+          :ui="{ leadingIcon: 'text-current' }"
+        >
+          {{ currentStreak }}
+        </UBadge>
+      </UTooltip>
+      <UTooltip
+        text="Best streak"
+        :content="{ side: 'top' }"
+        :delay-duration="0"
       >
-        {{ streakGoalLabel }}
-      </UBadge>
+        <UBadge
+          color="neutral"
+          variant="soft"
+          size="sm"
+          icon="i-lucide-trophy"
+          class="border"
+          :style="badgeStyle"
+          :ui="{ leadingIcon: 'text-current' }"
+        >
+          {{ bestStreak }}
+        </UBadge>
+      </UTooltip>
+      <UTooltip
+        text="Streak goal"
+        :content="{ side: 'top' }"
+        :delay-duration="0"
+      >
+        <UBadge
+          color="neutral"
+          variant="soft"
+          size="sm"
+          class="border"
+          :style="badgeStyle"
+        >
+          {{ streakGoalLabel }}
+        </UBadge>
+      </UTooltip>
     </div>
     <div v-else>
-      <UBadge
-        color="neutral"
-        variant="soft"
-        size="sm"
-        class="border"
-        :style="badgeStyle"
+      <UTooltip
+        text="Streak goal"
+        :content="{ side: 'top' }"
+        :delay-duration="0"
       >
-        No goal
-      </UBadge>
+        <UBadge
+          color="neutral"
+          variant="soft"
+          size="sm"
+          class="border"
+          :style="badgeStyle"
+        >
+          No goal
+        </UBadge>
+      </UTooltip>
     </div>
 
     <!-- Right: Legend items -->
@@ -70,18 +104,6 @@ const badgeStyle = {
           <div class="size-3 rounded-xs bg-(--habit-color)" />
         </div>
         <span>Completion</span>
-      </div>
-
-      <div class="flex items-center gap-1">
-        <div
-          class="relative size-3 rounded-xs bg-(--habit-color)"
-          :style="isTodayCompleted ? undefined : { opacity: todayOpacity }"
-        >
-          <span
-            class="absolute left-1/2 top-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-default"
-          />
-        </div>
-        <span>Today</span>
       </div>
     </div>
   </div>

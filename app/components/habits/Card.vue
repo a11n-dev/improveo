@@ -102,6 +102,7 @@ const handleCheckboxClick = (event: Event) => {
       :completions="habit.completions"
       :week-start="weekStart"
       :current-streak="habit.currentStreak"
+      :best-streak="habit.bestStreak"
       :has-streak="habit.streakInterval !== null"
       :streak-goal-label="streakGoalLabel"
     />

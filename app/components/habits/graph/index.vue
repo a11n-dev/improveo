@@ -12,12 +12,12 @@ interface Props {
   daysCount?: number;
   /** Show legend below the graph */
   showLegend?: boolean;
-  /** Opacity for today's cell (0-1) */
-  todayOpacity?: number;
   /** Show tooltips on hover */
   showTooltips?: boolean;
   /** Current streak count (for legend display) */
   currentStreak?: number;
+  /** Best streak count (for legend display) */
+  bestStreak?: number;
   /** Whether streak tracking is enabled */
   hasStreak?: boolean;
   /** Streak goal label (e.g., "Daily", "3 / week") */
@@ -31,17 +31,15 @@ const {
   endDate = new Date(),
   daysCount = 365,
   showLegend = true,
-  todayOpacity = 0.45,
   showTooltips = true,
   currentStreak = 0,
+  bestStreak = 0,
   hasStreak = false,
   streakGoalLabel = "",
 } = defineProps<Props>();
 
 /** Today's date in ISO format for comparison */
 const todayStr = computed(() => formatDate(endDate));
-
-const isTodayCompleted = computed(() => completions[todayStr.value] ?? false);
 
 /** Build grid data */
 const weeks = computed(() =>
@@ -151,29 +149,17 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
           </div>
 
           <!-- Grid of cells -->
-          <div
-            class="grid grid-flow-col grid-rows-7 gap-0.75"
-            v-memo="[weeks, todayOpacity]"
-          >
+          <div class="grid grid-flow-col grid-rows-7 gap-0.75">
             <template v-for="(week, weekIndex) in weeks" :key="weekIndex">
               <div
                 v-for="day in week"
+                v-show="day.date <= todayStr"
                 :key="day.date"
-                class="relative size-3 rounded-xs bg-(--habit-color)"
+                class="size-3 rounded-xs bg-(--habit-color)"
                 :class="day.inRange && day.completed ? '' : 'opacity-[0.15]'"
-                :style="
-                  day.date === todayStr && !day.completed
-                    ? { opacity: todayOpacity }
-                    : undefined
-                "
                 @mouseenter="handleCellEnter($event, day.date)"
                 @mouseleave="handleCellLeave"
-              >
-                <span
-                  v-if="day.date === todayStr"
-                  class="absolute left-1/2 top-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-default"
-                />
-              </div>
+              />
             </template>
           </div>
         </div>
@@ -182,9 +168,8 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
 
     <HabitsGraphLegend
       v-if="showLegend"
-      :is-today-completed="isTodayCompleted"
-      :today-opacity="todayOpacity"
       :current-streak="currentStreak"
+      :best-streak="bestStreak"
       :has-streak="hasStreak"
       :streak-goal-label="streakGoalLabel"
     />

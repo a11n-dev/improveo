@@ -77,6 +77,7 @@ const handleClose = () => {
           :week-start="weekStart"
           :show-legend="true"
           :current-streak="habit.currentStreak"
+          :best-streak="habit.bestStreak"
           :has-streak="habit.streakInterval !== null"
           :streak-goal-label="streakGoalLabel"
         />

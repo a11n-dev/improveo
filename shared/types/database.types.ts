@@ -16,6 +16,38 @@ export type Database = {
     Tables: {
       completions: {
         Row: {
+          bitmap: string;
+          habit_id: string;
+          updated_at: string;
+          user_id: string;
+          year: number;
+        };
+        Insert: {
+          bitmap: string;
+          habit_id: string;
+          updated_at?: string;
+          user_id: string;
+          year: number;
+        };
+        Update: {
+          bitmap?: string;
+          habit_id?: string;
+          updated_at?: string;
+          user_id?: string;
+          year?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "completions_habit_id_fkey1";
+            columns: ["habit_id"];
+            isOneToOne: false;
+            referencedRelation: "habits";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      completions_log: {
+        Row: {
           completed_on: string;
           created_at: string | null;
           habit_id: string;
@@ -126,7 +158,15 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      set_habit_completion: {
+        Args: {
+          p_date: string;
+          p_habit_id: string;
+          p_user_id: string;
+          p_value: number;
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;

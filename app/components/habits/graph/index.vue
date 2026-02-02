@@ -144,7 +144,7 @@ watch(containerWidth, () => {
       <div class="flex w-7 shrink-0 flex-col gap-1">
         <!-- Spacer for month labels row -->
         <div class="h-5.25" />
-        <!-- Day labels: 7 rows matching grid (size-3 = 12px with gap-0.75 = 3px) -->
+        <!-- Day labels -->
         <div class="grid grid-rows-7 gap-0.75">
           <span
             v-for="(label, index) in dayLabels"

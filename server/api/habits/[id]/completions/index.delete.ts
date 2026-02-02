@@ -51,15 +51,15 @@ export default defineEventHandler(
 
     const weekStart = (profile?.week_start ?? 0) as WeekStartDay;
 
-    // Delete the completion
-    const { error: deleteError } = await client
-      .from("completions")
-      .delete()
-      .eq("habit_id", habitId)
-      .eq("user_id", user.sub)
-      .eq("completed_on", date);
+    // Update completion bitmap via RPC
+    const { error: updateError } = await client.rpc("set_habit_completion", {
+      p_habit_id: habitId,
+      p_user_id: user.sub,
+      p_date: date,
+      p_value: 0,
+    });
 
-    if (deleteError) {
+    if (updateError) {
       throw createError({
         statusCode: 500,
         message: "Failed to delete completion",
@@ -67,10 +67,11 @@ export default defineEventHandler(
     }
 
     // Fetch remaining completions for this habit to recompute streaks
-    const { data: allCompletions, error: fetchError } = await client
+    const { data: completionRows, error: fetchError } = await client
       .from("completions")
-      .select("completed_on")
-      .eq("habit_id", habitId);
+      .select("year, bitmap")
+      .eq("habit_id", habitId)
+      .eq("user_id", user.sub);
 
     if (fetchError) {
       throw createError({
@@ -80,8 +81,10 @@ export default defineEventHandler(
     }
 
     // Compute streaks
+    const allCompletions = decodeCompletionRowsToRecords(completionRows || []);
+
     const streakResult = computeStreaks(
-      allCompletions || [],
+      allCompletions,
       {
         streakInterval: habit.streak_interval as StreakInterval | null,
         streakCount: habit.streak_count,
@@ -90,7 +93,7 @@ export default defineEventHandler(
     );
 
     // Update habit with new streak values
-    const { error: updateError } = await client
+    const { error: updateHabitError } = await client
       .from("habits")
       .update({
         current_streak: streakResult.currentStreak,
@@ -100,7 +103,7 @@ export default defineEventHandler(
       })
       .eq("id", habitId);
 
-    if (updateError) {
+    if (updateHabitError) {
       throw createError({
         statusCode: 500,
         message: "Failed to update streak values",

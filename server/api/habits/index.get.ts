@@ -63,12 +63,22 @@ export default defineEventHandler(
 
     // Fetch completions for all habits in the date range
     const habitIds = habitsData.map((h) => h.id);
+    const fromDate = parseISODateString(fromStr);
+    const toDate = parseISODateString(toStr);
+    const years: number[] = [];
+    for (
+      let year = fromDate.getFullYear();
+      year <= toDate.getFullYear();
+      year++
+    ) {
+      years.push(year);
+    }
+
     const { data: completionsData, error: completionsError } = await client
       .from("completions")
-      .select("habit_id, completed_on")
+      .select("habit_id, year, bitmap")
       .in("habit_id", habitIds)
-      .gte("completed_on", fromStr)
-      .lte("completed_on", toStr);
+      .in("year", years);
 
     if (completionsError) {
       throw createError({
@@ -83,8 +93,14 @@ export default defineEventHandler(
       if (!completionsByHabit.has(completion.habit_id)) {
         completionsByHabit.set(completion.habit_id, {});
       }
-      completionsByHabit.get(completion.habit_id)![completion.completed_on] =
-        true;
+      const existing = completionsByHabit.get(completion.habit_id)!;
+      const decoded = decodeBitmapToCompletionMap(
+        completion.bitmap,
+        completion.year,
+        fromStr,
+        toStr,
+      );
+      Object.assign(existing, decoded);
     }
 
     // Map DB rows to DTOs

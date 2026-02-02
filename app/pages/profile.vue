@@ -3,7 +3,11 @@ definePageMeta({
   keepalive: true,
 });
 
-const { profile, pending, updateWeekStart } = useProfile();
+const { profile, pending, error, updateWeekStart } = useProfile();
+
+const isLoading = computed(
+  () => pending.value && !profile.value && !error.value,
+);
 
 /**
  * Handle week start change from settings component.
@@ -15,33 +19,46 @@ const handleWeekStartChange = async (value: number): Promise<void> => {
 
 <template>
   <UContainer class="py-8 space-y-8">
-    <!-- User Section -->
-    <section>
-      <div v-if="pending" class="flex items-center gap-4">
-        <USkeleton class="size-12 rounded-full" />
-        <div class="space-y-2">
-          <USkeleton class="h-4 w-32" />
-          <USkeleton class="h-3 w-48" />
-        </div>
-      </div>
-      <ProfileUser v-else-if="profile" :profile="profile" />
-      <div v-else class="text-sm text-muted">Failed to load profile</div>
-    </section>
+    <!-- Loading state -->
+    <div
+      v-if="isLoading"
+      class="fixed inset-0 flex items-center justify-center"
+    >
+      <LoadingState />
+    </div>
 
-    <!-- Settings Section -->
-    <section v-if="profile">
-      <h2 class="font-medium mb-3 text-highlighted">Settings</h2>
-      <UCard variant="subtle">
-        <ProfileSettings
-          :profile="profile"
-          @update:week-start="handleWeekStartChange"
-        />
-      </UCard>
-    </section>
+    <!-- Error state -->
+    <div
+      v-else-if="error"
+      class="fixed inset-0 flex items-center justify-center px-6"
+    >
+      <UEmpty
+        title="Oops..."
+        description="Something went wrong while loading your profile. Please try again later."
+      />
+    </div>
 
-    <!-- Actions Section -->
-    <section v-if="profile">
-      <ProfileActions />
-    </section>
+    <template v-else>
+      <!-- User Section -->
+      <section>
+        <ProfileUser v-if="profile" :profile="profile" />
+      </section>
+
+      <!-- Settings Section -->
+      <section v-if="profile">
+        <h2 class="font-medium mb-3 text-highlighted">Settings</h2>
+        <UCard variant="subtle">
+          <ProfileSettings
+            :profile="profile"
+            @update:week-start="handleWeekStartChange"
+          />
+        </UCard>
+      </section>
+
+      <!-- Actions Section -->
+      <section v-if="profile">
+        <ProfileActions />
+      </section>
+    </template>
   </UContainer>
 </template>

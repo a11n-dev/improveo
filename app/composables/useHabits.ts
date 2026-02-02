@@ -7,6 +7,7 @@ const HABITS_KEY = "habits";
 
 export const useHabits = () => {
   const { notifyError } = useToastNotify();
+  const { data: cachedHabits } = useNuxtData<HabitsListResponse>(HABITS_KEY);
 
   // Main data fetcher
   const { data, status, error, refresh } = useAsyncData<HabitsListResponse>(
@@ -16,7 +17,8 @@ export const useHabits = () => {
         headers: useRequestHeaders(["cookie"]),
       }),
     {
-      default: () => ({ habits: [], weekStart: 0 as WeekStartDay }),
+      default: () =>
+        cachedHabits.value ?? { habits: [], weekStart: 0 as WeekStartDay },
     },
   );
 
@@ -28,31 +30,11 @@ export const useHabits = () => {
   const pending = computed(() => status.value === "pending");
 
   /**
-   * Get cached data for optimistic updates.
-   * Ensures habits array exists before returning.
-   */
-  const getCachedData = () => {
-    const { data: cachedData } = useNuxtData<HabitsListResponse>(HABITS_KEY);
-    return cachedData;
-  };
-
-  /**
-   * Helper to safely get habits array from cached data
-   */
-  const getHabitsFromCache = (
-    cachedData: Ref<HabitsListResponse | undefined>,
-  ): Habit[] => {
-    return cachedData.value?.habits ?? [];
-  };
-
-  /**
    * Create a new habit.
    */
   const createHabit = async (
     payload: HabitCreatePayload,
   ): Promise<Habit | null> => {
-    const cachedData = getCachedData();
-
     try {
       const created = await $fetch<Habit>("/api/habits", {
         method: "POST",
@@ -60,10 +42,10 @@ export const useHabits = () => {
       });
 
       // Add to cache after successful creation
-      if (cachedData.value) {
-        cachedData.value = {
-          ...cachedData.value,
-          habits: [...getHabitsFromCache(cachedData), created],
+      if (data.value) {
+        data.value = {
+          ...data.value,
+          habits: [...data.value.habits, created],
         };
       }
 
@@ -78,20 +60,16 @@ export const useHabits = () => {
    * Delete a habit.
    */
   const deleteHabit = async (habitId: string): Promise<boolean> => {
-    const cachedData = getCachedData();
-
     try {
       await $fetch(`/api/habits/${habitId}`, {
         method: "DELETE",
       });
 
       // Remove from cache after successful deletion
-      if (cachedData.value) {
-        cachedData.value = {
-          ...cachedData.value,
-          habits: getHabitsFromCache(cachedData).filter(
-            (h) => h.id !== habitId,
-          ),
+      if (data.value) {
+        data.value = {
+          ...data.value,
+          habits: data.value.habits.filter((h) => h.id !== habitId),
         };
       }
 
@@ -109,8 +87,7 @@ export const useHabits = () => {
     habitId: string,
     date: string,
   ): Promise<boolean> => {
-    const cachedData = getCachedData();
-    const currentHabits = getHabitsFromCache(cachedData);
+    const currentHabits = data.value?.habits ?? [];
     const habit = currentHabits.find((h) => h.id === habitId);
 
     if (!habit) {
@@ -122,9 +99,9 @@ export const useHabits = () => {
     const newCompleted = !wasCompleted;
 
     // Optimistic: update completion state immediately
-    if (cachedData.value) {
-      cachedData.value = {
-        ...cachedData.value,
+    if (data.value) {
+      data.value = {
+        ...data.value,
         habits: currentHabits.map((h) => {
           if (h.id !== habitId) return h;
           const newCompletions = { ...h.completions };
@@ -159,10 +136,10 @@ export const useHabits = () => {
       }
 
       // Update streak values from server response
-      if (cachedData.value) {
-        cachedData.value = {
-          ...cachedData.value,
-          habits: getHabitsFromCache(cachedData).map((h) => {
+      if (data.value) {
+        data.value = {
+          ...data.value,
+          habits: data.value.habits.map((h) => {
             if (h.id !== habitId) return h;
             return {
               ...h,
@@ -177,10 +154,10 @@ export const useHabits = () => {
       return true;
     } catch (err) {
       // Revert: restore previous completion state
-      if (cachedData.value) {
-        cachedData.value = {
-          ...cachedData.value,
-          habits: getHabitsFromCache(cachedData).map((h) => {
+      if (data.value) {
+        data.value = {
+          ...data.value,
+          habits: data.value.habits.map((h) => {
             if (h.id !== habitId) return h;
             const newCompletions = { ...h.completions };
             if (wasCompleted) {

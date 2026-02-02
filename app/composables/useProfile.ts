@@ -1,88 +1,31 @@
-/**
- * Return type for the useProfile composable.
- */
-export interface UseProfileReturn {
-  /** The user profile data, or null if not loaded. */
-  profile: Ref<Profile | null>;
-  /** Whether profile data is being fetched. */
-  pending: Ref<boolean>;
-  /** Error message if fetch/update failed. */
-  error: Ref<string | null>;
-  /** Update the week start preference (0 = Monday, 6 = Sunday). */
-  updateWeekStart: (value: number) => Promise<boolean>;
-  /** Refresh profile data from the database. */
-  refresh: () => Promise<void>;
-}
+const PROFILE_KEY = "profile";
 
 /**
  * Composable for managing user profile data.
  *
- * Fetches profile from the profiles table (linked to auth.users via RLS),
+ * Fetches profile via server API for SSR-friendly data loading,
  * provides reactive state for UI consumption, and allows updating
  * the week_start preference.
  *
  * @returns Profile state and methods for data management.
  */
-export const useProfile = (): UseProfileReturn => {
-  const supabaseClient = useSupabaseClient();
+export const useProfile = () => {
   const { notifyError } = useToastNotify();
+  const { data: cachedProfile } = useNuxtData<Profile | null>(PROFILE_KEY);
 
-  const profile = ref<Profile | null>(null);
-  const pending = ref(false);
-  const error = ref<string | null>(null);
+  const { data, status, error, refresh } = useAsyncData<Profile | null>(
+    PROFILE_KEY,
+    () =>
+      $fetch<Profile>("/api/profile", {
+        headers: useRequestHeaders(["cookie"]),
+      }),
+    {
+      default: () => cachedProfile.value ?? null,
+    },
+  );
 
-  /**
-   * Maps database row to Profile interface.
-   */
-  const mapRowToProfile = (row: Record<string, unknown>): Profile => ({
-    id: String(row.id),
-    email: String(row.email),
-    name: row.name ? String(row.name) : null,
-    weekStart: Number(row.week_start),
-    createdAt: String(row.created_at),
-  });
-
-  /**
-   * Fetches the current user's profile from Supabase.
-   */
-  const fetchProfile = async (): Promise<void> => {
-    pending.value = true;
-    error.value = null;
-
-    try {
-      const { data: userData } = await supabaseClient.auth.getUser();
-      const user = userData?.user;
-
-      if (!user) {
-        error.value = "User not authenticated";
-        pending.value = false;
-        return;
-      }
-
-      const { data, error: dbError } = await supabaseClient
-        .from("profiles")
-        .select("id, email, name, week_start, created_at")
-        .eq("id", user.id)
-        .single();
-
-      if (dbError) {
-        error.value = dbError.message;
-        notifyError("Failed to load profile", dbError.message);
-        pending.value = false;
-        return;
-      }
-
-      if (data) {
-        profile.value = mapRowToProfile(data as Record<string, unknown>);
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      error.value = message;
-      notifyError("Profile error", message);
-    } finally {
-      pending.value = false;
-    }
-  };
+  const profile = computed(() => data.value ?? null);
+  const pending = computed(() => status.value === "pending");
 
   const updateWeekStart = async (value: number): Promise<boolean> => {
     if (!profile.value) {
@@ -95,32 +38,21 @@ export const useProfile = (): UseProfileReturn => {
       return false;
     }
 
-    const { error: updateError } = await supabaseClient
-      .from("profiles")
-      .update({ week_start: value })
-      .eq("id", profile.value.id);
+    try {
+      const updated = await $fetch<Profile>("/api/profile", {
+        method: "PATCH",
+        body: { weekStart: value },
+      });
 
-    if (updateError) {
-      notifyError("Update failed", updateError.message);
+      data.value = updated;
+
+      await refreshNuxtData("habits");
+      return true;
+    } catch (err) {
+      notifyError("Update failed", "Please try again.");
       return false;
     }
-
-    profile.value.weekStart = value;
-    await refreshNuxtData("habits");
-    return true;
   };
-
-  /**
-   * Refreshes profile data from the database.
-   */
-  const refresh = async (): Promise<void> => {
-    await fetchProfile();
-  };
-
-  // Fetch profile on initialization
-  onMounted(() => {
-    void fetchProfile();
-  });
 
   return {
     error,

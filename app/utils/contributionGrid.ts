@@ -130,27 +130,38 @@ export function getMonthLabels(
     "Nov",
     "Dec",
   ];
+  const monthKeys = weeks.map((week) => {
+    const inRangeDay = week.find((d) => d.inRange);
+    if (!inRangeDay) {
+      return "";
+    }
+    const [yearStr, monthStr] = inRangeDay.date.split("-");
+    return yearStr && monthStr ? `${yearStr}-${monthStr}` : "";
+  });
+  const monthCounts = monthKeys.reduce<Record<string, number>>(
+    (acc, monthKey) => {
+      if (monthKey) {
+        acc[monthKey] = (acc[monthKey] ?? 0) + 1;
+      }
+      return acc;
+    },
+    {},
+  );
   let lastMonthKey = "";
 
-  weeks.forEach((week, colIndex) => {
-    // Find the first in-range day in this week
-    const inRangeDay = week.find((d) => d.inRange);
-    if (inRangeDay) {
-      const parts = inRangeDay.date.split("-");
-      const yearStr = parts[0];
-      const monthStr = parts[1];
-      if (monthStr && yearStr) {
-        const monthKey = `${yearStr}-${monthStr}`;
-        if (monthKey !== lastMonthKey) {
-          const month = parseInt(monthStr, 10) - 1;
-          const monthName = monthNames[month];
-          if (monthName) {
-            labels.push({ month: monthName, colIndex });
-            lastMonthKey = monthKey;
-          }
-        }
+  monthKeys.forEach((monthKey, colIndex) => {
+    if (!monthKey || monthKey === lastMonthKey) {
+      return;
+    }
+    const monthStr = monthKey.split("-")[1];
+    if (monthStr && (monthCounts[monthKey] ?? 0) >= 2) {
+      const month = parseInt(monthStr, 10) - 1;
+      const monthName = monthNames[month];
+      if (monthName) {
+        labels.push({ month: monthName, colIndex });
       }
     }
+    lastMonthKey = monthKey;
   });
 
   return labels;

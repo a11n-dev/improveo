@@ -14,6 +14,21 @@ export default defineNuxtConfig({
     "@nuxt/fonts",
   ],
 
+  app: {
+    head: {
+      meta: [
+        {
+          name: "viewport",
+          content:
+            "width=device-width,initial-scale=1,maximum-scale=1.0,viewport-fit=cover",
+        },
+        { name: "apple-mobile-web-app-capable", content: "yes" },
+        { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+        { name: "apple-mobile-web-app-title", content: "Improveme" },
+      ],
+    },
+  },
+
   css: ["~/assets/css/main.css"],
 
   colorMode: {
@@ -22,7 +37,7 @@ export default defineNuxtConfig({
   },
 
   supabase: {
-    redirect: false, 
+    redirect: false,
     types: "~~/shared/types/database.types.ts",
   },
 

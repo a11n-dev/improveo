@@ -45,16 +45,26 @@ const localSelectedDates = ref<CalendarDate[]>([]);
 
 const isOpen = computed(() => open);
 
-/** Sync local dates when habit changes or overlay opens */
+/** Sync local dates when overlay opens */
 watch(
-  [() => habit.completions, isOpen],
-  () => {
-    if (isOpen.value) {
+  isOpen,
+  (openNow) => {
+    if (openNow) {
       localSelectedDates.value = [...selectedDates.value];
       placeholder.value = todayDate;
     }
   },
   { immediate: true },
+);
+
+/** Sync local dates when completions change while open */
+watch(
+  () => habit.completions,
+  () => {
+    if (isOpen.value) {
+      localSelectedDates.value = [...selectedDates.value];
+    }
+  },
 );
 
 /** Watch for changes in localSelectedDates and emit toggle events */
@@ -69,6 +79,7 @@ watch(
     // Find added dates
     for (const d of newDates) {
       if (!oldSet.has(d.toString())) {
+        placeholder.value = new CalendarDate(d.year, d.month, d.day);
         emit("toggle-date", d.toString());
       }
     }
@@ -175,11 +186,6 @@ const monthYearLabel = computed(() => {
             // Handle unchecking the last date - calendar may return undefined/null
             localSelectedDates = [];
           }
-        }
-      "
-      @update:placeholder="
-        (v: DateValue) => {
-          placeholder = new CalendarDate(v.year, v.month, v.day);
         }
       "
     />

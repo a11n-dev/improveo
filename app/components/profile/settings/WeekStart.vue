@@ -37,6 +37,9 @@ const handleChange = (value: number): void => {
       :items="weekStartOptions"
       class="w-34 shrink-0"
       @update:model-value="handleChange"
+      :content="{
+        onCloseAutoFocus: (e) => e.preventDefault(),
+      }"
     />
   </div>
 </template>

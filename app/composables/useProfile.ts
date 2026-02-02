@@ -116,6 +116,10 @@ export const useProfile = (): UseProfileReturn => {
 
     // Optimistically update local state
     profile.value.weekStart = value;
+
+    // Refresh habits data to reflect new weekStart in graphs
+    await refreshNuxtData("habits");
+
     return true;
   };
 

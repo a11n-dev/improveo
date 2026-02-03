@@ -6,6 +6,11 @@ export default defineAppConfig({
         content: "divide-y-0",
       },
     },
+    drawer: {
+      slots: {
+        footer: "pb-6",
+      },
+    },
     card: {
       slots: {
         root: "rounded-xl",

@@ -28,14 +28,9 @@ const guides = {
   /** iOS (all browsers on mobile/tablet) */
   ios: {
     title: "iOS",
-    subtitle: "Safari Browser",
+    subtitle: "Mobile/Tablet",
     headerIcon: "i-lucide-smartphone",
     steps: [
-      {
-        title: "Open in Safari",
-        subtitle: "Make sure you're using the Safari browser",
-        icon: "i-lucide-compass",
-      },
       {
         title: "Tap the Share button",
         subtitle: "Find the share icon at the bottom of the screen",

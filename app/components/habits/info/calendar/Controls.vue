@@ -18,7 +18,6 @@ const emit = defineEmits<{
     <UButton
       color="neutral"
       variant="subtle"
-      size="md"
       icon="i-lucide-calendar"
       :label="monthYearLabel"
       @click="emit('today')"
@@ -29,7 +28,6 @@ const emit = defineEmits<{
         icon="i-lucide-chevron-left"
         color="neutral"
         variant="subtle"
-        size="md"
         aria-label="Previous month"
         @click="emit('prev')"
       />
@@ -37,7 +35,6 @@ const emit = defineEmits<{
         icon="i-lucide-chevron-right"
         color="neutral"
         variant="subtle"
-        size="md"
         aria-label="Next month"
         :disabled="isNextDisabled"
         @click="emit('next')"

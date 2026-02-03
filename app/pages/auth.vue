@@ -154,7 +154,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center">
+  <div class="flex min-h-dvh items-center justify-center">
     <UContainer class="flex w-full max-w-md flex-col gap-3 text-left">
       <div class="flex flex-col gap-3">
         <UColorModeImage

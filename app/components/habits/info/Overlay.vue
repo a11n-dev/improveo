@@ -14,7 +14,8 @@ const emit = defineEmits<{
 
 const open = defineModel<boolean>("open", { default: false });
 
-const { openOverlay: openEditOverlay } = useHabitEditOverlay();
+const { isOpen: isEditOverlayOpen, openOverlay: openEditOverlay } =
+  useHabitEditOverlay();
 
 const modalProps = {
   close: false,
@@ -147,6 +148,6 @@ const handleClose = () => {
     </template>
 
     <!-- Nested edit overlay (default slot for drawer context) -->
-    <HabitsEditOverlay :habit="habit" />
+    <HabitsEditOverlay v-if="isEditOverlayOpen" :habit="habit" />
   </ResponsiveOverlay>
 </template>

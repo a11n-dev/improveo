@@ -13,7 +13,7 @@ const {
   closeOverlay: closeInfo,
 } = useHabitInfoOverlay();
 
-const { isOpen: createOpen, openOverlay: openCreate } = useHabitCreateOverlay();
+const { openOverlay: openCreate } = useHabitCreateOverlay();
 
 /** Today's date string for checking completion */
 const todayStr = toISODateString(new Date());

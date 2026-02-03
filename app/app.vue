@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const isMounted = ref(false);
 const isDesktop = useIsDesktop();
 const colorMode = useColorMode();
 
@@ -16,14 +15,8 @@ useHead({
   ],
 });
 
-onMounted(() => {
-  isMounted.value = true;
-});
-
 const toasterConfig = computed(() => {
-  const shouldUseDesktop = isMounted.value && isDesktop.value;
-
-  if (!shouldUseDesktop) {
+  if (!isDesktop.value) {
     return {
       position: "bottom-center" as const,
       expand: false,
@@ -32,6 +25,7 @@ const toasterConfig = computed(() => {
     };
   }
 
+  // Desktop: top-right instead of bottom-center
   return {
     position: "bottom-right" as const,
     expand: true,
@@ -40,10 +34,14 @@ const toasterConfig = computed(() => {
 });
 </script>
 <template>
+  <VitePwaManifest />
+
   <UApp :toaster="toasterConfig">
     <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    
+    <PwaNotifications />
   </UApp>
 </template>

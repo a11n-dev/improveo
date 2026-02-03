@@ -63,7 +63,7 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <HabitsOverlayResponsive
+  <ResponsiveOverlay
     v-model:open="isOpen"
     :modal-props="modalProps"
     :drawer-props="drawerProps"
@@ -96,5 +96,5 @@ const handleCancel = () => {
         />
       </div>
     </template>
-  </HabitsOverlayResponsive>
+  </ResponsiveOverlay>
 </template>

@@ -9,7 +9,7 @@ const { openOverlay } = useHabitCreateOverlay();
       icon="i-lucide-plus"
       square
       size="xl"
-      class="rounded-full"
+      class="rounded-full p-4 shadow-md"
       aria-label="Create habit"
       @click="openOverlay"
     />

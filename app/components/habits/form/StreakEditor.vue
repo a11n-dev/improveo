@@ -109,7 +109,7 @@ const drawerProps = {
 </script>
 
 <template>
-  <HabitsOverlayResponsive
+  <ResponsiveOverlay
     v-model:open="open"
     :title="title"
     :drawer-props="drawerProps"
@@ -169,5 +169,5 @@ const drawerProps = {
         />
       </div>
     </template>
-  </HabitsOverlayResponsive>
+  </ResponsiveOverlay>
 </template>

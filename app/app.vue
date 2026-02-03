@@ -41,7 +41,7 @@ const toasterConfig = computed(() => {
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-    
+
     <PwaNotifications />
   </UApp>
 </template>

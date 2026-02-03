@@ -1,12 +1,22 @@
 <script setup lang="ts">
+/**
+ * PWA notifications component.
+ *
+ * Handles install prompts and update notifications via toast.
+ * Uses usePwaInstall for unified install logic.
+ */
 const { $pwa } = useNuxtApp();
 const toast = useToast();
+const { install, cancel, canPromptInstall, showInstallButton, hasOptedOut } =
+  usePwaInstall();
 
-// Install prompt toast
+/**
+ * Show install prompt toast when native prompt is available.
+ */
 watch(
   () => $pwa?.showInstallPrompt,
   (showPrompt) => {
-    if (showPrompt && !$pwa?.isPWAInstalled) {
+    if (showPrompt && showInstallButton.value) {
       toast.add({
         title: "Install Improveme",
         description: "Add to your home screen for quick access",
@@ -19,9 +29,7 @@ watch(
             variant: "subtle",
             size: "lg",
             block: true,
-            onClick: () => {
-              $pwa?.install();
-            },
+            onClick: install,
           },
           {
             label: "Later",
@@ -29,9 +37,7 @@ watch(
             variant: "ghost",
             size: "lg",
             block: true,
-            onClick: () => {
-              $pwa?.cancelInstall();
-            },
+            onClick: cancel,
           },
         ],
       });
@@ -40,7 +46,66 @@ watch(
   { immediate: true },
 );
 
-// Update available toast
+/**
+ * Show install guide toast for browsers without native prompt.
+ * Only shown once when:
+ * - No native prompt available
+ * - App not installed
+ * - User hasn't opted out
+ */
+const hasShownGuideToast = ref(false);
+
+/**
+ * Show guide toast after a delay.
+ * Uses nextTick to ensure opt-out state is synced from localStorage first.
+ */
+const showGuideToastIfNeeded = () => {
+  if (
+    !canPromptInstall.value &&
+    showInstallButton.value &&
+    !hasOptedOut.value &&
+    !hasShownGuideToast.value
+  ) {
+    hasShownGuideToast.value = true;
+    toast.add({
+      title: "Install Improveme",
+      description: "Add to your home screen for quick access",
+      color: "primary",
+      duration: 0,
+      actions: [
+        {
+          label: "Show me how",
+          color: "primary",
+          variant: "subtle",
+          size: "lg",
+          block: true,
+          onClick: install,
+        },
+        {
+          label: "Later",
+          color: "neutral",
+          variant: "ghost",
+          size: "lg",
+          block: true,
+          onClick: cancel,
+        },
+      ],
+    });
+  }
+};
+
+onMounted(async () => {
+  // Wait for next tick to ensure usePwaInstall's onMounted has run
+  // and synced the opt-out state from localStorage
+  await nextTick();
+
+  // Additional delay to avoid overwhelming user on page load
+  setTimeout(showGuideToastIfNeeded, 2000);
+});
+
+/**
+ * Update available toast.
+ */
 watch(
   () => $pwa?.needRefresh,
   (needsRefresh) => {
@@ -79,8 +144,7 @@ watch(
 </script>
 
 <template>
-  <div
-    aria-hidden="true"
-    style="display: none"
-  />
+  <div aria-hidden="true" style="display: none" />
+  <!-- PWA Install Guide overlay -->
+  <PwaInstallGuide />
 </template>

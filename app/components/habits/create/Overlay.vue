@@ -49,7 +49,7 @@ watch(isOpen, (open) => {
 </script>
 
 <template>
-  <HabitsOverlayResponsive v-model:open="isOpen" :modal-props="modalProps">
+  <ResponsiveOverlay v-model:open="isOpen" :modal-props="modalProps">
     <template #header>
       <HabitsCreateHeader @close="closeOverlay" />
     </template>
@@ -78,5 +78,5 @@ watch(isOpen, (open) => {
         />
       </div>
     </template>
-  </HabitsOverlayResponsive>
+  </ResponsiveOverlay>
 </template>

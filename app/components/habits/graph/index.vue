@@ -35,6 +35,9 @@ const {
   streakGoalLabel = "",
 } = defineProps<Props>();
 
+/** Whether on desktop viewport (used to disable tooltips on mobile) */
+const isDesktop = useIsDesktop();
+
 /** Today's date in ISO format for comparison */
 const todayStr = computed(() => formatDate(endDate));
 
@@ -64,7 +67,7 @@ const tooltipAnchor = ref<HTMLElement>();
 const tooltipText = ref("");
 
 const handleCellEnter = (event: MouseEvent, date: string) => {
-  if (!showTooltips) {
+  if (!showTooltips || !isDesktop.value) {
     return;
   }
   const formatted = formatDateWithWeekday(date);
@@ -103,7 +106,7 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
 <template>
   <div class="flex w-full flex-col gap-2" :style="{ '--habit-color': color }">
     <UTooltip
-      v-if="showTooltips"
+      v-if="showTooltips && isDesktop"
       :open="tooltipOpen"
       :reference="tooltipAnchor"
       :text="tooltipText"

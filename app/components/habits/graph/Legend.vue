@@ -27,7 +27,7 @@ const badgeStyle = {
 <template>
   <div class="flex items-center justify-between text-xs text-muted">
     <!-- Left: Streak info -->
-    <div v-if="hasStreak" class="flex items-center gap-1">
+    <div v-if="hasStreak" class="flex items-center gap-1" @click.stop>
       <UTooltip
         text="Current streak"
         :content="{ side: 'top' }"
@@ -78,7 +78,7 @@ const badgeStyle = {
         </UBadge>
       </UTooltip>
     </div>
-    <div v-else>
+    <div v-else @click.stop>
       <UTooltip
         text="Streak goal"
         :content="{ side: 'top' }"

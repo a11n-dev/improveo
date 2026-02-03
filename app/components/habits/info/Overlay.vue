@@ -56,7 +56,7 @@ const handleClose = () => {
 </script>
 
 <template>
-  <HabitsOverlayResponsive v-model:open="open" :modal-props="modalProps">
+  <ResponsiveOverlay v-model:open="open" :modal-props="modalProps">
     <template #header>
       <HabitsInfoHeader :habit="habit" @close="handleClose" />
     </template>
@@ -148,5 +148,5 @@ const handleClose = () => {
 
     <!-- Nested edit overlay (default slot for drawer context) -->
     <HabitsEditOverlay :habit="habit" />
-  </HabitsOverlayResponsive>
+  </ResponsiveOverlay>
 </template>

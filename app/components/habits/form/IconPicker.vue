@@ -113,7 +113,7 @@ const drawerProps = {
 </script>
 
 <template>
-  <HabitsOverlayResponsive
+  <ResponsiveOverlay
     v-model:open="open"
     :title="title"
     :modal-props="modalProps"
@@ -184,5 +184,5 @@ const drawerProps = {
         @click="open = false"
       />
     </template>
-  </HabitsOverlayResponsive>
+  </ResponsiveOverlay>
 </template>

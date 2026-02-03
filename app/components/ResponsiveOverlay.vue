@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * Responsive overlay component that renders as UModal on desktop or UDrawer on mobile.
+ * Provides consistent overlay behavior across different viewport sizes.
+ */
 interface Props {
   title?: string;
   description?: string;

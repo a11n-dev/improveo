@@ -40,21 +40,6 @@ watch(
   { immediate: true },
 );
 
-// Offline ready toast
-watch(
-  () => $pwa?.offlineReady,
-  (isOfflineReady) => {
-    if (isOfflineReady) {
-      toast.add({
-        title: "Offline Ready",
-        description: "App is ready to work offline",
-        color: "success",
-        duration: 3000,
-      });
-    }
-  },
-);
-
 // Update available toast
 watch(
   () => $pwa?.needRefresh,

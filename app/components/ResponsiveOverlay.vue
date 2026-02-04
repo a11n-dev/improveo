@@ -11,8 +11,8 @@ interface Props {
 }
 
 const {
-  title,
-  description,
+  title = undefined,
+  description = undefined,
   modalProps = {},
   drawerProps = {},
 } = defineProps<Props>();

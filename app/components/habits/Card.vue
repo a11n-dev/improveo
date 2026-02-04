@@ -72,11 +72,11 @@ const handleCheckboxClick = (event: Event) => {
           <!-- Checkbox (larger size) -->
           <div class="relative" @click="handleCheckboxClick">
             <UCheckbox
+              v-model="isChecked"
               :style="{
                 '--habit-color-dimmed': `${habit.color}20`,
                 '--habit-color': habit.color,
               }"
-              v-model="isChecked"
               :color="isChecked ? 'success' : 'neutral'"
               :ui="{
                 base: `size-10 rounded-lg bg-(--habit-color-dimmed)`,

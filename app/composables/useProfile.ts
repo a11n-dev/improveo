@@ -48,7 +48,7 @@ export const useProfile = () => {
 
       await refreshNuxtData("habits");
       return true;
-    } catch (err) {
+    } catch {
       notifyError("Update failed", "Please try again.");
       return false;
     }

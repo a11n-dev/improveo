@@ -18,7 +18,7 @@ interface Emits {
   (e: "update:weekStart", value: number): void;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 /**

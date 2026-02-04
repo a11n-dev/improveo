@@ -98,7 +98,6 @@ function areConsecutiveIntervals(
   prev: string,
   curr: string,
   interval: StreakInterval | null,
-  weekStart: WeekStartDay,
 ): boolean {
   switch (interval) {
     case "daily": {
@@ -216,12 +215,7 @@ export function computeStreaks(
 
   for (let i = 1; i < keys.length; i++) {
     if (
-      areConsecutiveIntervals(
-        keys[i - 1]!,
-        keys[i]!,
-        config.streakInterval,
-        weekStart,
-      )
+      areConsecutiveIntervals(keys[i - 1]!, keys[i]!, config.streakInterval)
     ) {
       currentRun++;
       bestStreak = Math.max(bestStreak, currentRun);
@@ -259,7 +253,6 @@ export function computeStreaks(
       latestKey,
       currentIntervalKey,
       config.streakInterval,
-      weekStart,
     );
 
     if (isLatestCurrent || isLatestPrevious) {
@@ -267,12 +260,7 @@ export function computeStreaks(
       currentStreak = 1;
       for (let i = keys.length - 2; i >= 0; i--) {
         if (
-          areConsecutiveIntervals(
-            keys[i]!,
-            keys[i + 1]!,
-            config.streakInterval,
-            weekStart,
-          )
+          areConsecutiveIntervals(keys[i]!, keys[i + 1]!, config.streakInterval)
         ) {
           currentStreak++;
         } else {

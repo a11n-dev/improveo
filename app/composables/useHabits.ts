@@ -50,7 +50,7 @@ export const useHabits = () => {
       }
 
       return created;
-    } catch (err) {
+    } catch {
       notifyError("Failed to create habit", "Please try again.");
       return null;
     }
@@ -74,7 +74,7 @@ export const useHabits = () => {
       }
 
       return true;
-    } catch (err) {
+    } catch {
       notifyError("Failed to delete habit", "Please try again.");
       return false;
     }
@@ -104,7 +104,7 @@ export const useHabits = () => {
       }
 
       return updated;
-    } catch (err) {
+    } catch {
       notifyError("Failed to update habit", "Please try again.");
       return null;
     }
@@ -134,12 +134,15 @@ export const useHabits = () => {
         ...data.value,
         habits: currentHabits.map((h) => {
           if (h.id !== habitId) return h;
-          const newCompletions = { ...h.completions };
+
+          let newCompletions: Record<string, boolean>;
           if (newCompleted) {
-            newCompletions[date] = true;
+            newCompletions = { ...h.completions, [date]: true };
           } else {
-            delete newCompletions[date];
+            const { [date]: _removed, ...rest } = h.completions;
+            newCompletions = rest;
           }
+
           return { ...h, completions: newCompletions };
         }),
       };
@@ -182,19 +185,22 @@ export const useHabits = () => {
       }
 
       return true;
-    } catch (err) {
+    } catch {
       // Revert: restore previous completion state
       if (data.value) {
         data.value = {
           ...data.value,
           habits: data.value.habits.map((h) => {
             if (h.id !== habitId) return h;
-            const newCompletions = { ...h.completions };
+
+            let newCompletions: Record<string, boolean>;
             if (wasCompleted) {
-              newCompletions[date] = true;
+              newCompletions = { ...h.completions, [date]: true };
             } else {
-              delete newCompletions[date];
+              const { [date]: _removed, ...rest } = h.completions;
+              newCompletions = rest;
             }
+
             return { ...h, completions: newCompletions };
           }),
         };

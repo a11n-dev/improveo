@@ -95,7 +95,7 @@ const handleClose = () => {
       <!-- Delete confirmation -->
       <template v-if="showDeleteConfirm">
         <p class="mb-2 text-center text-sm text-muted">
-          Are you sure you want to delete "{{ habit.title }}"? <br />
+          Are you sure you want to delete "{{ habit.title }}"? <br >
           This action cannot be undone.
         </p>
         <UButton

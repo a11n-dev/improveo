@@ -8,7 +8,7 @@ interface Emits {
   (e: "update:modelValue", value: number): void;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const weekStartOptions = [
@@ -36,10 +36,10 @@ const handleChange = (value: number): void => {
       :model-value="modelValue"
       :items="weekStartOptions"
       class="w-34 shrink-0"
-      @update:model-value="handleChange"
       :content="{
         onCloseAutoFocus: (e) => e.preventDefault(),
       }"
+      @update:model-value="handleChange"
     />
   </div>
 </template>

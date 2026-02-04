@@ -5,6 +5,12 @@ export default defineNuxtConfig({
 
   ssr: true,
 
+  vite: {
+    server: {
+      allowedHosts: [".trycloudflare.com"],
+    },
+  },
+
   modules: [
     "@nuxt/eslint",
     "@nuxt/test-utils",
@@ -66,7 +72,7 @@ export default defineNuxtConfig({
       start_url: "/",
       scope: "/",
       lang: "en",
-      orientation: 'portrait',
+      orientation: "portrait",
       icons: [
         {
           src: "pwa-64x64.png",

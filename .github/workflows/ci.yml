@@ -1,15 +1,17 @@
-name: Typecheck
+name: CI
 
 on:
   pull_request:
-    branches: [dev, main]
+    branches: [main, release]
+  push:
+    branches: [main, release]
 
 concurrency:
-  group: typecheck-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  typecheck:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,4 +26,6 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
       - run: pnpm type-check
+      - run: pnpm build

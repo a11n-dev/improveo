@@ -1,0 +1,20 @@
+changelog:
+  exclude:
+    labels:
+      - "github_actions"
+  categories:
+    - title: Features
+      labels:
+        - "enhancement"
+    - title: Fixes
+      labels:
+        - "bug"
+    - title: Docs
+      labels:
+        - "documentation"
+    - title: Dependencies
+      labels:
+        - "dependencies"
+    - title: Changelog
+      labels:
+        - "*"

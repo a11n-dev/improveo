@@ -1,11 +1,23 @@
 <script setup lang="ts">
+import type { FormSubmitEvent } from "@nuxt/ui";
+
 import type { AuthMode, AuthStep } from "~/types/auth";
+
+import { AuthLoginSchema, AuthRegisterSchema } from "~~/shared/validation/auth";
+import type {
+  AuthLoginInput,
+  AuthRegisterInput,
+} from "~~/shared/validation/auth";
 
 definePageMeta({
   layout: "auth",
 });
 
-const { clearError, isSending, isVerifying, requestOtp, verifyOtp } = useAuth();
+const supabaseClient = useSupabaseClient();
+const { notifyError } = useToastNotify();
+
+const isSending = ref(false);
+const isVerifying = ref(false);
 
 // UI mode and current step
 const activeTab = ref<AuthMode>("login");
@@ -22,25 +34,15 @@ const otpValue = ref<string[]>([]);
 const resendSeconds = ref(0);
 
 const isRegister = computed(() => activeTab.value === "register");
+const authSchema = computed(() =>
+  isRegister.value ? AuthRegisterSchema : AuthLoginSchema,
+);
 
 /** Normalize OTP input array into a single string token. */
 const otpToken = computed(() => otpValue.value.join(""));
 
-/** Format countdown as mm:ss for display. */
-const resendCountdown = computed(() => formatCountdown(resendSeconds.value));
-
-/** Validate that required fields are filled before sending OTP. */
-const canSend = computed(() => {
-  const hasEmail = formState.email.trim().length > 0;
-  const hasName = !isRegister.value || formState.name.trim().length > 0;
-
-  return hasEmail && hasName;
-});
-
-/** Validate that email and full OTP are present before verification. */
-const canVerify = computed(() => {
-  return formState.email.trim().length > 0 && otpToken.value.length === 6;
-});
+const hasValidOtp = () =>
+  formState.email.trim().length > 0 && otpToken.value.length === 6;
 
 const stopResendCountdown = () => {
   resendSeconds.value = 0;
@@ -70,16 +72,64 @@ watch(activeTab, () => {
   step.value = "request";
   otpValue.value = [];
   stopResendCountdown();
-  clearError();
+  formState.name = "";
+  formState.email = "";
 });
 
-/** Request or resend OTP depending on current step. */
-const handleOtpRequest = async () => {
-  if (isSending.value) {
+const notifyRequestError = (message: string): void => {
+  if (/signups not allowed/i.test(message)) {
+    notifyError(
+      "Account not found",
+      "No account found. Please register first.",
+    );
     return;
   }
 
-  if (step.value === "request" && !canSend.value) {
+  notifyError("Unable to send code", message);
+};
+
+const notifyOtpError = (message: string): void => {
+  if (/expired/i.test(message)) {
+    notifyError("Code expired", "Request a new code and try again.");
+    return;
+  }
+
+  if (/invalid|token/i.test(message)) {
+    notifyError("Invalid code", "Double-check the code or request a new one.");
+    return;
+  }
+
+  notifyError("Verification failed", message);
+};
+
+const requestOtp = async (payload: AuthFormOutput): Promise<boolean> => {
+  isSending.value = true;
+
+  const { error: supabaseError } = await supabaseClient.auth.signInWithOtp({
+    email: payload.email,
+    options: {
+      shouldCreateUser: isRegister.value,
+      ...(isRegister.value && payload.name
+        ? { data: { name: payload.name } }
+        : {}),
+    },
+  });
+
+  isSending.value = false;
+
+  if (supabaseError) {
+    notifyRequestError(supabaseError.message);
+    return false;
+  }
+
+  return true;
+};
+
+/** Request or resend OTP depending on current step. */
+type AuthFormOutput = AuthLoginInput | AuthRegisterInput;
+
+const handleOtpRequest = async (data?: AuthFormOutput) => {
+  if (isSending.value) {
     return;
   }
 
@@ -87,11 +137,8 @@ const handleOtpRequest = async () => {
     return;
   }
 
-  const success = await requestOtp({
-    email: formState.email,
-    name: isRegister.value ? formState.name : undefined,
-    shouldCreateUser: isRegister.value,
-  });
+  const payload = data ?? formState;
+  const success = await requestOtp(payload);
 
   if (!success) {
     return;
@@ -110,19 +157,34 @@ const handleOtpRequest = async () => {
 
 /** Verify OTP and redirect to home on success. */
 const handleVerify = async () => {
-  if (!canVerify.value || isVerifying.value) {
+  if (!hasValidOtp() || isVerifying.value) {
     return;
   }
 
-  const success = await verifyOtp({
-    email: formState.email,
-    token: otpToken.value,
+  const normalizedToken = otpToken.value.replace(/\s/g, "");
+
+  if (normalizedToken.length !== 6) {
+    notifyError("Invalid code", "OTP must be 6 characters.");
+    return;
+  }
+
+  isVerifying.value = true;
+
+  const { error: supabaseError } = await supabaseClient.auth.verifyOtp({
+    email: formState.email.trim(),
+    token: normalizedToken,
+    type: "email",
   });
 
-  if (success) {
-    stopResendCountdown();
-    await navigateTo("/");
+  isVerifying.value = false;
+
+  if (supabaseError) {
+    notifyOtpError(supabaseError.message);
+    return;
   }
+
+  stopResendCountdown();
+  await navigateTo("/");
 };
 
 /** Return to email entry step from OTP verification. */
@@ -130,17 +192,11 @@ const handleBack = () => {
   step.value = "request";
   otpValue.value = [];
   stopResendCountdown();
-  clearError();
 };
 
 /** Form submit handler: routes to appropriate action based on current step. */
-const handleSubmit = async () => {
-  if (step.value === "request") {
-    await handleOtpRequest();
-    return;
-  }
-
-  await handleVerify();
+const handleSubmit = async (event: FormSubmitEvent<AuthFormOutput>) => {
+  await handleOtpRequest(event.data);
 };
 
 /** Toggle between login and register modes. */
@@ -168,105 +224,25 @@ onBeforeUnmount(() => {
         </span>
       </div>
 
-      <UForm
-        :state="formState"
-        class="flex flex-col gap-5"
+      <AuthRequestForm
+        v-if="step === 'request'"
+        v-model:state="formState"
+        :schema="authSchema"
+        :is-register="isRegister"
+        :is-sending="isSending"
         @submit="handleSubmit"
-      >
-        <div v-if="step === 'request'" class="flex flex-col gap-5">
-          <p class="text-sm text-muted">
-            {{
-              isRegister
-                ? "Create an account to get started."
-                : "Build better habits with a focused tracker that keeps your streaks on track."
-            }}
-          </p>
-          <div class="flex flex-col gap-2">
-            <UFormField
-              v-if="isRegister"
-              label="Display Name"
-              name="name"
-              required
-            >
-              <UInput
-                v-model="formState.name"
-                class="w-full"
-                placeholder="Your name"
-                autocomplete="name"
-              />
-            </UFormField>
-
-            <UFormField label="Email Address" name="email" required>
-              <UInput
-                v-model="formState.email"
-                class="w-full"
-                type="email"
-                placeholder="example@example.com"
-                autocomplete="email"
-              />
-            </UFormField>
-          </div>
-
-          <UButton
-            type="submit"
-            :loading="isSending"
-            :disabled="!canSend"
-            :label="isRegister ? 'Sign Up' : 'Sign In'"
-            block
-          />
-        </div>
-
-        <div v-else class="flex flex-col gap-5">
-          <div class="text-sm text-muted">
-            <p>Enter the 6-character code sent to:</p>
-            <p class="font-medium text-highlighted">
-              {{ formState.email }}
-            </p>
-          </div>
-
-          <UPinInput
-            v-model="otpValue"
-            :length="6"
-            otp
-            size="xl"
-            placeholder="·"
-            autofocus
-            class="justify-between"
-            @complete="handleSubmit"
-          />
-
-          <div class="flex flex-col gap-3">
-            <UButton
-              type="submit"
-              block
-              :loading="isVerifying"
-              :disabled="!canVerify"
-              label="Verify & Continue"
-            />
-            <UButton
-              type="button"
-              color="neutral"
-              variant="soft"
-              block
-              label="Back"
-              @click="handleBack"
-            />
-            <p class="text-sm text-muted">
-              Didn't receive a code?
-              <UButton
-                type="button"
-                variant="link"
-                class="px-1 text-primary"
-                :disabled="resendSeconds > 0 || isSending"
-                @click="handleOtpRequest"
-              >
-                Resend code
-              </UButton>
-              <span v-if="resendSeconds > 0">in {{ resendCountdown }}</span>
-            </p>
-          </div>
-        </div>
-      </UForm>
+      />
+      <AuthVerifyForm
+        v-else
+        v-model:otp-value="otpValue"
+        :email="formState.email"
+        :resend-seconds="resendSeconds"
+        :is-sending="isSending"
+        :is-verifying="isVerifying"
+        @verify="handleVerify"
+        @back="handleBack"
+        @resend="handleOtpRequest()"
+      />
 
       <p v-if="step === 'request'" class="text-sm text-muted">
         <template v-if="isRegister">

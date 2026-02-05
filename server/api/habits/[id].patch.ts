@@ -5,6 +5,12 @@
  */
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 
+import { parseBody } from "~~/server/utils/validate";
+import {
+  HabitStreakSchema,
+  HabitUpdatePayloadSchema,
+} from "~~/shared/validation/habit";
+
 export default defineEventHandler(async (event): Promise<Habit> => {
   const client = await serverSupabaseClient<Database>(event);
   const user = await serverSupabaseUser(event);
@@ -32,63 +38,30 @@ export default defineEventHandler(async (event): Promise<Habit> => {
   }
 
   // Parse and validate body
-  const body = await readBody<HabitUpdatePayload>(event);
-
-  // Validate title if provided
-  if (body.title !== undefined && !body.title?.trim()) {
-    throw createError({ statusCode: 400, message: "Title cannot be empty" });
-  }
-
-  // Validate icon if provided
-  if (body.icon !== undefined && !body.icon?.trim()) {
-    throw createError({ statusCode: 400, message: "Icon cannot be empty" });
-  }
-
-  // Validate color if provided
-  if (body.color !== undefined && !body.color?.trim()) {
-    throw createError({ statusCode: 400, message: "Color cannot be empty" });
-  }
-
-  // Validate streak configuration
-  const validIntervals: StreakInterval[] = ["daily", "weekly", "monthly"];
-
-  if (
-    body.streakInterval !== undefined &&
-    body.streakInterval !== null &&
-    !validIntervals.includes(body.streakInterval)
-  ) {
-    throw createError({
-      statusCode: 400,
-      message:
-        "Invalid streak interval. Must be null, daily, weekly, or monthly",
-    });
-  }
+  const body = await parseBody(event, HabitUpdatePayloadSchema);
 
   // Determine the final streak configuration
-  const finalStreakInterval =
+  const finalStreakInterval = (
     body.streakInterval !== undefined
       ? body.streakInterval
-      : existingHabit.streak_interval;
+      : existingHabit.streak_interval
+  ) as StreakInterval | null;
   const finalStreakCount =
     body.streakCount !== undefined
       ? body.streakCount
       : existingHabit.streak_count;
 
-  // Validate streak count based on interval
-  if (finalStreakInterval === null) {
-    if (finalStreakCount !== 0) {
-      throw createError({
-        statusCode: 400,
-        message: "Streak count must be 0 when streak interval is disabled",
-      });
-    }
-  } else {
-    if (typeof finalStreakCount !== "number" || finalStreakCount < 1) {
-      throw createError({
-        statusCode: 400,
-        message: "Streak count must be a positive integer",
-      });
-    }
+  const streakValidation = HabitStreakSchema.safeParse({
+    streakInterval: finalStreakInterval,
+    streakCount: finalStreakCount,
+  });
+
+  if (!streakValidation.success) {
+    const issue = streakValidation.error.issues[0];
+    throw createError({
+      statusCode: 400,
+      message: issue?.message ?? "Invalid streak configuration",
+    });
   }
 
   // Build update object with only provided fields
@@ -97,16 +70,16 @@ export default defineEventHandler(async (event): Promise<Habit> => {
   };
 
   if (body.title !== undefined) {
-    updateData.title = body.title.trim();
+    updateData.title = body.title;
   }
   if (body.description !== undefined) {
     updateData.description = body.description?.trim() || null;
   }
   if (body.icon !== undefined) {
-    updateData.icon = body.icon.trim();
+    updateData.icon = body.icon;
   }
   if (body.color !== undefined) {
-    updateData.color = body.color.trim();
+    updateData.color = body.color;
   }
   if (body.streakInterval !== undefined) {
     updateData.streak_interval = body.streakInterval;

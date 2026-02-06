@@ -19,7 +19,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "format": "prettier --write .",
-    "gen:supabase": "npx supabase gen types typescript --project-id $(cat .secrets/supabase_project_ref) --schema public > shared/types/database.types.ts"
+    "supabase:gen:types": "npx supabase gen types typescript --local --schema public > shared/types/database.types.ts",
+    "supabase:seed": "npx supabase db reset --local"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.88",

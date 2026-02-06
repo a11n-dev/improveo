@@ -1,0 +1,100 @@
+-- Habit fixtures for deterministic local and CI tests.
+
+with member1 as (
+  select id as user_id
+  from public.profiles
+  where email = 'member1@example.test'
+)
+insert into public.habits (
+  id,
+  user_id,
+  title,
+  description,
+  icon,
+  color,
+  streak_interval,
+  streak_count,
+  current_streak,
+  best_streak,
+  last_completed_on
+)
+select
+  habit.id,
+  member1.user_id,
+  habit.title,
+  habit.description,
+  habit.icon,
+  habit.color,
+  habit.streak_interval,
+  habit.streak_count,
+  habit.current_streak,
+  habit.best_streak,
+  habit.last_completed_on
+from member1
+cross join (
+  values
+    ('11111111-1111-4111-8111-111111111111'::uuid, 'Read 20 pages', 'No completions yet', 'i-lucide-book-open', '#3B82F6', 'daily'::text, 1, 0, 0, null::date),
+    ('22222222-2222-4222-8222-222222222222'::uuid, 'Morning walk', 'Active daily streak', 'i-lucide-footprints', '#10B981', 'daily'::text, 1, 3, 3, current_date),
+    ('33333333-3333-4333-8333-333333333333'::uuid, 'Meditation', 'Broken daily streak', 'i-lucide-flower-2', '#F59E0B', 'daily'::text, 1, 0, 2, current_date - 7),
+    ('44444444-4444-4444-8444-444444444444'::uuid, 'Workout sessions', 'Weekly habit (3x)', 'i-lucide-dumbbell', '#EF4444', 'weekly'::text, 3, 1, 2, current_date - 1),
+    ('55555555-5555-4555-8555-555555555555'::uuid, 'Deep work blocks', 'Monthly habit (8x)', 'i-lucide-brain', '#8B5CF6', 'monthly'::text, 8, 1, 2, current_date - 1),
+    ('66666666-6666-4666-8666-666666666666'::uuid, 'Journal notes', 'No streak tracking', 'i-lucide-notebook-pen', '#06B6D4', null::text, 0, 0, 0, current_date - 4)
+) as habit(id, title, description, icon, color, streak_interval, streak_count, current_streak, best_streak, last_completed_on)
+on conflict (id) do update
+set
+  user_id = excluded.user_id,
+  title = excluded.title,
+  description = excluded.description,
+  icon = excluded.icon,
+  color = excluded.color,
+  streak_interval = excluded.streak_interval,
+  streak_count = excluded.streak_count,
+  current_streak = excluded.current_streak,
+  best_streak = excluded.best_streak,
+  last_completed_on = excluded.last_completed_on,
+  updated_at = now();
+
+with member2 as (
+  select id as user_id
+  from public.profiles
+  where email = 'member2@example.test'
+)
+insert into public.habits (
+  id,
+  user_id,
+  title,
+  description,
+  icon,
+  color,
+  streak_interval,
+  streak_count,
+  current_streak,
+  best_streak,
+  last_completed_on
+)
+select
+  '77777777-7777-4777-8777-777777777777'::uuid,
+  member2.user_id,
+  'Practice guitar',
+  'Secondary user habit for ownership checks',
+  'i-lucide-music-4',
+  '#14B8A6',
+  'daily',
+  1,
+  1,
+  1,
+  current_date - 2
+from member2
+on conflict (id) do update
+set
+  user_id = excluded.user_id,
+  title = excluded.title,
+  description = excluded.description,
+  icon = excluded.icon,
+  color = excluded.color,
+  streak_interval = excluded.streak_interval,
+  streak_count = excluded.streak_count,
+  current_streak = excluded.current_streak,
+  best_streak = excluded.best_streak,
+  last_completed_on = excluded.last_completed_on,
+  updated_at = now();

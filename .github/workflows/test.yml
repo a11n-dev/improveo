@@ -32,10 +32,10 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.75.5
 
       - name: Start local Supabase
-        run: supabase start
+        run: supabase start --debug
 
       - name: Export local Supabase env and create .env.test
         run: |
@@ -59,7 +59,7 @@ jobs:
           } > .env.test
 
       - name: Reset and seed local DB
-        run: pnpm supabase:seed
+        run: supabase db reset --local
 
       - name: Run unit tests
         run: pnpm test:unit

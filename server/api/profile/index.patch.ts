@@ -5,6 +5,9 @@
 
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 
+import { parseBody } from "~~/server/utils/validate";
+import { ProfileUpdatePayloadSchema } from "~~/shared/validation/profile";
+
 export default defineEventHandler(async (event): Promise<Profile> => {
   const client = await serverSupabaseClient<Database>(event);
   const user = await serverSupabaseUser(event);
@@ -13,16 +16,7 @@ export default defineEventHandler(async (event): Promise<Profile> => {
     throw createError({ statusCode: 401, message: "Unauthorized" });
   }
 
-  const payload = await readBody<ProfileUpdatePayload>(event);
-
-  if (payload.weekStart !== undefined) {
-    if (payload.weekStart < 0 || payload.weekStart > 6) {
-      throw createError({
-        statusCode: 400,
-        message: "Week start must be between 0 and 6",
-      });
-    }
-  }
+  const payload = await parseBody(event, ProfileUpdatePayloadSchema);
 
   const updatePayload = {
     ...(payload.weekStart !== undefined && { week_start: payload.weekStart }),

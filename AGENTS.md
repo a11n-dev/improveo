@@ -23,7 +23,7 @@ Scope: Nuxt 4 app with Tailwind v4, Vitest, Playwright.
 - Lint: `pnpm lint` (ESLint via `@nuxt/eslint`).
 - Format: `pnpm format` (Prettier defaults; no custom config).
 - Type check: `pnpm type-check` (Nuxt type checker).
-- After implementation, run `pnpm lint`, `pnpm type-check` and `pnpm format` and report results (or note if skipped).
+- After implementation, run `pnpm lint`, `pnpm type-check`, `pnpm format`, `pnpm test:unit`, `pnpm test:nuxt` and report results (or note if skipped).
 
 ## Tests
 
@@ -44,7 +44,7 @@ Scope: Nuxt 4 app with Tailwind v4, Vitest, Playwright.
 
 ## DB types generation
 
-- Supabase types: `pnpm run gen:supabase`.
+- Supabase types: `pnpm run supabase:gen:types`.
 
 ## Code style guidelines
 

@@ -21,7 +21,19 @@ interface Props {
   streakGoalLabel?: string;
 }
 
-const { color, completions, weekStart = 0, endDate = new Date(), daysCount = 365, showLegend = true, showTooltips = true, currentStreak = 0, bestStreak = 0, hasStreak = false, streakGoalLabel = "" } = defineProps<Props>();
+const {
+  color,
+  completions,
+  weekStart = 0,
+  endDate = new Date(),
+  daysCount = 365,
+  showLegend = true,
+  showTooltips = true,
+  currentStreak = 0,
+  bestStreak = 0,
+  hasStreak = false,
+  streakGoalLabel = "",
+} = defineProps<Props>();
 
 /** Whether on desktop viewport (used to disable tooltips on mobile) */
 const isDesktop = useIsDesktop();
@@ -92,10 +104,7 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
 </script>
 
 <template>
-  <div
-    class="flex w-full flex-col gap-2"
-    :style="{ '--habit-color': color }"
-  >
+  <div class="flex w-full flex-col gap-2" :style="{ '--habit-color': color }">
     <ClientOnly>
       <UTooltip
         v-if="showTooltips && isDesktop"
@@ -146,10 +155,7 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
 
           <!-- Grid of cells -->
           <div class="grid grid-flow-col grid-rows-7 gap-0.75">
-            <template
-              v-for="(week, weekIndex) in weeks"
-              :key="weekIndex"
-            >
+            <template v-for="(week, weekIndex) in weeks" :key="weekIndex">
               <div
                 v-for="day in week"
                 v-show="day.date <= todayStr"

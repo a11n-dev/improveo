@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import {
+  HABIT_DESCRIPTION_MAX_LENGTH,
+  HABIT_TITLE_MAX_LENGTH,
+} from "~~/shared/constants/validation";
 interface Props {
   /** The draft object to bind to */
   draft: {
@@ -82,8 +86,21 @@ const handleStreakChange = (streak: StreakGoal | null) => {
         :model-value="localDraft.name"
         placeholder="e.g. Morning meditation"
         class="w-full"
+        :maxlength="HABIT_TITLE_MAX_LENGTH"
+        :ui="{ base: 'pr-14', trailing: 'pointer-events-none pr-2' }"
         @update:model-value="updateField('name', $event as string)"
-      />
+      >
+        <template #trailing>
+          <div
+            id="habit-name-count"
+            class="text-xs text-muted tabular-nums"
+            aria-live="polite"
+            role="status"
+          >
+            {{ localDraft.name.length }}/{{ HABIT_TITLE_MAX_LENGTH }}
+          </div>
+        </template>
+      </UInput>
     </UFormField>
 
     <!-- Description -->
@@ -92,8 +109,23 @@ const handleStreakChange = (streak: StreakGoal | null) => {
         :model-value="localDraft.description"
         placeholder="Optional description..."
         class="w-full"
+        :maxlength="HABIT_DESCRIPTION_MAX_LENGTH"
+        :ui="{ base: 'pr-14', trailing: 'pointer-events-none pr-2' }"
         @update:model-value="updateField('description', $event as string)"
-      />
+      >
+        <template #trailing>
+          <div
+            id="habit-description-count"
+            class="text-xs text-muted tabular-nums"
+            aria-live="polite"
+            role="status"
+          >
+            {{ localDraft.description.length }}/{{
+              HABIT_DESCRIPTION_MAX_LENGTH
+            }}
+          </div>
+        </template>
+      </UInput>
     </UFormField>
 
     <!-- Streak Goal -->

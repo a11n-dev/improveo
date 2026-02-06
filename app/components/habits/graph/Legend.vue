@@ -10,7 +10,12 @@ interface Props {
   streakGoalLabel?: string;
 }
 
-const { currentStreak = 0, bestStreak = 0, hasStreak = false, streakGoalLabel = "" } = defineProps<Props>();
+const {
+  currentStreak = 0,
+  bestStreak = 0,
+  hasStreak = false,
+  streakGoalLabel = "",
+} = defineProps<Props>();
 
 const badgeStyle = {
   backgroundColor: "color-mix(in srgb, var(--habit-color) 16%, transparent)",
@@ -22,11 +27,7 @@ const badgeStyle = {
 <template>
   <div class="flex items-center justify-between text-xs text-muted">
     <!-- Left: Streak info -->
-    <div
-      v-if="hasStreak"
-      class="flex items-center gap-1"
-      @click.stop
-    >
+    <div v-if="hasStreak" class="flex items-center gap-1" @click.stop>
       <UTooltip
         text="Current streak"
         :content="{ side: 'top', sideOffset: 6 }"
@@ -77,10 +78,7 @@ const badgeStyle = {
         </UBadge>
       </UTooltip>
     </div>
-    <div
-      v-else
-      @click.stop
-    >
+    <div v-else @click.stop>
       <UTooltip
         text="Streak goal"
         :content="{ side: 'top', sideOffset: 6 }"

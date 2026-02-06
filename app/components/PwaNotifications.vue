@@ -18,7 +18,7 @@ watch(
   (showPrompt) => {
     if (showPrompt && showInstallButton.value) {
       toast.add({
-        title: "Install Improveme",
+        title: "Install Improveo",
         description: "Add to your home screen for quick access",
         color: "primary",
         duration: 0,
@@ -68,7 +68,7 @@ const showGuideToastIfNeeded = () => {
   ) {
     hasShownGuideToast.value = true;
     toast.add({
-      title: "Install Improveme",
+      title: "Install Improveo",
       description: "Add to your home screen for quick access",
       color: "primary",
       duration: 0,

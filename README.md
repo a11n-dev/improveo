@@ -1,6 +1,6 @@
-# Improveme
+# Improveo
 
-Improveme is a modern, full-stack habit tracking application designed to help you build and maintain positive routines.
+Improveo is a modern habit tracking application designed to help you build and maintain positive routines.
 
 ## ✨ Features
 
@@ -16,7 +16,7 @@ Improveme is a modern, full-stack habit tracking application designed to help yo
 
     ```bash
     git clone <repository-url>
-    cd Improveme
+    cd improveo
     ```
 
 2.  **Install dependencies:**

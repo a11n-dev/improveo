@@ -30,7 +30,7 @@ export default defineNuxtConfig({
         },
         { name: "apple-mobile-web-app-capable", content: "yes" },
         { name: "apple-mobile-web-app-status-bar-style", content: "default" },
-        { name: "apple-mobile-web-app-title", content: "Improveme" },
+        { name: "apple-mobile-web-app-title", content: "Improveo" },
       ],
       link: [
         {
@@ -63,8 +63,8 @@ export default defineNuxtConfig({
   pwa: {
     registerType: "autoUpdate",
     manifest: {
-      name: "Improveme",
-      short_name: "Improveme",
+      name: "Improveo",
+      short_name: "Improveo",
       description: "A modern habit tracking application.",
       theme_color: "#ffffff",
       background_color: "#ffffff",

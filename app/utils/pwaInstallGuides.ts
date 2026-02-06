@@ -110,7 +110,7 @@ const guides = {
       },
       {
         title: "Click the install icon",
-        subtitle: 'Or use menu → "Install Improveme..."',
+        subtitle: 'Or use menu → "Install Improveo..."',
         icon: "i-lucide-mouse-pointer-click",
       },
       {
@@ -158,7 +158,7 @@ const guides = {
       },
       {
         title: "Click the install icon",
-        subtitle: 'Or use menu → Apps → "Install Improveme"',
+        subtitle: 'Or use menu → Apps → "Install Improveo"',
         icon: "i-lucide-mouse-pointer-click",
       },
       {

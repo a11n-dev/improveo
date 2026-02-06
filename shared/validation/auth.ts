@@ -4,7 +4,7 @@ import {
   EMAIL_MAX_LENGTH,
   PROFILE_NAME_MAX_LENGTH,
   PROFILE_NAME_MIN_LENGTH,
-} from "~~/shared/constants/validation";
+} from "../constants/validation";
 
 const EmailSchema = z
   .string()

@@ -9,7 +9,7 @@ import {
   HABIT_TITLE_MIN_LENGTH,
   HABIT_TITLE_MAX_LENGTH,
   STREAK_COUNT_LIMITS,
-} from "~~/shared/constants/validation";
+} from "../constants/validation";
 
 const StreakIntervalSchema = z.enum(["daily", "weekly", "monthly"]);
 

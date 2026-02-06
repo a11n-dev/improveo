@@ -216,11 +216,11 @@ onBeforeUnmount(() => {
         <UColorModeImage
           light="/logo-light.svg"
           dark="/logo-dark.svg"
-          alt="Improveme Logo"
+          alt="Improveo Logo"
           class="h-10 w-10"
         />
         <span class="text-lg text-highlighted">
-          {{ isRegister ? "Signup to Improveme" : "Login to Improveme" }}
+          {{ isRegister ? "Signup to Improveo" : "Login to Improveo" }}
         </span>
       </div>
 

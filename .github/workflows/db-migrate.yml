@@ -3,6 +3,10 @@ name: DB Migrate
 on:
   push:
     branches: [main, release]
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/config.toml"
+      - ".github/workflows/db-migrate.yml"
   workflow_dispatch:
 
 permissions:

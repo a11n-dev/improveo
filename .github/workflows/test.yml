@@ -35,31 +35,23 @@ jobs:
           version: 2.75.5
 
       - name: Start local Supabase
-        run: supabase start --debug
+        run: pnpm run supabase:start
 
-      - name: Export local Supabase env and create .env.test
+      - name: Sync local Supabase env files
+        run: pnpm run supabase:env:sync
+
+      - name: Export .env.test values for later steps
         run: |
-          while IFS='=' read -r key rawValue; do
+          while IFS='=' read -r key value; do
             if [ -z "$key" ]; then
               continue
             fi
 
-            value="${rawValue#\"}"
-            value="${value%\"}"
             echo "$key=$value" >> "$GITHUB_ENV"
-            export "$key=$value"
-          done < <(supabase status -o env)
-
-          {
-            printf 'SUPABASE_URL=%s\n' "$API_URL"
-            printf 'SUPABASE_KEY=%s\n' "$PUBLISHABLE_KEY"
-            printf 'SUPABASE_SECRET_KEY=%s\n' "$SERVICE_ROLE_KEY"
-            printf 'NUXT_PUBLIC_SUPABASE_URL=%s\n' "$API_URL"
-            printf 'NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=%s\n' "$PUBLISHABLE_KEY"
-          } > .env.test
+          done < .env.test
 
       - name: Reset and seed local DB
-        run: supabase db reset --local
+        run: pnpm run supabase:reset
 
       - name: Run unit tests
         run: pnpm test:unit

@@ -6,8 +6,11 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --host --no-qr",
+    "dev:local": "pnpm run supabase:start && pnpm run supabase:env:sync && pnpm run dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "setup": "pnpm run supabase:start && pnpm run supabase:env:sync",
+    "setup:reset": "pnpm run setup && pnpm run supabase:reset",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "type-check": "nuxt typecheck",
@@ -19,8 +22,12 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "format": "prettier --write .",
-    "supabase:gen:types": "npx supabase gen types typescript --local --schema public > shared/types/database.types.ts",
-    "supabase:seed": "npx supabase db reset --local"
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:reset": "supabase db reset --local",
+    "supabase:env:sync": "node scripts/supabase-env-sync.mjs",
+    "supabase:gen:types": "supabase gen types typescript --local --schema public > shared/types/database.types.ts"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.89",
@@ -46,8 +53,14 @@
     "happy-dom": "^20.5.0",
     "playwright-core": "^1.58.1",
     "prettier": "^3.8.1",
+    "supabase": "^2.75.5",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18",
     "vue-tsc": "^3.2.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "supabase"
+    ]
   }
 }

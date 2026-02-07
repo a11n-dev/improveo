@@ -17,7 +17,6 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@vite-pwa/nuxt",
     "@nuxt/ui",
-    "@nuxt/fonts",
   ],
 
   app: {
@@ -52,12 +51,6 @@ export default defineNuxtConfig({
   supabase: {
     redirect: false,
     types: "~~/shared/types/database.types.ts",
-  },
-
-  fonts: {
-    families: [
-      { name: "Space Grotesk", provider: "google", weights: [400, 500, 600] },
-    ],
   },
 
   pwa: {

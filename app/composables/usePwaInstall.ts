@@ -174,6 +174,15 @@ export const usePwaInstall = () => {
   };
 
   /**
+   * Mark install toast as handled and persist opt-out flag.
+   * This should be called only from install toast interactions.
+   */
+  const markInstallToastHandled = () => {
+    setOptOut();
+    isOptedOut.value = true;
+  };
+
+  /**
    * Trigger installation.
    * Uses native prompt if available, otherwise opens guide.
    */
@@ -186,20 +195,14 @@ export const usePwaInstall = () => {
   };
 
   /**
-   * Cancel installation and set opt-out flag.
+   * Cancel installation flow.
    * Works for both native prompt and guide flow.
-   * Sets localStorage flag for browsers without native prompt support.
    */
   const cancel = () => {
     closeGuide();
 
     // Always try to cancel via $pwa if available
     $pwa?.cancelInstall();
-
-    // Also set our own opt-out flag for browsers without native prompt
-    // This ensures the toast won't show again even if $pwa.cancelInstall() doesn't work
-    setOptOut();
-    isOptedOut.value = true;
   };
 
   return {
@@ -212,6 +215,7 @@ export const usePwaInstall = () => {
     hasOptedOut,
     openGuide,
     closeGuide,
+    markInstallToastHandled,
     install,
     cancel,
   };

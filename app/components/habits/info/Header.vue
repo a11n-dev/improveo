@@ -29,7 +29,7 @@ const emit = defineEmits<{
           {{ habit.title }}
         </span>
         <span class="truncate text-sm text-muted">
-          {{ habit.description || "No Description" }}
+          {{ habit.description || "No description" }}
         </span>
       </div>
     </div>

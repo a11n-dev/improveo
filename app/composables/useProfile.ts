@@ -34,7 +34,7 @@ export const useProfile = () => {
     }
 
     if (value < 0 || value > 6) {
-      notifyError("Invalid value", "Week start must be between 0 and 6");
+      notifyError("Invalid value", "Choose a day from Monday to Sunday");
       return false;
     }
 

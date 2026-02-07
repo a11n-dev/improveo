@@ -7,8 +7,14 @@
  */
 const { $pwa } = useNuxtApp();
 const toast = useToast();
-const { install, cancel, canPromptInstall, showInstallButton, hasOptedOut } =
-  usePwaInstall();
+const {
+  install,
+  cancel,
+  canPromptInstall,
+  showInstallButton,
+  hasOptedOut,
+  markInstallToastHandled,
+} = usePwaInstall();
 
 /**
  * Show install prompt toast when native prompt is available.
@@ -16,12 +22,17 @@ const { install, cancel, canPromptInstall, showInstallButton, hasOptedOut } =
 watch(
   () => $pwa?.showInstallPrompt,
   (showPrompt) => {
-    if (showPrompt && showInstallButton.value) {
+    if (showPrompt && showInstallButton.value && !hasOptedOut.value) {
       toast.add({
         title: "Install Improveo",
         description: "Add to your home screen for quick access",
         color: "primary",
         duration: 0,
+        close: {
+          onClick: () => {
+            markInstallToastHandled();
+          },
+        },
         actions: [
           {
             label: "Install",
@@ -29,7 +40,10 @@ watch(
             variant: "subtle",
             size: "lg",
             block: true,
-            onClick: install,
+            onClick: () => {
+              markInstallToastHandled();
+              install();
+            },
           },
           {
             label: "Later",
@@ -37,7 +51,10 @@ watch(
             variant: "ghost",
             size: "lg",
             block: true,
-            onClick: cancel,
+            onClick: () => {
+              markInstallToastHandled();
+              cancel();
+            },
           },
         ],
       });
@@ -72,6 +89,11 @@ const showGuideToastIfNeeded = () => {
       description: "Add to your home screen for quick access",
       color: "primary",
       duration: 0,
+      close: {
+        onClick: () => {
+          markInstallToastHandled();
+        },
+      },
       actions: [
         {
           label: "Show me how",
@@ -79,7 +101,10 @@ const showGuideToastIfNeeded = () => {
           variant: "subtle",
           size: "lg",
           block: true,
-          onClick: install,
+          onClick: () => {
+            markInstallToastHandled();
+            install();
+          },
         },
         {
           label: "Later",
@@ -87,7 +112,10 @@ const showGuideToastIfNeeded = () => {
           variant: "ghost",
           size: "lg",
           block: true,
-          onClick: cancel,
+          onClick: () => {
+            markInstallToastHandled();
+            cancel();
+          },
         },
       ],
     });
@@ -111,13 +139,13 @@ watch(
   (needsRefresh) => {
     if (needsRefresh) {
       toast.add({
-        title: "Update Available",
-        description: "A new version is available. Click to update.",
+        title: "Update available",
+        description: "A new version is ready. Update now to continue.",
         color: "warning",
         duration: 0,
         actions: [
           {
-            label: "Update Now",
+            label: "Update now",
             color: "primary",
             variant: "subtle",
             size: "lg",

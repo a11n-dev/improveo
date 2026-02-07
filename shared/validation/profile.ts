@@ -20,8 +20,8 @@ const ProfileNameSchema = z
 const WeekStartSchema = z
   .number()
   .int()
-  .min(0, "Week start must be between 0 and 6")
-  .max(6, "Week start must be between 0 and 6");
+  .min(0, "Choose a day from Monday to Sunday")
+  .max(6, "Choose a day from Monday to Sunday");
 
 export const ProfileUpdatePayloadSchema = z
   .object({

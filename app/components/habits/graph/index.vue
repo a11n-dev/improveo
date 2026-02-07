@@ -114,10 +114,9 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
         :delay-duration="0"
         :content="{ side: 'top', sideOffset: 6 }"
       />
-      <template #fallback>
-        <span />
-      </template>
+      <template #fallback />
     </ClientOnly>
+
     <!-- Graph area -->
     <div class="flex w-full gap-1">
       <!-- Fixed day labels column (pinned Y-axis) -->

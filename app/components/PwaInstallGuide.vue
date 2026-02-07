@@ -7,11 +7,11 @@
  */
 import { getInstallGuide } from "~/utils/pwaInstallGuides";
 
-const { isGuideOpen, cancel, browser, device, isIOS } = usePwaInstall();
+const { isGuideOpen, closeGuide, browser, device, isIOS } = usePwaInstall();
 
 const guide = computed(() => getInstallGuide(browser, device, isIOS));
 
-const title = "Install Application";
+const title = "Install Improveo";
 const description = "Add to your home screen for quick access";
 </script>
 
@@ -66,7 +66,7 @@ const description = "Add to your home screen for quick access";
         color="neutral"
         block
         class="justify-center"
-        @click="cancel"
+        @click="closeGuide"
       />
     </template>
   </ResponsiveOverlay>

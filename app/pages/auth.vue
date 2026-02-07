@@ -164,7 +164,7 @@ const handleVerify = async () => {
   const normalizedToken = otpToken.value.replace(/\s/g, "");
 
   if (normalizedToken.length !== 6) {
-    notifyError("Invalid code", "OTP must be 6 characters.");
+    notifyError("Invalid code", "Enter the 6-digit code.");
     return;
   }
 
@@ -220,7 +220,7 @@ onBeforeUnmount(() => {
           class="h-10 w-10"
         />
         <span class="text-lg text-highlighted">
-          {{ isRegister ? "Signup to Improveo" : "Login to Improveo" }}
+          {{ isRegister ? "Sign up to Improveo" : "Log in to Improveo" }}
         </span>
       </div>
 
@@ -253,19 +253,19 @@ onBeforeUnmount(() => {
             class="ml-1 px-0 py-0 text-primary"
             @click="toggleAuthMode"
           >
-            Login Here
+            Log in
           </UButton>
         </template>
 
         <template v-else>
-          <span>Don't have an account?</span>
+          <span>Don’t have an account?</span>
           <UButton
             type="button"
             variant="link"
             class="ml-1 px-0 py-0 text-primary"
             @click="toggleAuthMode"
           >
-            Register Now
+            Create one
           </UButton>
         </template>
       </p>

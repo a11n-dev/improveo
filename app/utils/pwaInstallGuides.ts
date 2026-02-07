@@ -37,7 +37,7 @@ const guides = {
         icon: "i-lucide-share",
       },
       {
-        title: 'Scroll and tap "Add to Home Screen"',
+        title: 'Scroll and tap "Add to Home screen"',
         subtitle: "You may need to scroll down in the share menu",
         icon: "i-lucide-plus-square",
       },
@@ -225,11 +225,11 @@ const guides = {
     steps: [
       {
         title: "Open browser menu",
-        subtitle: "Usually three dots or lines icon",
+        subtitle: "Usually a three-dot or three-line icon",
         icon: "i-lucide-menu",
       },
       {
-        title: 'Look for "Install" or "Add to Home Screen"',
+        title: 'Look for "Install" or "Add to Home screen"',
         subtitle: "The option may vary by browser",
         icon: "i-lucide-download",
       },

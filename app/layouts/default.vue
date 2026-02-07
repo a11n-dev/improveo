@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-dvh pb-16">
+  <div class="min-h-dvh pb-20">
     <slot />
     <NavigationMenu />
     <HabitsCreateFab />

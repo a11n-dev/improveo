@@ -62,13 +62,13 @@ watch(
       {{
         props.isRegister
           ? "Create an account to get started."
-          : "Build better habits with a focused tracker that keeps your streaks on track."
+          : "Build better habits with a focused tracker that helps you stay consistent."
       }}
     </p>
     <div class="flex flex-col gap-2">
       <UFormField
         v-if="props.isRegister"
-        label="Display Name"
+        label="Display name"
         name="name"
         :hint="
           state.name.trim().length < PROFILE_NAME_MIN_LENGTH
@@ -80,7 +80,7 @@ watch(
         <UInput
           v-model="state.name"
           class="w-full"
-          placeholder="Your name"
+          placeholder="e.g. Alex Johnson"
           autocomplete="name"
           :minlength="PROFILE_NAME_MIN_LENGTH"
           :maxlength="PROFILE_NAME_MAX_LENGTH"
@@ -88,7 +88,7 @@ watch(
         />
       </UFormField>
 
-      <UFormField label="Email Address" name="email" required>
+      <UFormField label="Email address" name="email" required>
         <UInput
           v-model="state.email"
           class="w-full"
@@ -105,7 +105,7 @@ watch(
       type="submit"
       :loading="props.isSending"
       :disabled="props.isSending"
-      :label="props.isRegister ? 'Sign Up' : 'Sign In'"
+      :label="props.isRegister ? 'Sign up' : 'Sign in'"
       block
     />
   </UForm>

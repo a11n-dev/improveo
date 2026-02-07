@@ -107,7 +107,7 @@ const handleStreakChange = (streak: StreakGoal | null) => {
     <UFormField label="Description" name="description">
       <UInput
         :model-value="localDraft.description"
-        placeholder="Optional description..."
+        placeholder="Optional (e.g. 10 minutes before work)"
         class="w-full"
         :maxlength="HABIT_DESCRIPTION_MAX_LENGTH"
         :ui="{ base: 'pr-14', trailing: 'pointer-events-none pr-2' }"

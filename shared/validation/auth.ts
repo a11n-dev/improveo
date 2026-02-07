@@ -11,7 +11,7 @@ const EmailSchema = z
   .trim()
   .min(1, "Email is required")
   .max(EMAIL_MAX_LENGTH, `Email must be ${EMAIL_MAX_LENGTH} characters or less`)
-  .email("Invalid email");
+  .email("Enter a valid email address.");
 
 const NameSchema = z
   .string()

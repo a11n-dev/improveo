@@ -153,7 +153,7 @@ describe("Auth RequestForm", () => {
     expect(wrapper.find('input[autocomplete="name"]').exists()).toBe(false);
 
     const submitButton = wrapper.find('button[type="submit"]');
-    expect(submitButton.text()).toContain("Sign In");
+    expect(submitButton.text()).toContain("Sign in");
 
     await wrapper.find('[data-test="u-form"]').trigger("submit");
 

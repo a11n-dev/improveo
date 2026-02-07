@@ -25,7 +25,7 @@ const canVerify = computed(
 <template>
   <div class="flex flex-col gap-5">
     <div class="text-sm text-muted">
-      <p>Enter the 6-character code sent to:</p>
+      <p>Enter the 6-digit code sent to:</p>
       <p class="font-medium text-highlighted">
         {{ props.email }}
       </p>
@@ -48,7 +48,7 @@ const canVerify = computed(
         block
         :loading="props.isVerifying"
         :disabled="!canVerify"
-        label="Verify & Continue"
+        label="Verify and continue"
         @click="emit('verify')"
       />
       <UButton

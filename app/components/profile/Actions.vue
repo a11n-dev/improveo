@@ -81,7 +81,7 @@ const confirmDelete = async (): Promise<void> => {
         :disabled="isDeleting"
         @click="install"
       >
-        Install App
+        Install app
       </UButton>
     </ClientOnly>
 

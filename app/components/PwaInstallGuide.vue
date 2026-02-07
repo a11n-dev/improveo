@@ -11,7 +11,7 @@ const { isGuideOpen, closeGuide, browser, device, isIOS } = usePwaInstall();
 
 const guide = computed(() => getInstallGuide(browser, device, isIOS));
 
-const title = "Install Application";
+const title = "Install Improveo";
 const description = "Add to your home screen for quick access";
 </script>
 

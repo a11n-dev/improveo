@@ -65,7 +65,7 @@ describe("Auth VerifyForm", () => {
     const buttons = wrapper.findAll("button");
     const labels = buttons.map((button) => button.text().trim());
     const verifyButton =
-      buttons[findButtonByLabel(labels, "Verify & Continue")];
+      buttons[findButtonByLabel(labels, "Verify and continue")];
 
     expect(verifyButton?.attributes("disabled")).toBeDefined();
   });
@@ -88,7 +88,7 @@ describe("Auth VerifyForm", () => {
     const labels = buttons.map((button) => button.text().trim());
 
     const verifyButton =
-      buttons[findButtonByLabel(labels, "Verify & Continue")];
+      buttons[findButtonByLabel(labels, "Verify and continue")];
     const backButton = buttons[findButtonByLabel(labels, "Back")];
     const resendButton = buttons[findButtonByLabel(labels, "Resend code")];
 

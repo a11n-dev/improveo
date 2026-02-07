@@ -29,8 +29,10 @@ const handleChange = (value: number): void => {
 <template>
   <div class="flex items-center justify-between gap-4">
     <div class="flex flex-col gap-1 min-w-0 flex-1">
-      <span class="text-sm font-medium text-highlighted">Week Start</span>
-      <span class="text-xs text-muted">First day of the week in calendar</span>
+      <span class="text-sm font-medium text-highlighted">Week start</span>
+      <span class="text-xs text-muted"
+        >First day of the week in the calendar</span
+      >
     </div>
     <USelect
       :model-value="modelValue"

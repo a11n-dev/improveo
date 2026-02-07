@@ -51,7 +51,7 @@ describe("ProfileUpdatePayloadSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues[0]?.message).toBe(
-        "Week start must be between 0 and 6",
+        "Choose a day from Monday to Sunday",
       );
     }
   });

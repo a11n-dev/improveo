@@ -139,13 +139,13 @@ watch(
   (needsRefresh) => {
     if (needsRefresh) {
       toast.add({
-        title: "Update Available",
-        description: "A new version is available. Click to update.",
+        title: "Update available",
+        description: "A new version is ready. Update now to continue.",
         color: "warning",
         duration: 0,
         actions: [
           {
-            label: "Update Now",
+            label: "Update now",
             color: "primary",
             variant: "subtle",
             size: "lg",

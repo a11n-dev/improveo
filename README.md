@@ -25,19 +25,66 @@ Improveo is a modern habit tracking application designed to help you build and m
     pnpm install
     ```
 
-3.  **Environment Setup:**
-    Create a `.env` file in the root directory and add your Supabase credentials:
+    If `supabase` is not available after install, run:
 
-    ```env
-    SUPABASE_URL=your_supabase_url
-    SUPABASE_KEY=your_supabase_anon_key
-    ```
-
-4.  **Start Development Server:**
     ```bash
-    pnpm dev
+    pnpm approve-builds
+    pnpm rebuild supabase
     ```
+
+3.  **Install and start Docker:**
+    Local Supabase runs in Docker containers, so Docker Desktop (or Docker Engine) must be installed and running.
+
+4.  **Run one-time local setup:**
+
+    ```bash
+    pnpm run setup:reset
+    ```
+
+    This command will:
+    - start local Supabase
+    - sync local Supabase credentials into `.env` and `.env.test`
+    - reset and seed the local database
+
+    Use `pnpm run setup` when you only want to start local Supabase and sync env files without resetting data.
+
+5.  **Start Development Server:**
+
+    ```bash
+    pnpm run dev:local
+    ```
+
     The app will be available at `http://localhost:3000`.
+
+    PWA service worker is disabled by default in development. Set `NUXT_PWA_DEV=true` only when you need to test PWA behavior.
+
+## 🗄️ Supabase Commands
+
+```bash
+# Start local Supabase stack
+pnpm run supabase:start
+
+# Stop local Supabase stack
+pnpm run supabase:stop
+
+# Show local Supabase status
+pnpm run supabase:status
+
+# Sync local Supabase credentials into .env and .env.test
+pnpm run supabase:env:sync
+
+# Reset local DB and re-run migrations/seeds
+pnpm run supabase:reset
+```
+
+## 🔐 Environment Variables
+
+Local development env vars are generated automatically from `supabase status -o env`.
+If you ever need to refresh them manually, run:
+
+```bash
+pnpm run supabase:env:sync
+```
 
 ## 🧪 Testing
 

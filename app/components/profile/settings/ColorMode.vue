@@ -1,18 +1,52 @@
 <script setup lang="ts">
-/**
- * Color mode setting component.
- *
- * Provides a UColorModeSelect for switching between
- * system, light, and dark themes.
- */
+import type { TabsItem } from "@nuxt/ui";
+import SettingField from "./SettingField.vue";
+
+type ColorModePreference = "light" | "dark" | "system";
+
+const colorMode = useColorMode();
+
+const colorModeOptions: TabsItem[] = [
+  { label: "Light", value: "light" },
+  { label: "Dark", value: "dark" },
+  { label: "System", value: "system" },
+];
+
+const selectedPreference = computed<ColorModePreference>({
+  get: () => {
+    const preference = colorMode.preference;
+
+    if (
+      preference === "light" ||
+      preference === "dark" ||
+      preference === "system"
+    ) {
+      return preference;
+    }
+
+    return "system";
+  },
+  set: (value) => {
+    colorMode.preference = value;
+  },
+});
 </script>
 
 <template>
-  <div class="flex items-center justify-between gap-4">
-    <div class="flex flex-col gap-1 min-w-0 flex-1">
-      <span class="text-sm font-medium text-highlighted">Appearance</span>
-      <span class="text-xs text-muted">Choose your preferred color theme</span>
-    </div>
-    <UColorModeSelect class="w-34 shrink-0" variant="subtle" size="lg" />
-  </div>
+  <SettingField
+    title="Appearance"
+    description="Choose your preferred color theme"
+  >
+    <template #trailing>
+      <UTabs
+        v-model="selectedPreference"
+        :items="colorModeOptions"
+        :content="false"
+        color="neutral"
+        variant="pill"
+        size="sm"
+        class="w-48"
+      />
+    </template>
+  </SettingField>
 </template>

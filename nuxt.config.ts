@@ -109,7 +109,7 @@ export default defineNuxtConfig({
       periodicSyncForUpdates: 3600, // Check for updates every hour
     },
     devOptions: {
-      enabled: true,
+      enabled: process.env.NUXT_PWA_DEV === "true",
       suppressWarnings: true,
       type: "module",
     },

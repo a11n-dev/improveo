@@ -27,11 +27,16 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
       Boolean(profile.value.avatarPath),
   );
 
+  const hasUnsavedChanges = computed(
+    () =>
+      nameDraft.hasNameChange.value ||
+      Boolean(avatarDraft.selectedAvatarFile.value) ||
+      hasAvatarRemoval.value,
+  );
+
   const canSave = computed(
     () =>
-      (nameDraft.hasNameChange.value ||
-        Boolean(avatarDraft.selectedAvatarFile.value) ||
-        hasAvatarRemoval.value) &&
+      hasUnsavedChanges.value &&
       !nameDraft.nameError.value &&
       !showDeleteConfirm.value &&
       !isSaving.value &&
@@ -194,6 +199,7 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
     confirmDelete,
     draftName: nameDraft.draftName,
     handleDelete,
+    hasUnsavedChanges,
     hasStoredAvatar: avatarDraft.hasStoredAvatar,
     isDeleting,
     isSaving,

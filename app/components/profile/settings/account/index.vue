@@ -10,6 +10,7 @@ const {
   confirmDelete,
   draftName,
   handleDelete,
+  hasUnsavedChanges,
   hasStoredAvatar,
   isDeleting,
   isSaving,
@@ -44,6 +45,10 @@ const {
  */
 const isBusy = computed(
   () => isSaving.value || isDeleting.value || isEmailBusy.value,
+);
+
+const isSaveActionVisible = computed(
+  () => (hasUnsavedChanges.value || isSaving.value) && !showDeleteConfirm.value,
 );
 </script>
 
@@ -112,9 +117,9 @@ const isBusy = computed(
             {
               label: 'Save changes',
               color: 'primary',
-              visible: canSave && !showDeleteConfirm,
+              visible: isSaveActionVisible,
               loading: isSaving,
-              disabled: isDeleting,
+              disabled: !canSave,
               onClick: saveAccount,
             },
             {

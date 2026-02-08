@@ -23,10 +23,13 @@ const WeekStartSchema = z
   .min(0, "Choose a day from Monday to Sunday")
   .max(6, "Choose a day from Monday to Sunday");
 
+const AvatarPathSchema = z.string().trim().min(1).max(512).nullable();
+
 export const ProfileUpdatePayloadSchema = z
   .object({
     weekStart: WeekStartSchema.optional(),
     name: ProfileNameSchema.optional(),
+    avatarPath: AvatarPathSchema.optional(),
   })
   .strict();
 

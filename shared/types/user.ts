@@ -14,6 +14,8 @@ export interface Profile {
   email: string;
   /** Display name (null if not set) */
   name: string | null;
+  /** Relative path to avatar in Supabase Storage (null if not set) */
+  avatarPath: string | null;
   /** Week start day: 0 = Monday, 1 = Tuesday, ..., 6 = Sunday - ISO 8601 standard */
   weekStart: number;
   /** Account creation timestamp */
@@ -29,4 +31,6 @@ export interface ProfileUpdatePayload {
   weekStart?: number;
   /** Display name */
   name?: string;
+  /** Relative path to avatar in Supabase Storage, null clears avatar */
+  avatarPath?: string | null;
 }

@@ -58,6 +58,7 @@ const isSaveActionVisible = computed(
     <ProfileSettingsField
       title="Account"
       description="Manage your profile details"
+      icon="i-lucide-user-round"
       clickable
       show-chevron
       @click="open = true"
@@ -73,7 +74,7 @@ const isSaveActionVisible = computed(
       @after:leave="resetDrafts"
     >
       <template #body>
-        <div class="space-y-5">
+        <div class="space-y-3">
           <!-- Avatar -->
           <ProfileSettingsAccountAvatarUpload
             v-model="selectedAvatarFile"

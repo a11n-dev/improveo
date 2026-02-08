@@ -122,7 +122,7 @@ const submitRequestForm = async (): Promise<void> => {
 </script>
 
 <template>
-  <ResponsiveOverlay
+  <CommonOverlay
     v-model:open="open"
     title="Change email"
     :description="
@@ -193,69 +193,70 @@ const submitRequestForm = async (): Promise<void> => {
     </template>
 
     <template #footer>
-      <template v-if="step === 'form'">
-        <UButton
-          label="Send confirmation"
-          color="neutral"
-          block
-          :loading="isRequesting"
-          :disabled="!canSendConfirmation"
-          @click="submitRequestForm"
-        />
-
-        <UButton
-          label="Back"
-          color="neutral"
-          variant="subtle"
-          block
-          :disabled="isRequesting"
-          @click="emit('back')"
-        />
-
-        <p v-if="resendSeconds > 0" class="text-center text-sm text-muted">
-          You can request another code in {{ resendCountdown }}.
-        </p>
-      </template>
-
-      <template v-else>
-        <UButton
-          label="Verify code"
-          color="neutral"
-          block
-          :loading="isVerifying"
-          :disabled="!canVerify || isRequesting"
-          @click="emit('verify')"
-        />
-
-        <UButton
-          label="Back"
-          color="neutral"
-          variant="subtle"
-          block
-          :disabled="isVerifying"
-          @click="emit('back')"
-        />
-
-        <p class="text-center text-sm text-muted">
-          Didn&apos;t receive a code?
-          <UButton
-            v-if="resendSeconds === 0"
-            type="button"
-            variant="link"
-            class="px-1 text-primary"
-            :disabled="
-              !pendingEmail ||
-              !canRequestEmailChange ||
-              isRequesting ||
-              isVerifying
-            "
-            @click="emit('request', pendingEmail)"
-          >
-            Request another code
-          </UButton>
-          <span v-else>Request another code in {{ resendCountdown }}</span>
-        </p>
-      </template>
+      <CommonOverlayFooter
+        :actions="
+          step === 'form'
+            ? [
+                {
+                  label: 'Send confirmation',
+                  color: 'primary',
+                  loading: isRequesting,
+                  disabled: !canSendConfirmation,
+                  onClick: submitRequestForm,
+                },
+                {
+                  label: 'Back',
+                  color: 'secondary',
+                  disabled: isRequesting,
+                  onClick: () => emit('back'),
+                },
+              ]
+            : [
+                {
+                  label: 'Verify code',
+                  color: 'primary',
+                  loading: isVerifying,
+                  disabled: !canVerify || isRequesting,
+                  onClick: () => emit('verify'),
+                },
+                {
+                  label: 'Back',
+                  color: 'secondary',
+                  disabled: isVerifying,
+                  onClick: () => emit('back'),
+                },
+              ]
+        "
+      >
+        <template #bottom>
+          <template v-if="step === 'form'">
+            <p v-if="resendSeconds > 0" class="text-center text-sm text-muted">
+              You can request another code in {{ resendCountdown }}.
+            </p>
+          </template>
+          <template v-else>
+            <p class="text-center text-sm text-muted">
+              Didn&apos;t receive a code?
+              <UButton
+                v-if="resendSeconds === 0"
+                type="button"
+                variant="link"
+                class="px-1 text-primary"
+                :disabled="
+                  !pendingEmail ||
+                  !canRequestEmailChange ||
+                  isRequesting ||
+                  isVerifying
+                "
+                @click="emit('request', pendingEmail)"
+              >
+                Request another code
+              </UButton>
+              <span v-else>Request another code in {{ resendCountdown }}</span>
+            </p>
+          </template>
+        </template>
+      </CommonOverlayFooter>
     </template>
-  </ResponsiveOverlay>
+  </CommonOverlay>
 </template>

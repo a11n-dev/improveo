@@ -16,10 +16,17 @@ const description = "Add to your home screen for quick access";
 </script>
 
 <template>
-  <ResponsiveOverlay
+  <CommonOverlay
     v-model:open="isGuideOpen"
     :title="title"
     :description="description"
+    :actions="[
+      {
+        label: 'Got it',
+        color: 'primary',
+        onClick: closeGuide,
+      },
+    ]"
   >
     <template #body>
       <div class="space-y-4">
@@ -59,15 +66,5 @@ const description = "Add to your home screen for quick access";
         </div>
       </div>
     </template>
-
-    <template #footer>
-      <UButton
-        label="Got it"
-        color="neutral"
-        block
-        class="justify-center"
-        @click="closeGuide"
-      />
-    </template>
-  </ResponsiveOverlay>
+  </CommonOverlay>
 </template>

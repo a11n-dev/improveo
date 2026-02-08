@@ -6,7 +6,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const { isOpen, closeOverlay } = useHabitEditOverlay();
-const { draft, hasChanges, isValid } = useHabitEditDraft();
+const { draft, hasChanges, isValid, resetDraft } = useHabitEditDraft();
 const { updateHabit } = useHabits();
 
 /** Loading state for save action */
@@ -63,10 +63,27 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <ResponsiveOverlay
+  <CommonOverlay
     v-model:open="isOpen"
     :modal-props="modalProps"
     :drawer-props="drawerProps"
+    :actions="[
+      {
+        label: 'Save changes',
+        color: 'primary',
+        visible: hasChanges,
+        disabled: !isValid,
+        loading: isSaving,
+        onClick: handleSave,
+      },
+      {
+        label: 'Cancel',
+        color: 'secondary',
+        disabled: isSaving,
+        onClick: handleCancel,
+      },
+    ]"
+    @after:leave="resetDraft"
   >
     <template #header>
       <HabitsEditHeader @close="handleCancel" />
@@ -75,26 +92,5 @@ const handleCancel = () => {
     <template #body>
       <HabitsEditForm />
     </template>
-
-    <template #footer>
-      <div class="flex w-full flex-col gap-2">
-        <UButton
-          label="Save"
-          color="primary"
-          block
-          :disabled="!isValid"
-          :loading="isSaving"
-          @click="handleSave"
-        />
-        <UButton
-          label="Cancel"
-          color="neutral"
-          variant="subtle"
-          block
-          :disabled="isSaving"
-          @click="handleCancel"
-        />
-      </div>
-    </template>
-  </ResponsiveOverlay>
+  </CommonOverlay>
 </template>

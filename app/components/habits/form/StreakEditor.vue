@@ -109,10 +109,22 @@ const drawerProps = {
 </script>
 
 <template>
-  <ResponsiveOverlay
+  <CommonOverlay
     v-model:open="open"
     :title="title"
     :drawer-props="drawerProps"
+    :actions="[
+      {
+        label: 'Save',
+        color: 'primary',
+        onClick: save,
+      },
+      {
+        label: 'Cancel',
+        color: 'secondary',
+        onClick: () => (open = false),
+      },
+    ]"
   >
     <template #body>
       <div class="flex flex-col gap-4">
@@ -156,18 +168,5 @@ const drawerProps = {
         </UFormField>
       </div>
     </template>
-
-    <template #footer>
-      <div class="flex w-full flex-col gap-2">
-        <UButton label="Save" color="neutral" block @click="save" />
-        <UButton
-          label="Cancel"
-          color="neutral"
-          variant="subtle"
-          block
-          @click="open = false"
-        />
-      </div>
-    </template>
-  </ResponsiveOverlay>
+  </CommonOverlay>
 </template>

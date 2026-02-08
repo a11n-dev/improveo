@@ -14,8 +14,7 @@ const emit = defineEmits<{
 
 const open = defineModel<boolean>("open", { default: false });
 
-const { isOpen: isEditOverlayOpen, openOverlay: openEditOverlay } =
-  useHabitEditOverlay();
+const { openOverlay: openEditOverlay } = useHabitEditOverlay();
 
 const modalProps = {
   close: false,
@@ -57,7 +56,11 @@ const handleClose = () => {
 </script>
 
 <template>
-  <ResponsiveOverlay v-model:open="open" :modal-props="modalProps">
+  <CommonOverlay
+    v-model:open="open"
+    :modal-props="modalProps"
+    @after:leave="showDeleteConfirm = false"
+  >
     <template #header>
       <HabitsInfoHeader :habit="habit" @close="handleClose" />
     </template>
@@ -92,62 +95,41 @@ const handleClose = () => {
     </template>
 
     <template #footer>
-      <!-- Delete confirmation -->
-      <template v-if="showDeleteConfirm">
-        <p class="mb-2 text-center text-sm text-muted">
-          Are you sure you want to delete "{{ habit.title }}"? <br />
-          This action cannot be undone.
-        </p>
-        <UButton
-          label="Delete Habit"
-          color="error"
-          block
-          class="justify-center"
-          :loading="isDeleting"
-          :disabled="isDeleting"
-          @click="confirmDelete"
-        />
-        <UButton
-          label="Cancel"
-          color="neutral"
-          variant="subtle"
-          block
-          class="justify-center"
-          :disabled="isDeleting"
-          @click="cancelDelete"
-        />
-      </template>
-
-      <!-- Normal actions -->
-      <template v-else>
-        <UButton
-          label="Edit"
-          color="neutral"
-          variant="outline"
-          block
-          class="justify-center"
-          @click="handleEdit"
-        />
-        <UButton
-          label="Delete"
-          color="error"
-          variant="subtle"
-          block
-          class="justify-center"
-          @click="handleDelete"
-        />
-        <UButton
-          label="Close"
-          color="neutral"
-          variant="subtle"
-          block
-          class="justify-center"
-          @click="handleClose"
-        />
-      </template>
+      <CommonOverlayFooter
+        :actions="[
+          {
+            type: 'confirm',
+            color: 'danger',
+            confirmText: 'Are you sure you want to delete this habit?',
+            confirmSubtext: 'This action cannot be undone.',
+            visible: showDeleteConfirm,
+            onConfirm: confirmDelete,
+            onCancel: cancelDelete,
+            loading: isDeleting,
+          },
+          {
+            label: 'Edit',
+            color: 'outline',
+            visible: !showDeleteConfirm,
+            onClick: handleEdit,
+          },
+          {
+            label: 'Delete habit',
+            color: 'danger',
+            visible: !showDeleteConfirm,
+            onClick: handleDelete,
+          },
+          {
+            label: 'Close',
+            color: 'secondary',
+            visible: !showDeleteConfirm,
+            onClick: handleClose,
+          },
+        ]"
+      />
     </template>
 
     <!-- Nested edit overlay (default slot for drawer context) -->
-    <HabitsEditOverlay v-if="isEditOverlayOpen" :habit="habit" />
-  </ResponsiveOverlay>
+    <HabitsEditOverlay :habit="habit" />
+  </CommonOverlay>
 </template>

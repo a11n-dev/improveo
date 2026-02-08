@@ -2,12 +2,17 @@
 /**
  * Responsive overlay component that renders as UModal on desktop or UDrawer on mobile.
  * Provides consistent overlay behavior across different viewport sizes.
+ * Supports declarative footer actions via :actions prop or custom footer via #footer slot.
  */
+import type { FooterAction } from "./Footer.vue";
+
 interface Props {
   title?: string;
   description?: string;
   modalProps?: Record<string, unknown>;
   drawerProps?: Record<string, unknown>;
+  /** Declarative footer actions - renders CommonOverlayFooter automatically when provided */
+  actions?: FooterAction[];
 }
 
 const {
@@ -15,7 +20,12 @@ const {
   description = undefined,
   modalProps = {},
   drawerProps = {},
+  actions = undefined,
 } = defineProps<Props>();
+
+const emit = defineEmits<{
+  (e: "after:leave"): void;
+}>();
 
 const open = defineModel<boolean>("open", { default: false });
 const isDesktop = useIsDesktop();
@@ -94,6 +104,7 @@ onBeforeUnmount(() => {
       :title="title"
       :description="description"
       v-bind="modalProps"
+      @after:leave="emit('after:leave')"
     >
       <template v-if="$slots.header" #header>
         <slot name="header" />
@@ -101,8 +112,14 @@ onBeforeUnmount(() => {
       <template #body>
         <slot name="body" />
       </template>
-      <template v-if="$slots.footer" #footer>
-        <slot name="footer" />
+      <template #footer>
+        <!-- Auto-render footer when :actions prop provided and no custom slot -->
+        <CommonOverlayFooter
+          v-if="actions && !$slots.footer"
+          :actions="actions"
+        />
+        <!-- Custom footer slot takes precedence -->
+        <slot v-else name="footer" />
       </template>
       <!-- Default slot for nested overlays -->
       <slot />
@@ -114,6 +131,7 @@ onBeforeUnmount(() => {
       :title="title"
       :description="description"
       v-bind="drawerProps"
+      @after:leave="emit('after:leave')"
     >
       <template v-if="$slots.header" #header>
         <slot name="header" />
@@ -123,8 +141,14 @@ onBeforeUnmount(() => {
           <slot name="body" />
         </div>
       </template>
-      <template v-if="$slots.footer" #footer>
-        <slot name="footer" />
+      <template #footer>
+        <!-- Auto-render footer when :actions prop provided and no custom slot -->
+        <CommonOverlayFooter
+          v-if="actions && !$slots.footer"
+          :actions="actions"
+        />
+        <!-- Custom footer slot takes precedence -->
+        <slot v-else name="footer" />
       </template>
       <!-- Default slot for nested overlays -->
       <slot />

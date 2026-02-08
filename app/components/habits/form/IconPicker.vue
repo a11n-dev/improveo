@@ -113,11 +113,18 @@ const drawerProps = {
 </script>
 
 <template>
-  <ResponsiveOverlay
+  <CommonOverlay
     v-model:open="open"
     :title="title"
     :modal-props="modalProps"
     :drawer-props="drawerProps"
+    :actions="[
+      {
+        label: 'Cancel',
+        color: 'secondary',
+        onClick: () => (open = false),
+      },
+    ]"
   >
     <template #body>
       <div class="flex flex-col">
@@ -173,16 +180,5 @@ const drawerProps = {
         </div>
       </div>
     </template>
-
-    <template #footer>
-      <UButton
-        label="Cancel"
-        color="neutral"
-        variant="subtle"
-        block
-        class="justify-center"
-        @click="open = false"
-      />
-    </template>
-  </ResponsiveOverlay>
+  </CommonOverlay>
 </template>

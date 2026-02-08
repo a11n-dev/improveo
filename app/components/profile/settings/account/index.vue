@@ -17,6 +17,7 @@ const {
   nameError,
   open,
   removeCurrentAvatar,
+  resetDrafts,
   saveAccount,
   selectedAvatarFile,
   showDeleteConfirm,
@@ -58,12 +59,13 @@ const isBusy = computed(
     />
 
     <!-- Account Editor -->
-    <ResponsiveOverlay
+    <CommonOverlay
       v-model:open="open"
       title="Account"
       description="Update your name, email, and avatar"
       :modal-props="{ ui: { footer: 'flex-col gap-2' } }"
       :drawer-props="{ ui: { footer: 'flex-col gap-2' } }"
+      @after:leave="resetDrafts"
     >
       <template #body>
         <div class="space-y-5">
@@ -95,16 +97,41 @@ const isBusy = computed(
       </template>
 
       <template #footer>
-        <!-- Save and Delete Actions -->
-        <ProfileSettingsAccountFooterActions
-          :show-delete-confirm="showDeleteConfirm"
-          :can-save="canSave"
-          :is-saving="isSaving"
-          :is-deleting="isDeleting"
-          @save="saveAccount"
-          @delete="handleDelete"
-          @confirm-delete="confirmDelete"
-          @cancel-delete="cancelDelete"
+        <CommonOverlayFooter
+          :actions="[
+            {
+              type: 'confirm',
+              color: 'danger',
+              confirmText: 'Are you sure you want to delete your account?',
+              confirmSubtext: 'This action cannot be undone.',
+              visible: showDeleteConfirm,
+              onConfirm: confirmDelete,
+              onCancel: cancelDelete,
+              loading: isDeleting,
+            },
+            {
+              label: 'Save changes',
+              color: 'primary',
+              visible: canSave && !showDeleteConfirm,
+              loading: isSaving,
+              disabled: isDeleting,
+              onClick: saveAccount,
+            },
+            {
+              label: 'Delete account',
+              color: 'danger',
+              visible: !showDeleteConfirm,
+              disabled: isSaving || isDeleting,
+              onClick: handleDelete,
+            },
+            {
+              label: 'Cancel',
+              color: 'secondary',
+              visible: !showDeleteConfirm,
+              disabled: isSaving || isDeleting,
+              onClick: () => (open = false),
+            },
+          ]"
         />
       </template>
 
@@ -123,6 +150,6 @@ const isBusy = computed(
         @back="handleBack"
         @verify="verifyCode"
       />
-    </ResponsiveOverlay>
+    </CommonOverlay>
   </div>
 </template>

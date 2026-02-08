@@ -74,10 +74,17 @@ const saveWeekStart = (): void => {
       @click="openEditor"
     />
 
-    <ResponsiveOverlay
+    <CommonOverlay
       v-model:open="open"
       title="Week start"
       description="First day of the week in the calendar"
+      :actions="[
+        {
+          label: 'Save',
+          color: 'primary',
+          onClick: saveWeekStart,
+        },
+      ]"
     >
       <template #body>
         <URadioGroup
@@ -94,12 +101,6 @@ const saveWeekStart = (): void => {
           }"
         />
       </template>
-
-      <template #footer>
-        <div class="flex w-full flex-col gap-2">
-          <UButton label="Save" color="neutral" block @click="saveWeekStart" />
-        </div>
-      </template>
-    </ResponsiveOverlay>
+    </CommonOverlay>
   </div>
 </template>

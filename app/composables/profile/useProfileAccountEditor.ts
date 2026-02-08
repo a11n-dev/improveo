@@ -29,6 +29,9 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
 
   const canSave = computed(
     () =>
+      (nameDraft.hasNameChange.value ||
+        Boolean(avatarDraft.selectedAvatarFile.value) ||
+        hasAvatarRemoval.value) &&
       !nameDraft.nameError.value &&
       !showDeleteConfirm.value &&
       !isSaving.value &&
@@ -41,14 +44,11 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
     showDeleteConfirm.value = false;
   };
 
+  /** Initialize when opening */
   watch(open, (value) => {
     if (value) {
       resetDrafts();
-      return;
     }
-
-    avatarDraft.resetAvatarDraft();
-    showDeleteConfirm.value = false;
   });
 
   const buildProfilePayload = async (): Promise<{
@@ -201,6 +201,7 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
     nameError: nameDraft.nameError,
     open,
     removeCurrentAvatar: avatarDraft.removeCurrentAvatar,
+    resetDrafts,
     saveAccount,
     selectedAvatarFile: avatarDraft.selectedAvatarFile,
     showDeleteConfirm,

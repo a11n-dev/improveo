@@ -39,17 +39,29 @@ const handleCreate = async () => {
     isCreating.value = false;
   }
 };
-
-/** Reset draft when overlay closes */
-watch(isOpen, (open) => {
-  if (!open) {
-    resetDraft();
-  }
-});
 </script>
 
 <template>
-  <ResponsiveOverlay v-model:open="isOpen" :modal-props="modalProps">
+  <CommonOverlay
+    v-model:open="isOpen"
+    :modal-props="modalProps"
+    :actions="[
+      {
+        label: 'Create habit',
+        color: 'primary',
+        disabled: !isValid,
+        loading: isCreating,
+        onClick: handleCreate,
+      },
+      {
+        label: 'Cancel',
+        color: 'secondary',
+        disabled: isCreating,
+        onClick: closeOverlay,
+      },
+    ]"
+    @after:leave="resetDraft"
+  >
     <template #header>
       <HabitsCreateHeader @close="closeOverlay" />
     </template>
@@ -57,26 +69,5 @@ watch(isOpen, (open) => {
     <template #body>
       <HabitsCreateForm />
     </template>
-
-    <template #footer>
-      <div class="flex w-full flex-col gap-2">
-        <UButton
-          label="Create"
-          color="primary"
-          block
-          :disabled="!isValid"
-          :loading="isCreating"
-          @click="handleCreate"
-        />
-        <UButton
-          label="Cancel"
-          color="neutral"
-          variant="subtle"
-          block
-          :disabled="isCreating"
-          @click="closeOverlay"
-        />
-      </div>
-    </template>
-  </ResponsiveOverlay>
+  </CommonOverlay>
 </template>

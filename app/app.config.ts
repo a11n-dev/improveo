@@ -8,7 +8,7 @@ export default defineAppConfig({
     },
     drawer: {
       slots: {
-        footer: "pb-6",
+        footer: "py-4",
       },
     },
     card: {

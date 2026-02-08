@@ -1,4 +1,4 @@
-import type { ProfileSelectRow } from "~~/server/types/profile";
+import type { ProfileSelectRow } from "~~/server/types/user";
 
 /**
  * Maps a database row from the profiles table to a Profile DTO. Handles type conversions and nullability for each field.

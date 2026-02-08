@@ -17,7 +17,7 @@ export default defineEventHandler(async (event): Promise<Profile> => {
 
   const payload = await parseBody(event, ProfileUpdatePayloadSchema);
 
-  const updatePayload = {
+  const updatePayload: TablesUpdate<"profiles"> = {
     ...(payload.weekStart !== undefined && { week_start: payload.weekStart }),
     ...(payload.name !== undefined && { name: payload.name }),
     ...(payload.avatarPath !== undefined && {

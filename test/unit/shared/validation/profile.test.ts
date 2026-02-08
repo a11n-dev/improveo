@@ -11,6 +11,7 @@ describe("ProfileUpdatePayloadSchema", () => {
     const result = ProfileUpdatePayloadSchema.safeParse({
       name: "  Jamie  ",
       weekStart: 1,
+      avatarPath: "  user-id/avatar.jpg  ",
     });
 
     expect(result.success).toBe(true);
@@ -20,6 +21,24 @@ describe("ProfileUpdatePayloadSchema", () => {
 
     expect(result.data.name).toBe("Jamie");
     expect(result.data.weekStart).toBe(1);
+    expect(result.data.avatarPath).toBe("user-id/avatar.jpg");
+  });
+
+  it("accepts avatarPath as null for avatar removal", () => {
+    const result = ProfileUpdatePayloadSchema.safeParse({ avatarPath: null });
+
+    expect(result.success).toBe(true);
+    if (!result.success) {
+      return;
+    }
+
+    expect(result.data.avatarPath).toBeNull();
+  });
+
+  it("rejects empty avatarPath string", () => {
+    const result = ProfileUpdatePayloadSchema.safeParse({ avatarPath: "   " });
+
+    expect(result.success).toBe(false);
   });
 
   it("enforces name min and max bounds", () => {

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TabsItem } from "@nuxt/ui";
-import SettingField from "./SettingField.vue";
 
 type ColorModePreference = "light" | "dark" | "system";
 
@@ -12,6 +11,9 @@ const colorModeOptions: TabsItem[] = [
   { label: "System", value: "system" },
 ];
 
+/**
+ * Bridges Nuxt color mode preference into strict UI tab values.
+ */
 const selectedPreference = computed<ColorModePreference>({
   get: () => {
     const preference = colorMode.preference;
@@ -33,7 +35,7 @@ const selectedPreference = computed<ColorModePreference>({
 </script>
 
 <template>
-  <SettingField
+  <ProfileSettingsField
     title="Appearance"
     description="Choose your preferred color theme"
   >
@@ -48,5 +50,5 @@ const selectedPreference = computed<ColorModePreference>({
         class="w-48"
       />
     </template>
-  </SettingField>
+  </ProfileSettingsField>
 </template>

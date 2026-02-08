@@ -2,15 +2,6 @@
  * Server-side streak calculation logic.
  * Recomputes streak information based on all completions for a habit.
  */
-
-import type { StreakInterval, WeekStartDay } from "~~/shared/types/habit";
-import {
-  getWeekKey,
-  getMonthKey,
-  parseISODateString,
-  toISODateString,
-} from "~~/shared/utils/weekStart";
-
 interface CompletionRecord {
   completed_on: string; // YYYY-MM-DD
 }

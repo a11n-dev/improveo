@@ -6,7 +6,7 @@ import {
   PROFILE_NAME_MIN_LENGTH,
 } from "../constants/validation";
 
-const EmailSchema = z
+export const EmailSchema = z
   .string()
   .trim()
   .min(1, "Email is required")

@@ -1,5 +1,4 @@
 import type { H3Event } from "h3";
-import { createError, readBody } from "h3";
 import type { z } from "zod";
 
 export const parseBody = async <TSchema extends z.ZodTypeAny>(

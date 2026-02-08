@@ -7,11 +7,6 @@ export type Json =
   | Json[];
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.1";
-  };
   public: {
     Tables: {
       completions: {
@@ -39,6 +34,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "completions_habit_id_fkey1";
+            columns: ["habit_id"];
+            isOneToOne: false;
+            referencedRelation: "habits";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      completions_log: {
+        Row: {
+          completed_on: string;
+          created_at: string | null;
+          habit_id: string;
+          id: string;
+          user_id: string;
+        };
+        Insert: {
+          completed_on: string;
+          created_at?: string | null;
+          habit_id: string;
+          id?: string;
+          user_id?: string;
+        };
+        Update: {
+          completed_on?: string;
+          created_at?: string | null;
+          habit_id?: string;
+          id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "completions_habit_id_fkey";
             columns: ["habit_id"];
             isOneToOne: false;
             referencedRelation: "habits";
@@ -96,6 +123,7 @@ export type Database = {
       };
       profiles: {
         Row: {
+          avatar_path: string | null;
           created_at: string;
           email: string;
           id: string;
@@ -104,6 +132,7 @@ export type Database = {
           week_start: number;
         };
         Insert: {
+          avatar_path?: string | null;
           created_at?: string;
           email: string;
           id: string;
@@ -112,6 +141,7 @@ export type Database = {
           week_start?: number;
         };
         Update: {
+          avatar_path?: string | null;
           created_at?: string;
           email?: string;
           id?: string;

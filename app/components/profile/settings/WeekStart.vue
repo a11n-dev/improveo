@@ -1,16 +1,8 @@
 <script setup lang="ts">
-import SettingField from "./SettingField.vue";
-
-interface Props {
-  modelValue: number;
-}
-
-interface Emits {
-  /** Emitted when week start selection changes. */
+const props = defineProps<{ modelValue: number }>();
+const emit = defineEmits<{
   (e: "update:modelValue", value: number): void;
-}
-const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
+}>();
 
 const open = ref(false);
 const draftWeekStart = ref(props.modelValue);
@@ -39,6 +31,9 @@ const selectedWeekStartLabel = computed(() => {
   return fullWeekdayLabels[props.modelValue] ?? "Monday";
 });
 
+/**
+ * Keeps draft value in sync with external model updates when editor is closed.
+ */
 watch(
   () => props.modelValue,
   (value) => {
@@ -48,11 +43,17 @@ watch(
   },
 );
 
+/**
+ * Opens the editor and initializes draft from current model value.
+ */
 const openEditor = (): void => {
   draftWeekStart.value = props.modelValue;
   open.value = true;
 };
 
+/**
+ * Persists draft only when value changed, then closes the editor.
+ */
 const saveWeekStart = (): void => {
   if (draftWeekStart.value !== props.modelValue) {
     emit("update:modelValue", draftWeekStart.value);
@@ -64,7 +65,7 @@ const saveWeekStart = (): void => {
 
 <template>
   <div class="space-y-3">
-    <SettingField
+    <ProfileSettingsField
       title="Week start"
       description="First day of the week in the calendar"
       :value="selectedWeekStartLabel"

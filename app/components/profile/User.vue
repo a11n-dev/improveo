@@ -1,32 +1,30 @@
 <script setup lang="ts">
-/**
- * Props for the ProfileUser component.
- */
-interface Props {
-  /** The user profile data containing name, email, and id. */
-  profile: Profile;
-}
+const { profile } = defineProps<{ profile: Profile }>();
+const supabaseClient = useSupabaseClient();
 
-const props = defineProps<Props>();
-
-/**
- * Computed display name - falls back to "User" if name is null/empty.
- */
-const displayName = computed(() => props.profile.name ?? "User");
-
-/**
- * Computed member since text formatted as "Since Mmm YYYY".
- */
-const memberSince = computed(() => formatMemberSince(props.profile.createdAt));
+const displayName = computed(() => profile.name ?? "User");
+const joinedLabel = computed(() => formatMemberSince(profile.createdAt));
+const avatarUrl = computed(() =>
+  getAvatarPublicUrl(supabaseClient, profile.avatarPath),
+);
 </script>
 
 <template>
-  <div class="flex items-center gap-4">
-    <UUser
-      :name="displayName"
-      :description="memberSince"
-      :avatar="{ alt: displayName }"
+  <div
+    class="flex flex-col items-center gap-2 text-center md:flex-row md:items-center md:gap-3 md:text-left"
+  >
+    <UAvatar
+      :src="avatarUrl"
+      :alt="displayName"
       size="xl"
+      class="size-16 md:size-10"
     />
+
+    <div>
+      <p class="font-semibold text-highlighted">
+        {{ displayName }}
+      </p>
+      <p class="text-sm text-muted">{{ joinedLabel }}</p>
+    </div>
   </div>
 </template>

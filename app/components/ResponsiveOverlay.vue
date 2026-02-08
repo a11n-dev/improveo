@@ -129,5 +129,7 @@ onBeforeUnmount(() => {
       <!-- Default slot for nested overlays -->
       <slot />
     </UDrawer>
+
+    <template #fallback />
   </ClientOnly>
 </template>

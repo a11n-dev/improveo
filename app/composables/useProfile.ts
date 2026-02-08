@@ -1,36 +1,38 @@
-const PROFILE_KEY = "profile";
-
 /**
- * Composable for managing user profile data.
+ * Public facade for profile state and profile-related workflows.
  *
- * Fetches profile via server API for SSR-friendly data loading,
- * provides reactive state for UI consumption, and allows updating
- * the week_start preference.
- *
- * @returns Profile state and methods for data management.
+ * Keeps a small, stable API at `app/composables` while profile domain
+ * implementation lives under `app/composables/profile`.
  */
 export const useProfile = () => {
+  const profileStore = useProfileStore();
   const { notifyError } = useToastNotify();
-  const { data: cachedProfile } = useNuxtData<Profile | null>(PROFILE_KEY);
+  const { error, pending, profile } = storeToRefs(profileStore);
 
-  const { data, status, error, refresh } = useAsyncData<Profile | null>(
-    PROFILE_KEY,
-    () =>
-      $fetch<Profile>("/api/profile", {
-        headers: useRequestHeaders(["cookie"]),
-      }),
-    {
-      default: () => cachedProfile.value ?? null,
-    },
-  );
+  /**
+   * Fetches the authenticated user profile from the API.
+   */
+  const fetchProfile = async (): Promise<Profile | null> => {
+    return profileStore.fetchProfile();
+  };
 
-  const profile = computed(() => data.value ?? null);
-  const pending = computed(() => status.value === "pending");
+  /**
+   * Updates profile fields with server validation.
+   */
+  const updateProfile = async (
+    payload: ProfileUpdatePayload,
+  ): Promise<Profile | null> => {
+    return profileStore.updateProfile(payload);
+  };
 
+  /**
+   * Updates week start and emits user-friendly validation errors.
+   */
   const updateWeekStart = async (value: number): Promise<boolean> => {
-    if (!profile.value) {
-      notifyError("Update failed", "Profile not loaded");
-      return false;
+    const isUpdated = await profileStore.updateWeekStart(value);
+
+    if (isUpdated) {
+      return true;
     }
 
     if (value < 0 || value > 6) {
@@ -38,27 +40,24 @@ export const useProfile = () => {
       return false;
     }
 
-    try {
-      const updated = await $fetch<Profile>("/api/profile", {
-        method: "PATCH",
-        body: { weekStart: value },
-      });
+    notifyError("Update failed", "Please try again.");
+    return false;
+  };
 
-      data.value = updated;
-
-      await refreshNuxtData("habits");
-      return true;
-    } catch {
-      notifyError("Update failed", "Please try again.");
-      return false;
-    }
+  /**
+   * Permanently deletes the authenticated account profile.
+   */
+  const deleteProfile = async (): Promise<boolean> => {
+    return profileStore.deleteProfile();
   };
 
   return {
+    deleteProfile,
     error,
+    fetchProfile,
     pending,
     profile,
-    refresh,
+    updateProfile,
     updateWeekStart,
   };
 };

@@ -3,14 +3,17 @@ definePageMeta({
   keepalive: true,
 });
 
-const { profile, pending, error, updateWeekStart } = useProfile();
+const { error, fetchProfile, pending, profile, updateWeekStart } = useProfile();
+
+await callOnce("profile", fetchProfile);
 
 const isLoading = computed(
   () => pending.value && !profile.value && !error.value,
 );
 
 /**
- * Handle week start change from settings component.
+ * Handles the change of the week start day in the profile settings.
+ * @param value The new week start day.
  */
 const handleWeekStartChange = async (value: number): Promise<void> => {
   await updateWeekStart(value);
@@ -39,12 +42,12 @@ const handleWeekStartChange = async (value: number): Promise<void> => {
     </div>
 
     <template v-else>
-      <!-- User Section -->
+      <!-- User section -->
       <section>
         <ProfileUser v-if="profile" :profile="profile" />
       </section>
 
-      <!-- Settings Section -->
+      <!-- Settings section -->
       <section v-if="profile">
         <h2 class="font-medium mb-3 text-highlighted">Settings</h2>
         <UCard variant="subtle">
@@ -55,7 +58,7 @@ const handleWeekStartChange = async (value: number): Promise<void> => {
         </UCard>
       </section>
 
-      <!-- Actions Section -->
+      <!-- Actions section -->
       <section v-if="profile">
         <ProfileActions />
       </section>

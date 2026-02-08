@@ -31,7 +31,12 @@ const formState = reactive({
 
 // OTP input and resend cooldown
 const otpValue = ref<string[]>([]);
-const resendSeconds = ref(0);
+const {
+  isActive: isResendCooldownActive,
+  secondsLeft: resendSeconds,
+  start: startResendCountdown,
+  stop: stopResendCountdown,
+} = useResendCooldown();
 
 const isRegister = computed(() => activeTab.value === "register");
 const authSchema = computed(() =>
@@ -43,29 +48,6 @@ const otpToken = computed(() => otpValue.value.join(""));
 
 const hasValidOtp = () =>
   formState.email.trim().length > 0 && otpToken.value.length === 6;
-
-const stopResendCountdown = () => {
-  resendSeconds.value = 0;
-};
-
-const startResendCountdown = (seconds = 60) => {
-  resendSeconds.value = seconds;
-};
-
-// Countdown tick: decrement every second when active
-watch(resendSeconds, (value, _, onCleanup) => {
-  if (value <= 0) {
-    return;
-  }
-
-  const timeout = setTimeout(() => {
-    resendSeconds.value = value - 1;
-  }, 1000);
-
-  onCleanup(() => {
-    clearTimeout(timeout);
-  });
-});
 
 /** Reset form state when switching between login and register modes. */
 watch(activeTab, () => {
@@ -133,7 +115,7 @@ const handleOtpRequest = async (data?: AuthFormOutput) => {
     return;
   }
 
-  if (step.value === "verify" && resendSeconds.value > 0) {
+  if (step.value === "verify" && isResendCooldownActive.value) {
     return;
   }
 

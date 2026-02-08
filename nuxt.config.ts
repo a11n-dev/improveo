@@ -14,6 +14,7 @@ export default defineNuxtConfig({
   modules: [
     "@nuxt/eslint",
     "@nuxt/test-utils",
+    "@pinia/nuxt",
     "@nuxtjs/supabase",
     "@vite-pwa/nuxt",
     "@nuxt/ui",

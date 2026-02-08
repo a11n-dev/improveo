@@ -14,6 +14,11 @@ const {
 } = useHabitInfoOverlay();
 
 const { openOverlay: openCreate } = useHabitCreateOverlay();
+const route = useRoute();
+const shouldScrollAfterHabitCreate = useState<boolean>(
+  "habit-created-pending-scroll",
+  () => false,
+);
 
 /** Today's date string for checking completion */
 const todayStr = toISODateString(new Date());
@@ -68,18 +73,22 @@ const scrollToBottom = () => {
   });
 };
 
-/** Listen for habit created event from layout overlay */
-onMounted(() => {
-  const handleCreated = () => {
-    scrollToBottom();
-  };
+watch(
+  [shouldScrollAfterHabitCreate, () => route.path, pending],
+  ([shouldScroll, currentPath, isPending]) => {
+    if (!shouldScroll || currentPath !== "/" || isPending) {
+      return;
+    }
 
-  window.addEventListener("habit-created", handleCreated);
-
-  onUnmounted(() => {
-    window.removeEventListener("habit-created", handleCreated);
-  });
-});
+    nextTick(() => {
+      setTimeout(() => {
+        scrollToBottom();
+        shouldScrollAfterHabitCreate.value = false;
+      }, 300);
+    });
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

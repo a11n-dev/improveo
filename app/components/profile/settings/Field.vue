@@ -2,6 +2,7 @@
 const {
   description = undefined,
   clickable = false,
+  icon = undefined,
   showChevron = false,
   value = undefined,
   hideDescriptionOnMobile = true,
@@ -9,6 +10,7 @@ const {
   title: string;
   description?: string;
   clickable?: boolean;
+  icon?: string;
   showChevron?: boolean;
   value?: string;
   hideDescriptionOnMobile?: boolean;
@@ -39,9 +41,18 @@ const descriptionClass = computed(() =>
     "
     @click="clickable && emit('click')"
   >
-    <div class="min-w-0 flex-1">
-      <span class="text-sm font-medium text-highlighted">{{ title }}</span>
-      <p v-if="description" :class="descriptionClass">{{ description }}</p>
+    <div class="flex min-w-0 flex-1 items-center gap-3">
+      <div
+        v-if="icon"
+        class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-info/15"
+      >
+        <UIcon :name="icon" class="size-5 text-info" />
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <span class="text-sm font-medium text-highlighted">{{ title }}</span>
+        <p v-if="description" :class="descriptionClass">{{ description }}</p>
+      </div>
     </div>
 
     <div class="flex shrink-0 items-center gap-2">

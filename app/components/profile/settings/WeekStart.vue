@@ -68,6 +68,7 @@ const saveWeekStart = (): void => {
     <ProfileSettingsField
       title="Week start"
       description="First day of the week in the calendar"
+      icon="i-lucide-calendar-days"
       :value="selectedWeekStartLabel"
       clickable
       show-chevron

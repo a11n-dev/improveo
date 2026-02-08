@@ -17,7 +17,7 @@ const avatarUrl = computed(() =>
       :src="avatarUrl"
       :alt="displayName"
       size="xl"
-      class="size-16 md:size-10"
+      class="size-20 md:size-12"
     />
 
     <div>

@@ -1,7 +1,17 @@
 <script setup lang="ts">
-/** Handle habit created event from layout overlay */
-const handleHabitCreated = () => {
-  window.dispatchEvent(new CustomEvent("habit-created"));
+const route = useRoute();
+const shouldScrollAfterHabitCreate = useState<boolean>(
+  "habit-created-pending-scroll",
+  () => false,
+);
+
+/** Redirect to home after creation and request a post-navigation scroll. */
+const handleHabitCreated = async () => {
+  shouldScrollAfterHabitCreate.value = true;
+
+  if (route.path !== "/") {
+    await navigateTo("/");
+  }
 };
 </script>
 

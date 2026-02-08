@@ -3,21 +3,14 @@ interface Props {
   color: string;
   completions: Record<string, boolean>;
   weekStart?: WeekStartDay;
-  /** End date (defaults to today) */
   endDate?: Date;
-  /** Number of days to display (defaults to 365) */
   daysCount?: number;
-  /** Show legend below the graph */
   showLegend?: boolean;
-  /** Show tooltips on hover */
+  showAxes?: boolean;
   showTooltips?: boolean;
-  /** Current streak count (for legend display) */
   currentStreak?: number;
-  /** Best streak count (for legend display) */
   bestStreak?: number;
-  /** Whether streak tracking is enabled */
   hasStreak?: boolean;
-  /** Streak goal label (e.g., "Daily", "3 / week") */
   streakGoalLabel?: string;
 }
 
@@ -28,6 +21,7 @@ const {
   endDate = new Date(),
   daysCount = 365,
   showLegend = true,
+  showAxes = true,
   showTooltips = true,
   currentStreak = 0,
   bestStreak = 0,
@@ -118,9 +112,9 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
     </ClientOnly>
 
     <!-- Graph area -->
-    <div class="flex w-full gap-1">
+    <div class="flex w-full" :class="showAxes ? 'gap-1' : ''">
       <!-- Fixed day labels column (pinned Y-axis) -->
-      <div class="flex w-7 shrink-0 flex-col gap-1">
+      <div v-if="showAxes" class="flex w-7 shrink-0 flex-col gap-1">
         <!-- Spacer for month labels row -->
         <div class="h-5.25" />
         <!-- Day labels -->
@@ -140,9 +134,12 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
         class="no-scrollbar min-w-0 flex-1 overflow-x-auto overflow-y-hidden [direction:rtl]"
         @scroll="handleGraphScroll"
       >
-        <div class="inline-flex flex-col gap-1 [direction:ltr]">
+        <div
+          class="inline-flex flex-col [direction:ltr]"
+          :class="showAxes ? 'gap-1' : ''"
+        >
           <!-- Month labels row -->
-          <div class="flex gap-0.75">
+          <div v-if="showAxes" class="flex gap-0.75">
             <span
               v-for="(_, weekIndex) in weeks"
               :key="weekIndex"

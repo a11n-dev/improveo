@@ -10,6 +10,7 @@ const {
   confirmDelete,
   draftName,
   handleDelete,
+  hasUnsavedChanges,
   hasStoredAvatar,
   isDeleting,
   isSaving,
@@ -45,6 +46,10 @@ const {
 const isBusy = computed(
   () => isSaving.value || isDeleting.value || isEmailBusy.value,
 );
+
+const isSaveActionVisible = computed(
+  () => (hasUnsavedChanges.value || isSaving.value) && !showDeleteConfirm.value,
+);
 </script>
 
 <template>
@@ -53,6 +58,7 @@ const isBusy = computed(
     <ProfileSettingsField
       title="Account"
       description="Manage your profile details"
+      icon="i-lucide-user-round"
       clickable
       show-chevron
       @click="open = true"
@@ -68,7 +74,7 @@ const isBusy = computed(
       @after:leave="resetDrafts"
     >
       <template #body>
-        <div class="space-y-5">
+        <div class="space-y-3">
           <!-- Avatar -->
           <ProfileSettingsAccountAvatarUpload
             v-model="selectedAvatarFile"
@@ -112,9 +118,9 @@ const isBusy = computed(
             {
               label: 'Save changes',
               color: 'primary',
-              visible: canSave && !showDeleteConfirm,
+              visible: isSaveActionVisible,
               loading: isSaving,
-              disabled: isDeleting,
+              disabled: !canSave,
               onClick: saveAccount,
             },
             {

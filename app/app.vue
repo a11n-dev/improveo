@@ -20,16 +20,14 @@ const toasterConfig = computed(() => {
     return {
       position: "bottom-center" as const,
       expand: false,
-      richColors: true,
-      offset: 16,
+      ui: { viewport: "bottom-8" },
     };
   }
 
   // Desktop: top-right instead of bottom-center
   return {
     position: "bottom-right" as const,
-    expand: true,
-    richColors: true,
+    expand: false,
   };
 });
 </script>

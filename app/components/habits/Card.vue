@@ -37,7 +37,7 @@ const handleCheckboxClick = (event: Event) => {
 <template>
   <UCard
     variant="subtle"
-    class="cursor-pointer transition-shadow hover:shadow-md"
+    class="shrink-0 cursor-pointer transition-shadow hover:shadow-md"
     @click="handleInfoClick"
   >
     <template #header>

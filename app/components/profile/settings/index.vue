@@ -1,43 +1,27 @@
 <script setup lang="ts">
-import ColorMode from "./ColorMode.vue";
-import WeekStart from "./WeekStart.vue";
-
-/**
- * Props for the ProfileSettings component.
- */
-interface Props {
-  /** The user profile data containing week_start preference. */
-  profile: Profile;
-}
-
-/**
- * Emits for the ProfileSettings component.
- */
-interface Emits {
-  /** Emitted when week start value changes. */
+const { profile } = defineProps<{ profile: Profile }>();
+const emit = defineEmits<{
   (e: "update:weekStart", value: number): void;
-}
-
-defineProps<Props>();
-const emit = defineEmits<Emits>();
-
-/**
- * Handle week start change and emit to parent.
- */
-const handleWeekStartChange = (value: number): void => {
-  emit("update:weekStart", value);
-};
+}>();
 </script>
 
 <template>
   <div class="divide-y divide-default">
+    <!-- Account -->
     <div class="pb-4">
-      <ColorMode />
+      <ProfileSettingsAccount :profile="profile" />
     </div>
+
+    <!-- Appearance -->
+    <div class="py-4">
+      <ProfileSettingsAppearance />
+    </div>
+
+    <!-- Calendar Preferences -->
     <div class="pt-4">
-      <WeekStart
+      <ProfileSettingsWeekStart
         :model-value="profile.weekStart"
-        @update:model-value="handleWeekStartChange"
+        @update:model-value="emit('update:weekStart', $event)"
       />
     </div>
   </div>

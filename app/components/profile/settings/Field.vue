@@ -1,38 +1,30 @@
 <script setup lang="ts">
-interface Props {
+const {
+  description = undefined,
+  clickable = false,
+  showChevron = false,
+  value = undefined,
+  hideDescriptionOnMobile = true,
+} = defineProps<{
   title: string;
   description?: string;
   clickable?: boolean;
   showChevron?: boolean;
   value?: string;
   hideDescriptionOnMobile?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  description: undefined,
-  clickable: false,
-  showChevron: false,
-  value: undefined,
-  hideDescriptionOnMobile: true,
-});
+}>();
 
 const emit = defineEmits<{
   click: [];
 }>();
 
-const rootTag = computed(() => (props.clickable ? "button" : "div"));
+const rootTag = computed(() => (clickable ? "button" : "div"));
 
 const descriptionClass = computed(() =>
-  props.hideDescriptionOnMobile
+  hideDescriptionOnMobile
     ? "hidden text-xs text-muted md:block"
     : "text-xs text-muted",
 );
-
-const handleClick = (): void => {
-  if (props.clickable) {
-    emit("click");
-  }
-};
 </script>
 
 <template>
@@ -45,7 +37,7 @@ const handleClick = (): void => {
         ? 'appearance-none border-0 bg-transparent cursor-pointer px-0 text-left'
         : ''
     "
-    @click="handleClick"
+    @click="clickable && emit('click')"
   >
     <div class="min-w-0 flex-1">
       <span class="text-sm font-medium text-highlighted">{{ title }}</span>

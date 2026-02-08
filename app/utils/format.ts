@@ -72,11 +72,11 @@ const MONTH_NAMES = [
 ];
 
 /**
- * Format ISO timestamp to "Since Mmm YYYY" format.
+ * Format ISO timestamp to "Joined Mmm YYYY" format.
  */
 export const formatMemberSince = (timestamp: string): string => {
   const date = new Date(timestamp);
   const month = MONTH_NAMES[date.getMonth()];
   const year = date.getFullYear();
-  return `Since ${month} ${year}`;
+  return `Joined ${month} ${year}`;
 };

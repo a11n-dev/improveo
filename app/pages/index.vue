@@ -59,6 +59,27 @@ const handleDelete = async () => {
     isDeleting.value = false;
   }
 };
+
+/** Scroll to bottom of page smoothly */
+const scrollToBottom = () => {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth",
+  });
+};
+
+/** Listen for habit created event from layout overlay */
+onMounted(() => {
+  const handleCreated = () => {
+    scrollToBottom();
+  };
+
+  window.addEventListener("habit-created", handleCreated);
+
+  onUnmounted(() => {
+    window.removeEventListener("habit-created", handleCreated);
+  });
+});
 </script>
 
 <template>
@@ -68,38 +89,41 @@ const handleDelete = async () => {
       <LoadingState />
     </div>
 
-    <!-- Empty state -->
-    <div
-      v-else-if="habits.length === 0"
-      class="fixed inset-0 flex items-center justify-center"
-    >
-      <UEmpty
-        icon="i-lucide-list-checks"
-        title="No habits yet"
-        description="Create your first habit to start tracking your progress."
+    <!-- Content with auto-animate for smooth transitions -->
+    <div v-else v-auto-animate class="contents">
+      <!-- Empty state -->
+      <div
+        v-if="habits.length === 0"
+        class="fixed inset-0 flex items-center justify-center"
       >
-        <template #actions>
-          <UButton
-            label="Create Habit"
-            icon="i-lucide-plus"
-            color="primary"
-            @click="openCreate"
-          />
-        </template>
-      </UEmpty>
-    </div>
+        <UEmpty
+          icon="i-lucide-list-checks"
+          title="No habits yet"
+          description="Create your first habit to start tracking your progress."
+        >
+          <template #actions>
+            <UButton
+              label="Create Habit"
+              icon="i-lucide-plus"
+              color="primary"
+              @click="openCreate"
+            />
+          </template>
+        </UEmpty>
+      </div>
 
-    <!-- Habits list -->
-    <div v-else class="flex flex-col gap-4">
-      <HabitsCard
-        v-for="habit in habits"
-        :key="habit.id"
-        :habit="habit"
-        :week-start="weekStart"
-        :completed="isCompletedToday(habit.id)"
-        @update:completed="handleTodayToggle(habit.id, $event)"
-        @info="handleInfo(habit.id)"
-      />
+      <!-- Habits list -->
+      <div v-else v-auto-animate class="flex flex-col gap-4">
+        <HabitsCard
+          v-for="habit in habits"
+          :key="habit.id"
+          :habit="habit"
+          :week-start="weekStart"
+          :completed="isCompletedToday(habit.id)"
+          @update:completed="handleTodayToggle(habit.id, $event)"
+          @info="handleInfo(habit.id)"
+        />
+      </div>
     </div>
 
     <!-- Habit Info Overlay -->

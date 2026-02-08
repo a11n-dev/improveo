@@ -3,6 +3,10 @@ const { isOpen, closeOverlay } = useHabitCreateOverlay();
 const { draft, isValid, resetDraft } = useHabitDraft();
 const { createHabit } = useHabits();
 
+const emit = defineEmits<{
+  created: [];
+}>();
+
 const modalProps = {
   close: false,
 };
@@ -34,6 +38,7 @@ const handleCreate = async () => {
     if (created) {
       resetDraft();
       closeOverlay();
+      emit("created");
     }
   } finally {
     isCreating.value = false;

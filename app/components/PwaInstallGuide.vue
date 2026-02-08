@@ -29,13 +29,13 @@ const description = "Add to your home screen for quick access";
     ]"
   >
     <template #body>
-      <div class="space-y-4">
+      <div class="space-y-6">
         <!-- Browser/Device header -->
         <div class="flex items-center gap-3">
           <div
-            class="flex size-10 items-center justify-center rounded-lg bg-linear-to-br from-neutral-500 to-neutral-600"
+            class="flex size-10 items-center justify-center rounded-lg bg-info-500/10 border border-info-500"
           >
-            <UIcon :name="guide.headerIcon" class="size-5 text-white" />
+            <UIcon :name="guide.headerIcon" class="size-5 text-info-500" />
           </div>
           <div>
             <h3 class="font-semibold text-highlighted">{{ guide.title }}</h3>

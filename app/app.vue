@@ -20,7 +20,7 @@ const toasterConfig = computed(() => {
     return {
       position: "bottom-center" as const,
       expand: false,
-      ui: { viewport: 'bottom-8' }
+      ui: { viewport: "bottom-8" },
     };
   }
 

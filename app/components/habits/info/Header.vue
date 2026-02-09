@@ -12,7 +12,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="flex w-full items-start justify-between gap-3">
-    <div class="flex items-center gap-3">
+    <div class="flex flex-1 items-center gap-3">
       <div
         class="flex size-12 shrink-0 items-center justify-center rounded-lg"
         :style="{ backgroundColor: `${habit.color}20` }"
@@ -24,7 +24,7 @@ const emit = defineEmits<{
         />
       </div>
 
-      <div class="flex min-w-0 flex-col">
+      <div class="flex min-w-0 flex-1 flex-col">
         <span class="break-words text-lg font-semibold text-highlighted">
           {{ habit.title }}
         </span>

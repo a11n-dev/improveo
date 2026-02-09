@@ -235,25 +235,16 @@ const submitRequestForm = async (): Promise<void> => {
             </p>
           </template>
           <template v-else>
-            <p class="text-center text-sm text-muted">
-              Didn&apos;t receive a code?
-              <UButton
-                v-if="resendSeconds === 0"
-                type="button"
-                variant="link"
-                class="px-1 text-primary"
-                :disabled="
-                  !pendingEmail ||
-                  !canRequestEmailChange ||
-                  isRequesting ||
-                  isVerifying
-                "
-                @click="emit('request', pendingEmail)"
-              >
-                Request another code
-              </UButton>
-              <span v-else>Request another code in {{ resendCountdown }}</span>
-            </p>
+            <CommonResendCodeAction
+              :seconds-left="resendSeconds"
+              :can-request="
+                Boolean(pendingEmail) &&
+                canRequestEmailChange &&
+                !isRequesting &&
+                !isVerifying
+              "
+              @request="emit('request', pendingEmail)"
+            />
           </template>
         </template>
       </CommonOverlayFooter>

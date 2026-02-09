@@ -18,9 +18,14 @@ interface Props {
   schema: z.ZodTypeAny;
   isRegister: boolean;
   isSending: boolean;
+  canSubmit?: boolean;
+  resendSeconds?: number;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  canSubmit: true,
+  resendSeconds: 0,
+});
 
 const state = defineModel<{
   name: string;
@@ -40,6 +45,8 @@ const emit = defineEmits<{
 const handleSubmit = (event: FormSubmitEvent<unknown>) => {
   emit("submit", event as FormSubmitEvent<AuthFormOutput>);
 };
+
+const resendCountdown = computed(() => formatCountdown(props.resendSeconds));
 
 watch(
   () => props.isRegister,
@@ -104,9 +111,13 @@ watch(
     <UButton
       type="submit"
       :loading="props.isSending"
-      :disabled="props.isSending"
+      :disabled="props.isSending || !props.canSubmit"
       :label="props.isRegister ? 'Sign up' : 'Sign in'"
       block
     />
+
+    <p v-if="props.resendSeconds > 0" class="text-sm text-muted">
+      You can request another code in {{ resendCountdown }}.
+    </p>
   </UForm>
 </template>

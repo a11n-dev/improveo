@@ -161,4 +161,27 @@ describe("Auth RequestForm", () => {
       data: state,
     });
   });
+
+  it("disables submit and shows cooldown message while resend cooldown is active", async () => {
+    const wrapper = await mountSuspended(AuthRequestForm, {
+      props: {
+        isRegister: false,
+        isSending: false,
+        canSubmit: false,
+        resendSeconds: 30,
+        schema: AuthLoginSchema,
+        state: {
+          email: "user@example.com",
+          name: "",
+        },
+      },
+      global: {
+        stubs: globalStubs,
+      },
+    });
+
+    const submitButton = wrapper.find('button[type="submit"]');
+    expect(submitButton.attributes("disabled")).toBeDefined();
+    expect(wrapper.text()).toContain("You can request another code in 0:30.");
+  });
 });

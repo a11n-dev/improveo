@@ -13,13 +13,13 @@ const otpValue = defineModel<string[]>("otpValue", { default: () => [] });
 const emit = defineEmits<{
   verify: [];
   back: [];
-  resend: [];
+  request: [];
 }>();
-
-const resendCountdown = computed(() => formatCountdown(props.resendSeconds));
 const canVerify = computed(
   () => props.email.trim().length > 0 && otpValue.value.length === 6,
 );
+
+const canRequestCode = computed(() => !props.isSending && !props.isVerifying);
 </script>
 
 <template>
@@ -59,19 +59,11 @@ const canVerify = computed(
         label="Back"
         @click="emit('back')"
       />
-      <p class="text-sm text-muted">
-        Didn't receive a code?
-        <UButton
-          type="button"
-          variant="link"
-          class="px-1 text-primary"
-          :disabled="props.resendSeconds > 0 || props.isSending"
-          @click="emit('resend')"
-        >
-          Resend code
-        </UButton>
-        <span v-if="props.resendSeconds > 0">in {{ resendCountdown }}</span>
-      </p>
+      <CommonResendCodeAction
+        :seconds-left="props.resendSeconds"
+        :can-request="canRequestCode"
+        @request="emit('request')"
+      />
     </div>
   </div>
 </template>

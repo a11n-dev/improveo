@@ -49,6 +49,10 @@ const otpToken = computed(() => otpValue.value.join(""));
 const hasValidOtp = () =>
   formState.email.trim().length > 0 && otpToken.value.length === 6;
 
+const canRequestOtp = computed(
+  () => !isSending.value && !isVerifying.value && !isResendCooldownActive.value,
+);
+
 /** Reset form state when switching between login and register modes. */
 watch(activeTab, () => {
   step.value = "request";
@@ -111,11 +115,7 @@ const requestOtp = async (payload: AuthFormOutput): Promise<boolean> => {
 type AuthFormOutput = AuthLoginInput | AuthRegisterInput;
 
 const handleOtpRequest = async (data?: AuthFormOutput) => {
-  if (isSending.value) {
-    return;
-  }
-
-  if (step.value === "verify" && isResendCooldownActive.value) {
+  if (!canRequestOtp.value) {
     return;
   }
 
@@ -173,7 +173,6 @@ const handleVerify = async () => {
 const handleBack = () => {
   step.value = "request";
   otpValue.value = [];
-  stopResendCountdown();
 };
 
 /** Form submit handler: routes to appropriate action based on current step. */
@@ -212,6 +211,8 @@ onBeforeUnmount(() => {
         :schema="authSchema"
         :is-register="isRegister"
         :is-sending="isSending"
+        :can-submit="canRequestOtp"
+        :resend-seconds="resendSeconds"
         @submit="handleSubmit"
       />
       <AuthVerifyForm
@@ -223,7 +224,7 @@ onBeforeUnmount(() => {
         :is-verifying="isVerifying"
         @verify="handleVerify"
         @back="handleBack"
-        @resend="handleOtpRequest()"
+        @request="handleOtpRequest()"
       />
 
       <p v-if="step === 'request'" class="text-sm text-muted">

@@ -6,7 +6,7 @@ type EmailChangeStep = "form" | "otp";
  * Manages email change request and OTP verification workflow.
  */
 export const useProfileEmailChange = () => {
-  const { notifyError, notifyInfo, notifySuccess } = useToastNotify();
+  const { notifyError, notifySuccess } = useToastNotify();
   const supabaseClient = useSupabaseClient();
   const supabaseUser = useSupabaseUser();
   const profileStore = useProfileStore();
@@ -87,13 +87,6 @@ export const useProfileEmailChange = () => {
     const normalizedEmail = nextEmail.trim().toLowerCase();
 
     if (!canRequestEmailChange.value) {
-      if (isResendCooldownActive.value) {
-        notifyInfo(
-          "Please wait",
-          `You can request another code in ${formatCountdown(resendSeconds.value)}.`,
-        );
-      }
-
       return false;
     }
 
@@ -113,11 +106,6 @@ export const useProfileEmailChange = () => {
       step.value = "otp";
       otpValue.value = [];
       startResendCooldown(OTP_RESEND_COOLDOWN_SECONDS);
-
-      notifyInfo(
-        "Code sent",
-        "Enter the 6-digit confirmation code from your inbox.",
-      );
 
       return true;
     } finally {

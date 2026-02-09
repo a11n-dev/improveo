@@ -25,10 +25,10 @@ const emit = defineEmits<{
       </div>
 
       <div class="flex min-w-0 flex-col">
-        <span class="truncate text-lg font-semibold text-highlighted">
+        <span class="break-words text-lg font-semibold text-highlighted">
           {{ habit.title }}
         </span>
-        <span class="truncate text-sm text-muted">
+        <span class="break-words text-sm text-muted">
           {{ habit.description || "No description" }}
         </span>
       </div>

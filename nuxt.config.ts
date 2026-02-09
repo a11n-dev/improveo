@@ -54,6 +54,21 @@ export default defineNuxtConfig({
     types: "~~/shared/types/database.types.ts",
   },
 
+  nitro: {
+    storage: {
+      redis: {
+        driver: "redis",
+        url: process.env.REDIS_URL,
+      },
+    },
+    devStorage: {
+      redis: {
+        driver: "fs",
+        base: "./.data/redis",
+      },
+    },
+  },
+
   pwa: {
     registerType: "autoUpdate",
     manifest: {

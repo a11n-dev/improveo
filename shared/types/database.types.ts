@@ -115,6 +115,38 @@ export type Database = {
         };
         Relationships: [];
       };
+      profile_settings: {
+        Row: {
+          color_mode: string;
+          created_at: string;
+          id: string;
+          updated_at: string;
+          week_start: number;
+        };
+        Insert: {
+          color_mode?: string;
+          created_at?: string;
+          id: string;
+          updated_at?: string;
+          week_start?: number;
+        };
+        Update: {
+          color_mode?: string;
+          created_at?: string;
+          id?: string;
+          updated_at?: string;
+          week_start?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "profile_settings_id_fkey";
+            columns: ["id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
           avatar_path: string | null;
@@ -124,7 +156,6 @@ export type Database = {
           name: string | null;
           timezone: string;
           updated_at: string;
-          week_start: number;
         };
         Insert: {
           avatar_path?: string | null;
@@ -134,7 +165,6 @@ export type Database = {
           name?: string | null;
           timezone?: string;
           updated_at?: string;
-          week_start?: number;
         };
         Update: {
           avatar_path?: string | null;
@@ -144,7 +174,6 @@ export type Database = {
           name?: string | null;
           timezone?: string;
           updated_at?: string;
-          week_start?: number;
         };
         Relationships: [];
       };

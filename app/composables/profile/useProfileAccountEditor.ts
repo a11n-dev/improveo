@@ -86,8 +86,9 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
   const shouldCleanupPreviousAvatar = (
     previousAvatarPath: string,
     uploadedAvatarPath: string | null,
+    wasAvatarRemoved: boolean,
   ): boolean => {
-    if (hasAvatarRemoval.value) {
+    if (wasAvatarRemoved) {
       return true;
     }
 
@@ -107,6 +108,7 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
 
     try {
       const previousAvatarPath = profile.value.avatarPath;
+      const wasAvatarRemoved = hasAvatarRemoval.value;
       const payloadState = await buildProfilePayload();
 
       uploadedAvatarPath = payloadState.uploadedAvatarPath;
@@ -130,7 +132,11 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
 
       if (
         previousAvatarPath &&
-        shouldCleanupPreviousAvatar(previousAvatarPath, uploadedAvatarPath)
+        shouldCleanupPreviousAvatar(
+          previousAvatarPath,
+          uploadedAvatarPath,
+          wasAvatarRemoved,
+        )
       ) {
         await avatarStorage.removeAvatarObject(previousAvatarPath);
       }

@@ -10,8 +10,8 @@ interface Props {
   showTooltips?: boolean;
   currentStreak?: number;
   bestStreak?: number;
-  hasStreak?: boolean;
-  streakGoalLabel?: string;
+  hasGoal?: boolean;
+  goalLabel?: string;
 }
 
 const {
@@ -25,8 +25,8 @@ const {
   showTooltips = true,
   currentStreak = 0,
   bestStreak = 0,
-  hasStreak = false,
-  streakGoalLabel = "",
+  hasGoal = false,
+  goalLabel = "",
 } = defineProps<Props>();
 
 /** Whether on desktop viewport (used to disable tooltips on mobile) */
@@ -171,8 +171,8 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
       v-if="showLegend"
       :current-streak="currentStreak"
       :best-streak="bestStreak"
-      :has-streak="hasStreak"
-      :streak-goal-label="streakGoalLabel"
+      :has-goal="hasGoal"
+      :goal-label="goalLabel"
     />
   </div>
 </template>

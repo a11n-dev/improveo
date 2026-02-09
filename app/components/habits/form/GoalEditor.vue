@@ -2,27 +2,27 @@
 import type { RadioGroupItem } from "@nuxt/ui";
 
 interface Props {
-  streak: StreakGoal | null;
+  goal: Goal | null;
 }
 
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  "update:streak": [streak: StreakGoal | null];
+  "update:goal": [goal: Goal | null];
 }>();
 
 const open = defineModel<boolean>("open", { default: false });
 
-/** Radio options for streak interval */
-const intervalItems: RadioGroupItem[] = [
+/** Radio options for goal period type */
+const periodItems: RadioGroupItem[] = [
   { label: "None", value: "none" },
-  { label: "Daily", value: "daily" },
-  { label: "Weekly", value: "weekly" },
-  { label: "Monthly", value: "monthly" },
+  { label: "Daily", value: "day" },
+  { label: "Weekly", value: "week" },
+  { label: "Monthly", value: "month" },
 ];
 
-/** Current interval selection (bound to radio group) */
-const selectedInterval = ref<string>("none");
+/** Current period type selection (bound to radio group) */
+const selectedPeriodType = ref<string>("none");
 
 /** Completions count for weekly/monthly */
 const completionsCount = ref(1);
@@ -30,23 +30,23 @@ const completionsCount = ref(1);
 /** Flag to skip resetting completions during initialization */
 const isInitializing = ref(false);
 
-/** Max completions based on interval */
+/** Max completions based on period type */
 const maxCompletions = computed(() => {
-  if (selectedInterval.value === "weekly") return 7;
-  if (selectedInterval.value === "monthly") return 31;
+  if (selectedPeriodType.value === "week") return 7;
+  if (selectedPeriodType.value === "month") return 31;
   return 1;
 });
 
 /** Period label for display */
 const periodLabel = computed(() => {
-  if (selectedInterval.value === "weekly") return "Week";
-  if (selectedInterval.value === "monthly") return "Month";
+  if (selectedPeriodType.value === "week") return "Week";
+  if (selectedPeriodType.value === "month") return "Month";
   return "";
 });
 
 /** Whether to show completions counter */
 const showCompletions = computed(() =>
-  ["weekly", "monthly"].includes(selectedInterval.value),
+  ["week", "month"].includes(selectedPeriodType.value),
 );
 
 /** Decrement completions (min 1) */
@@ -56,7 +56,7 @@ const decrement = () => {
   }
 };
 
-/** Increment completions (max based on interval) */
+/** Increment completions (max based on period type) */
 const increment = () => {
   if (completionsCount.value < maxCompletions.value) {
     completionsCount.value++;
@@ -67,22 +67,22 @@ const increment = () => {
 watch(open, (isOpen) => {
   if (isOpen) {
     isInitializing.value = true;
-    if (props.streak) {
-      selectedInterval.value = props.streak.interval;
-      completionsCount.value = props.streak.count;
+    if (props.goal) {
+      selectedPeriodType.value = props.goal.periodType;
+      completionsCount.value = props.goal.targetCount;
     } else {
-      selectedInterval.value = "none";
+      selectedPeriodType.value = "none";
       completionsCount.value = 1;
     }
-    // Reset flag after Vue processes the interval change
+    // Reset flag after Vue processes the period type change
     nextTick(() => {
       isInitializing.value = false;
     });
   }
 });
 
-/** Reset completions when interval changes (but not during initialization) */
-watch(selectedInterval, () => {
+/** Reset completions when period type changes (but not during initialization) */
+watch(selectedPeriodType, () => {
   if (!isInitializing.value) {
     completionsCount.value = 1;
   }
@@ -90,18 +90,19 @@ watch(selectedInterval, () => {
 
 /** Save selection and close */
 const save = () => {
-  if (selectedInterval.value === "none") {
-    emit("update:streak", null);
+  if (selectedPeriodType.value === "none") {
+    emit("update:goal", null);
   } else {
-    emit("update:streak", {
-      interval: selectedInterval.value as StreakInterval,
-      count: selectedInterval.value === "daily" ? 1 : completionsCount.value,
+    emit("update:goal", {
+      periodType: selectedPeriodType.value as PeriodType,
+      targetCount:
+        selectedPeriodType.value === "day" ? 1 : completionsCount.value,
     });
   }
   open.value = false;
 };
 
-const title = "Streak Goal";
+const title = "Goal";
 
 const drawerProps = {
   nested: true,
@@ -130,8 +131,8 @@ const drawerProps = {
       <div class="flex flex-col gap-4">
         <UFormField label="Interval" name="interval">
           <URadioGroup
-            v-model="selectedInterval"
-            :items="intervalItems"
+            v-model="selectedPeriodType"
+            :items="periodItems"
             variant="table"
             color="neutral"
           />

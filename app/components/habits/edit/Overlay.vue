@@ -34,15 +34,12 @@ const handleSave = async () => {
 
   try {
     // Build payload with all fields
-    const hasStreak = draft.value.streak !== null;
-
     const payload: HabitUpdatePayload = {
       title: draft.value.name,
       description: draft.value.description || null,
       icon: draft.value.icon!,
       color: draft.value.color!,
-      streakInterval: hasStreak ? draft.value.streak!.interval : null,
-      streakCount: hasStreak ? draft.value.streak!.count : 0,
+      goal: draft.value.goal,
     };
 
     const updated = await updateHabit(props.habit.id, payload);

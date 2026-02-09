@@ -21,9 +21,9 @@ const modalProps = {
   ui: { footer: "flex-col gap-2" },
 };
 
-/** Streak goal label for legend */
-const streakGoalLabel = computed(() =>
-  formatStreakGoalLabel(habit.streakInterval, habit.streakCount),
+/** Goal label for legend */
+const goalLabel = computed(() =>
+  formatGoalLabel(habit.goal?.periodType, habit.goal?.targetCount),
 );
 
 /** Delete confirmation state */
@@ -81,8 +81,8 @@ const handleClose = () => {
           :show-legend="true"
           :current-streak="habit.currentStreak"
           :best-streak="habit.bestStreak"
-          :has-streak="habit.streakInterval !== null"
-          :streak-goal-label="streakGoalLabel"
+          :has-goal="habit.goal !== null"
+          :goal-label="goalLabel"
         />
 
         <HabitsInfoCalendar

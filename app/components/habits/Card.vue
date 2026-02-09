@@ -18,9 +18,9 @@ const isChecked = computed({
   set: (value: boolean) => emit("update:completed", value),
 });
 
-/** Streak goal label for legend */
-const streakGoalLabel = computed(() =>
-  formatStreakGoalLabel(habit.streakInterval, habit.streakCount),
+/** Goal label for legend */
+const goalLabel = computed(() =>
+  formatGoalLabel(habit.goal?.periodType, habit.goal?.targetCount),
 );
 
 /** Handle card click */
@@ -101,8 +101,8 @@ const handleCheckboxClick = (event: Event) => {
       :week-start="weekStart"
       :current-streak="habit.currentStreak"
       :best-streak="habit.bestStreak"
-      :has-streak="habit.streakInterval !== null"
-      :streak-goal-label="streakGoalLabel"
+      :has-goal="habit.goal !== null"
+      :goal-label="goalLabel"
     />
   </UCard>
 </template>

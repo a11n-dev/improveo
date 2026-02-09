@@ -21,16 +21,13 @@ const handleCreate = async () => {
   isCreating.value = true;
 
   try {
-    // When streak is not set (None selected), send null for interval and 0 for count
-    const hasStreak = draft.value.streak !== null;
-
+    // Build payload from draft
     const payload: HabitCreatePayload = {
       title: draft.value.name,
       description: draft.value.description || undefined,
       icon: draft.value.icon!,
       color: draft.value.color!,
-      streakInterval: hasStreak ? draft.value.streak!.interval : null,
-      streakCount: hasStreak ? draft.value.streak!.count : 0,
+      goal: draft.value.goal,
     };
 
     const created = await createHabit(payload);

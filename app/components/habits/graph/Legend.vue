@@ -1,20 +1,20 @@
 <script setup lang="ts">
 interface Props {
-  /** Current streak count (only shown if streakInterval is set) */
+  /** Current streak count (only shown if goal is set) */
   currentStreak?: number;
   /** Best streak count */
   bestStreak?: number;
-  /** Whether streak tracking is enabled */
-  hasStreak?: boolean;
-  /** Streak goal label (e.g., "Daily", "3 / week") */
-  streakGoalLabel?: string;
+  /** Whether goal tracking is enabled */
+  hasGoal?: boolean;
+  /** Goal label (e.g., "Daily", "3 / Week") */
+  goalLabel?: string;
 }
 
 const {
   currentStreak = 0,
   bestStreak = 0,
-  hasStreak = false,
-  streakGoalLabel = "",
+  hasGoal = false,
+  goalLabel = "",
 } = defineProps<Props>();
 
 const badgeStyle = {
@@ -27,7 +27,7 @@ const badgeStyle = {
 <template>
   <div class="flex items-center justify-between text-xs text-muted">
     <!-- Left: Streak info -->
-    <div v-if="hasStreak" class="flex items-center gap-1" @click.stop>
+    <div v-if="hasGoal" class="flex items-center gap-1" @click.stop>
       <UTooltip
         text="Current streak"
         :content="{ side: 'top', sideOffset: 6 }"
@@ -63,7 +63,7 @@ const badgeStyle = {
         </UBadge>
       </UTooltip>
       <UTooltip
-        text="Streak goal"
+        text="Goal"
         :content="{ side: 'top', sideOffset: 6 }"
         :delay-duration="0"
       >
@@ -74,13 +74,13 @@ const badgeStyle = {
           class="border"
           :style="badgeStyle"
         >
-          {{ streakGoalLabel }}
+          {{ goalLabel }}
         </UBadge>
       </UTooltip>
     </div>
     <div v-else @click.stop>
       <UTooltip
-        text="Streak goal"
+        text="Goal"
         :content="{ side: 'top', sideOffset: 6 }"
         :delay-duration="0"
       >

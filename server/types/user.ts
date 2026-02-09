@@ -4,5 +4,11 @@
 
 export type ProfileSelectRow = Pick<
   Tables<"profiles">,
-  "id" | "email" | "name" | "avatar_path" | "week_start" | "created_at"
+  | "id"
+  | "email"
+  | "name"
+  | "avatar_path"
+  | "week_start"
+  | "timezone"
+  | "created_at"
 >;

@@ -8,10 +8,10 @@ import {
   HABIT_ICON_PATTERN,
   HABIT_TITLE_MIN_LENGTH,
   HABIT_TITLE_MAX_LENGTH,
-  STREAK_COUNT_LIMITS,
+  GOAL_COUNT_LIMITS,
 } from "../constants/validation";
 
-const StreakIntervalSchema = z.enum(["daily", "weekly", "monthly"]);
+const PeriodTypeSchema = z.enum(["day", "week", "month"]);
 
 const HabitTitleSchema = z
   .string()
@@ -55,49 +55,38 @@ const HabitColorSchema = z
   )
   .regex(HABIT_COLOR_PATTERN, "Color format is invalid");
 
-const applyStreakRules = (
+const applyGoalRules = (
   value: {
-    streakInterval: z.infer<typeof StreakIntervalSchema> | null;
-    streakCount: number;
+    periodType: z.infer<typeof PeriodTypeSchema>;
+    targetCount: number;
   },
   ctx: z.RefinementCtx,
 ) => {
-  if (value.streakInterval === null) {
-    if (value.streakCount !== 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Streak count must be 0 when streak interval is disabled",
-        path: ["streakCount"],
-      });
-    }
-    return;
-  }
-
-  if (value.streakCount < 1) {
+  if (value.targetCount < 1) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Streak count must be a positive integer",
-      path: ["streakCount"],
+      message: "Target count must be a positive integer",
+      path: ["targetCount"],
     });
     return;
   }
 
-  const maxCount = STREAK_COUNT_LIMITS[value.streakInterval];
-  if (value.streakCount > maxCount) {
+  const maxCount = GOAL_COUNT_LIMITS[value.periodType];
+  if (value.targetCount > maxCount) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Streak count must be ${maxCount} or less for ${value.streakInterval}`,
-      path: ["streakCount"],
+      message: `Target count must be ${maxCount} or less for ${value.periodType}`,
+      path: ["targetCount"],
     });
   }
 };
 
-export const HabitStreakSchema = z
+export const HabitGoalSchema = z
   .object({
-    streakInterval: StreakIntervalSchema.nullable(),
-    streakCount: z.number().int(),
+    periodType: PeriodTypeSchema,
+    targetCount: z.number().int(),
   })
-  .superRefine(applyStreakRules);
+  .superRefine(applyGoalRules);
 
 export const HabitCreatePayloadSchema = z
   .object({
@@ -105,10 +94,8 @@ export const HabitCreatePayloadSchema = z
     description: HabitDescriptionSchema.optional(),
     icon: HabitIconSchema,
     color: HabitColorSchema,
-    streakInterval: StreakIntervalSchema.nullable(),
-    streakCount: z.number().int(),
+    goal: HabitGoalSchema.nullable(),
   })
-  .superRefine(applyStreakRules)
   .strict();
 
 export const HabitUpdatePayloadSchema = z
@@ -117,11 +104,10 @@ export const HabitUpdatePayloadSchema = z
     description: HabitDescriptionSchema.nullable().optional(),
     icon: HabitIconSchema.optional(),
     color: HabitColorSchema.optional(),
-    streakInterval: StreakIntervalSchema.nullable().optional(),
-    streakCount: z.number().int().optional(),
+    goal: HabitGoalSchema.nullable().optional(),
   })
   .strict();
 
 export type HabitCreateInput = z.infer<typeof HabitCreatePayloadSchema>;
 export type HabitUpdateInput = z.infer<typeof HabitUpdatePayloadSchema>;
-export type HabitStreakInput = z.infer<typeof HabitStreakSchema>;
+export type HabitGoalInput = z.infer<typeof HabitGoalSchema>;

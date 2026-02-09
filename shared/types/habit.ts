@@ -3,16 +3,25 @@
  * These DTOs decouple the client from the database schema.
  */
 
-/** Streak interval options for habits with streak tracking */
-export type StreakInterval = "daily" | "weekly" | "monthly";
+/** Period type for goal tracking */
+export type PeriodType = "day" | "week" | "month";
 
 /** Week start day (0 = Monday, 1 = Tuesday, ..., 6 = Sunday) - ISO 8601 standard */
 export type WeekStartDay = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-/** Streak goal: interval + completions per interval */
-export interface StreakGoal {
-  interval: StreakInterval;
-  count: number;
+/** Goal: period type + target completions per period */
+export interface Goal {
+  periodType: PeriodType;
+  targetCount: number;
+}
+
+/** Goal version from the habit_goal_versions table */
+export interface HabitGoalVersion {
+  id: string;
+  periodType: PeriodType;
+  targetCount: number;
+  effectiveFrom: string;
+  effectiveTo: string | null;
 }
 
 /**
@@ -25,13 +34,12 @@ export interface Habit {
   description: string | null;
   icon: string;
   color: string;
-  /** null means no streak tracking */
-  streakInterval: StreakInterval | null;
-  /** 0 when streakInterval is null */
-  streakCount: number;
+  /** Current active goal, or null if no goal tracking */
+  goal: HabitGoalVersion | null;
+  /** Current streak count (computed on read from packed counters) */
   currentStreak: number;
+  /** Best streak count (computed on read from packed counters) */
   bestStreak: number;
-  lastCompletedOn: string | null;
   /** Completion map: date (YYYY-MM-DD) -> completed */
   completions: Record<string, boolean>;
   createdAt: string;
@@ -45,10 +53,8 @@ export interface HabitCreatePayload {
   description?: string;
   icon: string;
   color: string;
-  /** null means no streak tracking */
-  streakInterval: StreakInterval | null;
-  /** 0 when streakInterval is null */
-  streakCount: number;
+  /** null means no goal tracking */
+  goal: Goal | null;
 }
 
 /**
@@ -60,10 +66,8 @@ export interface HabitUpdatePayload {
   description?: string | null;
   icon?: string;
   color?: string;
-  /** null means no streak tracking */
-  streakInterval?: StreakInterval | null;
-  /** 0 when streakInterval is null */
-  streakCount?: number;
+  /** null means no goal tracking; undefined means unchanged */
+  goal?: Goal | null;
 }
 
 /**
@@ -76,13 +80,11 @@ export interface CompletionTogglePayload {
 
 /**
  * Response from completion toggle API.
- * Contains updated streak information.
  */
 export interface CompletionToggleResponse {
   completed: boolean;
   currentStreak: number;
   bestStreak: number;
-  lastCompletedOn: string | null;
 }
 
 /**

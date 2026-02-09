@@ -2,7 +2,7 @@
  * DELETE /api/habits/:id/completions
  * Remove a completion for a habit.
  * Query param: date=YYYY-MM-DD
- * Recomputes streaks after delete.
+ * Calls the set_habit_completion RPC with p_value=0.
  */
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 
@@ -33,7 +33,7 @@ export default defineEventHandler(
     // Verify habit exists and belongs to user
     const { data: habit, error: habitError } = await client
       .from("habits")
-      .select("id, streak_interval, streak_count")
+      .select("id")
       .eq("id", habitId)
       .eq("user_id", user.sub)
       .single();
@@ -42,7 +42,7 @@ export default defineEventHandler(
       throw createError({ statusCode: 404, message: "Habit not found" });
     }
 
-    // Get user's week_start setting
+    // Get user's week_start setting for the RPC
     const { data: profile } = await client
       .from("profiles")
       .select("week_start")
@@ -51,12 +51,12 @@ export default defineEventHandler(
 
     const weekStart = (profile?.week_start ?? 0) as WeekStartDay;
 
-    // Update completion bitmap via RPC
+    // Update completion bitmap via RPC (p_value=0 to clear)
     const { error: updateError } = await client.rpc("set_habit_completion", {
       p_habit_id: habitId,
-      p_user_id: user.sub,
       p_date: date,
       p_value: 0,
+      p_week_start: weekStart,
     });
 
     if (updateError) {
@@ -66,55 +66,40 @@ export default defineEventHandler(
       });
     }
 
-    // Fetch remaining completions for this habit to recompute streaks
-    const { data: completionRows, error: fetchError } = await client
-      .from("completions")
-      .select("year, bitmap")
+    // Fetch current goal version to compute streaks
+    const { data: goalVersion } = await client
+      .from("habit_goal_versions")
+      .select("period_type, target_count")
       .eq("habit_id", habitId)
-      .eq("user_id", user.sub);
+      .is("effective_to", null)
+      .single();
 
-    if (fetchError) {
-      throw createError({
-        statusCode: 500,
-        message: "Failed to fetch completions for streak calculation",
-      });
+    if (!goalVersion) {
+      return { completed: false, currentStreak: 0, bestStreak: 0 };
     }
 
-    // Compute streaks
-    const allCompletions = decodeCompletionRowsToRecords(completionRows || []);
+    // Fetch all completion rows for this habit to compute streaks
+    const { data: completionRows } = await client
+      .from("completions")
+      .select("year, bitmap, week_counts, month_counts")
+      .eq("habit_id", habitId);
 
-    const streakResult = computeStreaks(
-      allCompletions,
+    const rows: CompletionBitmapRow[] = (completionRows ?? []).map((r) => ({
+      year: r.year,
+      bitmap: r.bitmap,
+      week_counts: r.week_counts,
+      month_counts: r.month_counts,
+    }));
+
+    const { currentStreak, bestStreak } = computeStreaks(
+      rows,
       {
-        streakInterval: habit.streak_interval as StreakInterval | null,
-        streakCount: habit.streak_count,
+        periodType: goalVersion.period_type as PeriodType,
+        targetCount: goalVersion.target_count,
       },
       weekStart,
     );
 
-    // Update habit with new streak values
-    const { error: updateHabitError } = await client
-      .from("habits")
-      .update({
-        current_streak: streakResult.currentStreak,
-        best_streak: streakResult.bestStreak,
-        last_completed_on: streakResult.lastCompletedOn,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", habitId);
-
-    if (updateHabitError) {
-      throw createError({
-        statusCode: 500,
-        message: "Failed to update streak values",
-      });
-    }
-
-    return {
-      completed: false,
-      currentStreak: streakResult.currentStreak,
-      bestStreak: streakResult.bestStreak,
-      lastCompletedOn: streakResult.lastCompletedOn,
-    };
+    return { completed: false, currentStreak, bestStreak };
   },
 );

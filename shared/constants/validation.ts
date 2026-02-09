@@ -11,8 +11,8 @@ export const HABIT_COLOR_MAX_LENGTH = 16;
 export const HABIT_ICON_PATTERN = /^i-lucide-[a-z0-9-]+$/;
 export const HABIT_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 
-export const STREAK_COUNT_LIMITS = {
-  daily: 1,
-  weekly: 7,
-  monthly: 31,
+export const GOAL_COUNT_LIMITS = {
+  day: 1,
+  week: 7,
+  month: 31,
 } as const;

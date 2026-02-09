@@ -15,6 +15,7 @@ export interface Profile {
   name: Tables<"profiles">["name"];
   avatarPath: Tables<"profiles">["avatar_path"];
   weekStart: Tables<"profiles">["week_start"];
+  timezone: Tables<"profiles">["timezone"];
   createdAt: Tables<"profiles">["created_at"];
 }
 
@@ -26,4 +27,5 @@ export interface ProfileUpdatePayload {
   weekStart?: TablesUpdate<"profiles">["week_start"];
   name?: TablesUpdate<"profiles">["name"];
   avatarPath?: TablesUpdate<"profiles">["avatar_path"];
+  timezone?: TablesUpdate<"profiles">["timezone"];
 }

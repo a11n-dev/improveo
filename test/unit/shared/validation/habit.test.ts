@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { STREAK_COUNT_LIMITS } from "../../../../shared/constants/validation";
+import { GOAL_COUNT_LIMITS } from "../../../../shared/constants/validation";
 import {
   HabitCreatePayloadSchema,
-  HabitStreakSchema,
+  HabitGoalSchema,
   HabitUpdatePayloadSchema,
 } from "../../../../shared/validation/habit";
 
@@ -12,8 +12,7 @@ const VALID_CREATE_PAYLOAD = {
   description: "Before bed",
   icon: "i-lucide-book-open",
   color: "#3B82F6",
-  streakInterval: "daily" as const,
-  streakCount: 1,
+  goal: { periodType: "day" as const, targetCount: 1 },
 };
 
 describe("Habit validation schemas", () => {
@@ -30,6 +29,15 @@ describe("Habit validation schemas", () => {
       }
 
       expect(result.data.title).toBe("Read 20 pages");
+    });
+
+    it("accepts a payload with null goal (no tracking)", () => {
+      const result = HabitCreatePayloadSchema.safeParse({
+        ...VALID_CREATE_PAYLOAD,
+        goal: null,
+      });
+
+      expect(result.success).toBe(true);
     });
 
     it("requires title", () => {
@@ -69,21 +77,6 @@ describe("Habit validation schemas", () => {
       }
     });
 
-    it("enforces streak rule when interval is disabled", () => {
-      const result = HabitCreatePayloadSchema.safeParse({
-        ...VALID_CREATE_PAYLOAD,
-        streakInterval: null,
-        streakCount: 1,
-      });
-
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toBe(
-          "Streak count must be 0 when streak interval is disabled",
-        );
-      }
-    });
-
     it("rejects unknown keys", () => {
       const result = HabitCreatePayloadSchema.safeParse({
         ...VALID_CREATE_PAYLOAD,
@@ -94,38 +87,38 @@ describe("Habit validation schemas", () => {
     });
   });
 
-  describe("HabitStreakSchema", () => {
+  describe("HabitGoalSchema", () => {
     it.each([
-      ["daily", STREAK_COUNT_LIMITS.daily + 1],
-      ["weekly", STREAK_COUNT_LIMITS.weekly + 1],
-      ["monthly", STREAK_COUNT_LIMITS.monthly + 1],
+      ["day", GOAL_COUNT_LIMITS.day + 1],
+      ["week", GOAL_COUNT_LIMITS.week + 1],
+      ["month", GOAL_COUNT_LIMITS.month + 1],
     ] as const)(
-      "enforces max count for %s interval",
-      (streakInterval, streakCount) => {
-        const result = HabitStreakSchema.safeParse({
-          streakInterval,
-          streakCount,
+      "enforces max target count for %s period",
+      (periodType, targetCount) => {
+        const result = HabitGoalSchema.safeParse({
+          periodType,
+          targetCount,
         });
 
         expect(result.success).toBe(false);
         if (!result.success) {
           expect(result.error.issues[0]?.message).toContain(
-            `Streak count must be ${STREAK_COUNT_LIMITS[streakInterval]} or less`,
+            `Target count must be ${GOAL_COUNT_LIMITS[periodType]} or less`,
           );
         }
       },
     );
 
-    it("requires positive count when interval is enabled", () => {
-      const result = HabitStreakSchema.safeParse({
-        streakInterval: "weekly",
-        streakCount: 0,
+    it("requires positive target count", () => {
+      const result = HabitGoalSchema.safeParse({
+        periodType: "week",
+        targetCount: 0,
       });
 
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0]?.message).toBe(
-          "Streak count must be a positive integer",
+          "Target count must be a positive integer",
         );
       }
     });
@@ -135,6 +128,22 @@ describe("Habit validation schemas", () => {
     it("accepts partial updates", () => {
       const result = HabitUpdatePayloadSchema.safeParse({
         title: "New title",
+      });
+
+      expect(result.success).toBe(true);
+    });
+
+    it("accepts goal update to null", () => {
+      const result = HabitUpdatePayloadSchema.safeParse({
+        goal: null,
+      });
+
+      expect(result.success).toBe(true);
+    });
+
+    it("accepts goal update with new values", () => {
+      const result = HabitUpdatePayloadSchema.safeParse({
+        goal: { periodType: "week", targetCount: 3 },
       });
 
       expect(result.success).toBe(true);

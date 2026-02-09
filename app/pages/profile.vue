@@ -3,21 +3,11 @@ definePageMeta({
   keepalive: true,
 });
 
-const { error, fetchProfile, pending, profile, updateWeekStart } = useProfile();
-
-await callOnce("profile", fetchProfile);
+const { error, pending, profile } = useProfile();
 
 const isLoading = computed(
   () => pending.value && !profile.value && !error.value,
 );
-
-/**
- * Handles the change of the week start day in the profile settings.
- * @param value The new week start day.
- */
-const handleWeekStartChange = async (value: number): Promise<void> => {
-  await updateWeekStart(value);
-};
 </script>
 
 <template>
@@ -51,10 +41,7 @@ const handleWeekStartChange = async (value: number): Promise<void> => {
       <section v-if="profile">
         <h2 class="font-medium mb-3 text-highlighted">Settings</h2>
         <UCard variant="subtle">
-          <ProfileSettings
-            :profile="profile"
-            @update:week-start="handleWeekStartChange"
-          />
+          <ProfileSettings :profile="profile" />
         </UCard>
       </section>
 

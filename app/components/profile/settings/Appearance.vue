@@ -1,7 +1,6 @@
 <script setup lang="ts">
-type ColorModePreference = "light" | "dark" | "system";
-
 const colorMode = useColorMode();
+const { updateColorMode } = useSettings();
 const open = ref(false);
 
 const colorModeOptions = [
@@ -10,32 +9,69 @@ const colorModeOptions = [
   { label: "System", value: "system", description: "Follow system settings" },
 ];
 
-/**
- * Bridges Nuxt color mode preference into strict radio group values.
- */
-const selectedPreference = computed<ColorModePreference>({
-  get: () => {
-    const preference = colorMode.preference;
-    if (
-      preference === "light" ||
-      preference === "dark" ||
-      preference === "system"
-    ) {
-      return preference;
-    }
-    return "system";
-  },
-  set: (value) => {
-    colorMode.preference = value;
-    // We don't close automatically here to let user confirm/see the change
-  },
-});
+/** The saved preference at the time the overlay was opened. */
+const savedPreference = ref<ColorModePreference>(resolvePreference());
+
+/** Draft value the user is previewing inside the overlay. */
+const draftPreference = ref<ColorModePreference>(resolvePreference());
+
+const hasChanges = computed(
+  () => draftPreference.value !== savedPreference.value,
+);
 
 const currentLabel = computed(
   () =>
-    colorModeOptions.find((opt) => opt.value === selectedPreference.value)
+    colorModeOptions.find((opt) => opt.value === savedPreference.value)
       ?.label ?? "System",
 );
+
+/**
+ * Reads Nuxt color mode preference narrowed to the valid enum values.
+ */
+function resolvePreference(): ColorModePreference {
+  const preference = colorMode.preference;
+  if (
+    preference === "light" ||
+    preference === "dark" ||
+    preference === "system"
+  ) {
+    return preference;
+  }
+  return "system";
+}
+
+/**
+ * Opens the overlay and snapshots the current preference as the baseline.
+ */
+const openEditor = (): void => {
+  savedPreference.value = resolvePreference();
+  draftPreference.value = savedPreference.value;
+  open.value = true;
+};
+
+/**
+ * Live-preview: apply draft to Nuxt color mode as the user toggles options.
+ */
+watch(draftPreference, (value) => {
+  colorMode.preference = value;
+});
+
+/**
+ * Persists the draft to the server and closes the overlay.
+ */
+const save = (): void => {
+  updateColorMode(draftPreference.value);
+  open.value = false;
+};
+
+/**
+ * Reverts the preview back to the saved preference and closes.
+ */
+const cancel = (): void => {
+  colorMode.preference = savedPreference.value;
+  draftPreference.value = savedPreference.value;
+  open.value = false;
+};
 </script>
 
 <template>
@@ -47,7 +83,7 @@ const currentLabel = computed(
       :value="currentLabel"
       clickable
       show-chevron
-      @click="open = true"
+      @click="openEditor"
     />
 
     <CommonOverlay
@@ -56,15 +92,21 @@ const currentLabel = computed(
       description="Choose your preferred color theme"
       :actions="[
         {
-          label: 'Close',
+          label: 'Save',
+          color: 'primary',
+          visible: hasChanges,
+          onClick: save,
+        },
+        {
+          label: hasChanges ? 'Cancel' : 'Close',
           color: 'secondary',
-          onClick: () => (open = false),
+          onClick: cancel,
         },
       ]"
     >
       <template #body>
         <URadioGroup
-          v-model="selectedPreference"
+          v-model="draftPreference"
           :items="colorModeOptions"
           value-key="value"
           color="neutral"

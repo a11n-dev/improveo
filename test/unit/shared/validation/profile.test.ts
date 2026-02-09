@@ -10,7 +10,6 @@ describe("ProfileUpdatePayloadSchema", () => {
   it("accepts a valid payload and trims name", () => {
     const result = ProfileUpdatePayloadSchema.safeParse({
       name: "  Jamie  ",
-      weekStart: 1,
       avatarPath: "  user-id/avatar.jpg  ",
     });
 
@@ -20,7 +19,6 @@ describe("ProfileUpdatePayloadSchema", () => {
     }
 
     expect(result.data.name).toBe("Jamie");
-    expect(result.data.weekStart).toBe(1);
     expect(result.data.avatarPath).toBe("user-id/avatar.jpg");
   });
 
@@ -62,23 +60,6 @@ describe("ProfileUpdatePayloadSchema", () => {
         `Name must be ${PROFILE_NAME_MAX_LENGTH} characters or less`,
       );
     }
-  });
-
-  it.each([-1, 7])("rejects weekStart out of range: %s", (weekStart) => {
-    const result = ProfileUpdatePayloadSchema.safeParse({ weekStart });
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues[0]?.message).toBe(
-        "Choose a day from Monday to Sunday",
-      );
-    }
-  });
-
-  it("requires weekStart to be an integer", () => {
-    const result = ProfileUpdatePayloadSchema.safeParse({ weekStart: 1.5 });
-
-    expect(result.success).toBe(false);
   });
 
   it("rejects unknown keys", () => {

@@ -42,14 +42,9 @@ export default defineEventHandler(
       throw createError({ statusCode: 404, message: "Habit not found" });
     }
 
-    // Get user's week_start setting for the RPC
-    const { data: profile } = await client
-      .from("profiles")
-      .select("week_start")
-      .eq("id", user.sub)
-      .single();
-
-    const weekStart = (profile?.week_start ?? 0) as WeekStartDay;
+    // Get user's week_start setting (cached)
+    const settings = await getUserSettings(event);
+    const weekStart = settings.weekStart as WeekStartDay;
 
     // Update completion bitmap via RPC (p_value=0 to clear)
     const { error: updateError } = await client.rpc("set_habit_completion", {

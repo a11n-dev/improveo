@@ -133,14 +133,9 @@ export default defineEventHandler(async (event): Promise<Habit> => {
     }
   }
 
-  // Fetch user profile for week_start (needed for streak computation)
-  const { data: profile } = await client
-    .from("profiles")
-    .select("week_start")
-    .eq("id", user.sub)
-    .single();
-
-  const weekStart = (profile?.week_start ?? 0) as WeekStartDay;
+  // Fetch user settings for week_start (cached, needed for streak computation)
+  const settings = await getUserSettings(event);
+  const weekStart = settings.weekStart as WeekStartDay;
 
   // Fetch completions for the response (same range as GET /api/habits)
   const today = new Date();

@@ -11,7 +11,6 @@ export const mapProfileRowToDto = (row: ProfileSelectRow): Profile => {
     email: row.email,
     name: row.name,
     avatarPath: row.avatar_path,
-    weekStart: row.week_start,
     timezone: row.timezone,
     createdAt: row.created_at,
   };

@@ -70,7 +70,7 @@ describe("Auth VerifyForm", () => {
     expect(verifyButton?.attributes("disabled")).toBeDefined();
   });
 
-  it("enables verify and emits verify/back/resend actions", async () => {
+  it("enables verify and emits verify/back/request actions", async () => {
     const wrapper = await mountSuspended(AuthVerifyForm, {
       props: {
         email: "user@example.com",
@@ -90,20 +90,21 @@ describe("Auth VerifyForm", () => {
     const verifyButton =
       buttons[findButtonByLabel(labels, "Verify and continue")];
     const backButton = buttons[findButtonByLabel(labels, "Back")];
-    const resendButton = buttons[findButtonByLabel(labels, "Resend code")];
+    const requestButton =
+      buttons[findButtonByLabel(labels, "Request another code")];
 
     expect(verifyButton?.attributes("disabled")).toBeUndefined();
 
     await verifyButton?.trigger("click");
     await backButton?.trigger("click");
-    await resendButton?.trigger("click");
+    await requestButton?.trigger("click");
 
     expect(wrapper.emitted("verify")).toHaveLength(1);
     expect(wrapper.emitted("back")).toHaveLength(1);
-    expect(wrapper.emitted("resend")).toHaveLength(1);
+    expect(wrapper.emitted("request")).toHaveLength(1);
   });
 
-  it("disables resend while cooldown is active", async () => {
+  it("hides request button while cooldown is active", async () => {
     const wrapper = await mountSuspended(AuthVerifyForm, {
       props: {
         email: "user@example.com",
@@ -119,9 +120,10 @@ describe("Auth VerifyForm", () => {
 
     const buttons = wrapper.findAll("button");
     const labels = buttons.map((button) => button.text().trim());
-    const resendButton = buttons[findButtonByLabel(labels, "Resend code")];
+    const requestButton =
+      buttons[findButtonByLabel(labels, "Request another code")];
 
-    expect(resendButton?.attributes("disabled")).toBeDefined();
-    expect(wrapper.text()).toContain("in 0:30");
+    expect(requestButton).toBeUndefined();
+    expect(wrapper.text()).toContain("Request another code in 0:30");
   });
 });

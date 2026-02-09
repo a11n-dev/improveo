@@ -32,8 +32,42 @@ const isDesktop = useIsDesktop();
 const drawerBodyRef = ref<HTMLElement | null>(null);
 const scrollGateEnabled = computed(() => !isDesktop.value && open.value);
 
+const SCROLL_GATE_DRAG_THRESHOLD = 4;
+
+const isElementVerticallyScrollable = (element: HTMLElement) => {
+  const { overflowY } = window.getComputedStyle(element);
+
+  return (
+    ["auto", "scroll", "overlay"].includes(overflowY) &&
+    element.scrollHeight > element.clientHeight
+  );
+};
+
+const getClosestScrollableWithinContainer = (
+  target: EventTarget | null,
+  container: HTMLElement,
+) => {
+  if (!(target instanceof Node)) {
+    return container;
+  }
+
+  let currentElement: HTMLElement | null =
+    target instanceof HTMLElement ? target : target.parentElement;
+
+  while (currentElement && currentElement !== container) {
+    if (isElementVerticallyScrollable(currentElement)) {
+      return currentElement;
+    }
+
+    currentElement = currentElement.parentElement;
+  }
+
+  return container;
+};
+
 const applyScrollGate = (container: HTMLElement) => {
   let startY = 0;
+  let activeScrollable: HTMLElement = container;
 
   const handleTouchStart = (event: TouchEvent) => {
     if (event.touches.length === 0) {
@@ -41,6 +75,10 @@ const applyScrollGate = (container: HTMLElement) => {
     }
 
     startY = event.touches[0]?.clientY ?? 0;
+    activeScrollable = getClosestScrollableWithinContainer(
+      event.target,
+      container,
+    );
   };
 
   const handleTouchMove = (event: TouchEvent) => {
@@ -50,7 +88,16 @@ const applyScrollGate = (container: HTMLElement) => {
 
     const currentY = event.touches[0]?.clientY ?? 0;
     const deltaY = currentY - startY;
-    if (container.scrollTop <= 0 && deltaY > 0 && event.cancelable) {
+
+    if (deltaY <= SCROLL_GATE_DRAG_THRESHOLD) {
+      return;
+    }
+
+    if (activeScrollable.scrollTop > 0) {
+      return;
+    }
+
+    if (event.cancelable) {
       event.preventDefault();
     }
   };

@@ -64,26 +64,6 @@ export const useProfileStore = defineStore("profile", () => {
   };
 
   /**
-   * Updates the user's week start day for habit tracking. Validates that the provided value is between 0 and 6 (inclusive) before sending the update request.
-   * @param value The new week start day (0 for Sunday, 1 for Monday, ..., 6 for Saturday).
-   * @returns True if the update was successful, false if the value was invalid or if the update request failed.
-   */
-  const updateWeekStart = async (value: number): Promise<boolean> => {
-    if (value < 0 || value > 6) {
-      return false;
-    }
-
-    const updatedProfile = await updateProfile({ weekStart: value });
-
-    if (!updatedProfile) {
-      return false;
-    }
-
-    await refreshNuxtData("habits");
-    return true;
-  };
-
-  /**
    * Deletes the user's profile from the server and clears the profile state in the store.
    * @returns True if the profile was successfully deleted, false if the delete request failed.
    */
@@ -107,6 +87,5 @@ export const useProfileStore = defineStore("profile", () => {
     pending,
     profile,
     updateProfile,
-    updateWeekStart,
   };
 });

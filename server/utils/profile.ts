@@ -12,6 +12,7 @@ export const mapProfileRowToDto = (row: ProfileSelectRow): Profile => {
     name: row.name,
     avatarPath: row.avatar_path,
     weekStart: row.week_start,
+    timezone: row.timezone,
     createdAt: row.created_at,
   };
 };

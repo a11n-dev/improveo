@@ -4,6 +4,8 @@
 export interface CompletionBitmapRow {
   year: number;
   bitmap: string;
+  week_counts: string;
+  month_counts: string;
 }
 
 /**
@@ -11,13 +13,6 @@ export interface CompletionBitmapRow {
  */
 export interface HabitCompletionBitmapRow extends CompletionBitmapRow {
   habit_id: string;
-}
-
-/**
- * Completion record used by streak calculations.
- */
-export interface CompletionRecord {
-  completed_on: string;
 }
 
 const isLeapYear = (year: number): boolean => {
@@ -102,19 +97,10 @@ export const decodeBitmapToCompletionDates = (
 };
 
 /**
- * Convert bitmap rows into completion records for streak calculations.
+ * Parse packed bytea counters into a number array.
+ * Each byte is a uint8 counter value.
  */
-export const decodeCompletionRowsToRecords = (
-  rows: CompletionBitmapRow[],
-): CompletionRecord[] => {
-  const records: CompletionRecord[] = [];
-
-  for (const row of rows) {
-    const dates = decodeBitmapToCompletionDates(row.bitmap, row.year);
-    for (const date of dates) {
-      records.push({ completed_on: date });
-    }
-  }
-
-  return records;
+export const parsePackedCounts = (bytea: string): number[] => {
+  const bytes = parseBytea(bytea);
+  return Array.from(bytes);
 };

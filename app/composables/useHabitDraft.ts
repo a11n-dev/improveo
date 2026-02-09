@@ -4,7 +4,7 @@ export interface HabitDraft {
   description: string;
   icon: string | null;
   color: HabitColor | null;
-  streak: StreakGoal | null;
+  goal: Goal | null;
 }
 
 /** Default draft state (reset on overlay open) */
@@ -13,7 +13,7 @@ const defaultDraft = (): HabitDraft => ({
   description: "",
   icon: null,
   color: null,
-  streak: null,
+  goal: null,
 });
 
 /**
@@ -28,27 +28,18 @@ export const useHabitDraft = () => {
     draft.value = defaultDraft();
   };
 
-  /** Computed label for streak goal display */
-  const streakLabel = computed<string>(() => {
-    const { streak } = draft.value;
+  /** Computed label for goal display */
+  const goalLabel = computed<string>(() => {
+    const { goal } = draft.value;
 
-    if (!streak) {
+    if (!goal) {
       return "None";
     }
 
-    switch (streak.interval) {
-      case "daily":
-        return "Daily";
-      case "weekly":
-        return `${streak.count} / Week`;
-      case "monthly":
-        return `${streak.count} / Month`;
-      default:
-        return "None";
-    }
+    return formatGoalLabel(goal.periodType, goal.targetCount);
   });
 
-  /** Check if all required fields are filled (streak is now optional) */
+  /** Check if all required fields are filled (goal is optional) */
   const isValid = computed(() => {
     const { name, icon, color } = draft.value;
     return name.trim().length > 0 && icon !== null && color !== null;
@@ -57,7 +48,7 @@ export const useHabitDraft = () => {
   return {
     draft,
     resetDraft,
-    streakLabel,
+    goalLabel,
     isValid,
   };
 };

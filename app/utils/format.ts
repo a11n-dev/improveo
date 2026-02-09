@@ -35,25 +35,25 @@ export const formatDateWithWeekday = (isoDate: string): string => {
 };
 
 /**
- * Format streak goal for display (e.g., "Daily", "3 / week").
+ * Format goal for display (e.g., "Daily", "3 / Week").
  */
-export const formatStreakGoalLabel = (
-  streakInterval: StreakInterval | null,
-  streakCount: number,
+export const formatGoalLabel = (
+  periodType: PeriodType | null | undefined,
+  targetCount: number | undefined,
 ): string => {
-  if (!streakInterval) return "";
+  if (!periodType) return "";
 
-  const intervalMap: Record<StreakInterval, string> = {
-    daily: "day",
-    weekly: "week",
-    monthly: "month",
-  };
-  const interval = intervalMap[streakInterval];
-
-  if (streakCount === 1 && streakInterval === "daily") {
+  if (periodType === "day") {
     return "Daily";
   }
-  return `${streakCount} / ${interval}`;
+
+  const periodMap: Record<string, string> = {
+    week: "Week",
+    month: "Month",
+  };
+  const period = periodMap[periodType] ?? periodType;
+
+  return `${targetCount ?? 1} / ${period}`;
 };
 
 const MONTH_NAMES = [

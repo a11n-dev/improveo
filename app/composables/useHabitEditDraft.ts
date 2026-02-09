@@ -4,7 +4,7 @@ export interface HabitEditDraft {
   description: string;
   icon: string | null;
   color: HabitColor | null;
-  streak: StreakGoal | null;
+  goal: Goal | null;
 }
 
 /** Original values from when edit started (for change detection) */
@@ -13,7 +13,7 @@ interface OriginalValues {
   description: string;
   icon: string | null;
   color: HabitColor | null;
-  streak: StreakGoal | null;
+  goal: Goal | null;
 }
 
 /** Default empty draft state */
@@ -22,7 +22,7 @@ const defaultDraft = (): HabitEditDraft => ({
   description: "",
   icon: null,
   color: null,
-  streak: null,
+  goal: null,
 });
 
 /**
@@ -43,8 +43,11 @@ export const useHabitEditDraft = () => {
       description: habit.description ?? "",
       icon: habit.icon,
       color: habit.color as HabitColor,
-      streak: habit.streakInterval
-        ? { interval: habit.streakInterval, count: habit.streakCount }
+      goal: habit.goal
+        ? {
+            periodType: habit.goal.periodType,
+            targetCount: habit.goal.targetCount,
+          }
         : null,
     };
 
@@ -58,24 +61,15 @@ export const useHabitEditDraft = () => {
     originalValues.value = null;
   };
 
-  /** Computed label for streak goal display */
-  const streakLabel = computed<string>(() => {
-    const { streak } = draft.value;
+  /** Computed label for goal display */
+  const goalLabel = computed<string>(() => {
+    const { goal } = draft.value;
 
-    if (!streak) {
+    if (!goal) {
       return "None";
     }
 
-    switch (streak.interval) {
-      case "daily":
-        return "Daily";
-      case "weekly":
-        return `${streak.count} / Week`;
-      case "monthly":
-        return `${streak.count} / Month`;
-      default:
-        return "None";
-    }
+    return formatGoalLabel(goal.periodType, goal.targetCount);
   });
 
   /** Check if all required fields are filled */
@@ -96,16 +90,16 @@ export const useHabitEditDraft = () => {
       o.description !== d.description ||
       o.icon !== d.icon ||
       o.color !== d.color ||
-      JSON.stringify(o.streak) !== JSON.stringify(d.streak)
+      JSON.stringify(o.goal) !== JSON.stringify(d.goal)
     );
   });
 
-  /** Check if streak configuration specifically changed */
-  const streakChanged = computed(() => {
+  /** Check if goal configuration specifically changed */
+  const goalChanged = computed(() => {
     if (!originalValues.value) return false;
     return (
-      JSON.stringify(originalValues.value.streak) !==
-      JSON.stringify(draft.value.streak)
+      JSON.stringify(originalValues.value.goal) !==
+      JSON.stringify(draft.value.goal)
     );
   });
 
@@ -114,9 +108,9 @@ export const useHabitEditDraft = () => {
     originalValues,
     initializeFromHabit,
     resetDraft,
-    streakLabel,
+    goalLabel,
     isValid,
     hasChanges,
-    streakChanged,
+    goalChanged,
   };
 };

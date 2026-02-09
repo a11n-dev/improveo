@@ -23,13 +23,14 @@ export default defineEventHandler(async (event): Promise<Profile> => {
     ...(payload.avatarPath !== undefined && {
       avatar_path: payload.avatarPath,
     }),
+    ...(payload.timezone !== undefined && { timezone: payload.timezone }),
   };
 
   const { data, error } = await client
     .from("profiles")
     .update(updatePayload)
     .eq("id", user.sub)
-    .select("id, email, name, avatar_path, week_start, created_at")
+    .select("id, email, name, avatar_path, week_start, timezone, created_at")
     .single();
 
   if (error) {

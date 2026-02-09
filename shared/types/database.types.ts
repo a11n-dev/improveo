@@ -13,22 +13,25 @@ export type Database = {
         Row: {
           bitmap: string;
           habit_id: string;
+          month_counts: string;
           updated_at: string;
-          user_id: string;
+          week_counts: string;
           year: number;
         };
         Insert: {
           bitmap: string;
           habit_id: string;
+          month_counts?: string;
           updated_at?: string;
-          user_id: string;
+          week_counts?: string;
           year: number;
         };
         Update: {
           bitmap?: string;
           habit_id?: string;
+          month_counts?: string;
           updated_at?: string;
-          user_id?: string;
+          week_counts?: string;
           year?: number;
         };
         Relationships: [
@@ -41,31 +44,37 @@ export type Database = {
           },
         ];
       };
-      completions_log: {
+      habit_goal_versions: {
         Row: {
-          completed_on: string;
-          created_at: string | null;
+          created_at: string;
+          effective_from: string;
+          effective_to: string | null;
           habit_id: string;
           id: string;
-          user_id: string;
+          period_type: string;
+          target_count: number;
         };
         Insert: {
-          completed_on: string;
-          created_at?: string | null;
+          created_at?: string;
+          effective_from: string;
+          effective_to?: string | null;
           habit_id: string;
           id?: string;
-          user_id?: string;
+          period_type: string;
+          target_count: number;
         };
         Update: {
-          completed_on?: string;
-          created_at?: string | null;
+          created_at?: string;
+          effective_from?: string;
+          effective_to?: string | null;
           habit_id?: string;
           id?: string;
-          user_id?: string;
+          period_type?: string;
+          target_count?: number;
         };
         Relationships: [
           {
-            foreignKeyName: "completions_habit_id_fkey";
+            foreignKeyName: "habit_goal_versions_habit_id_fkey";
             columns: ["habit_id"];
             isOneToOne: false;
             referencedRelation: "habits";
@@ -75,46 +84,31 @@ export type Database = {
       };
       habits: {
         Row: {
-          best_streak: number;
           color: string;
           created_at: string | null;
-          current_streak: number;
           description: string | null;
           icon: string;
           id: string;
-          last_completed_on: string | null;
-          streak_count: number;
-          streak_interval: string | null;
           title: string;
           updated_at: string | null;
           user_id: string;
         };
         Insert: {
-          best_streak?: number;
           color: string;
           created_at?: string | null;
-          current_streak?: number;
           description?: string | null;
           icon: string;
           id?: string;
-          last_completed_on?: string | null;
-          streak_count: number;
-          streak_interval?: string | null;
           title: string;
           updated_at?: string | null;
           user_id?: string;
         };
         Update: {
-          best_streak?: number;
           color?: string;
           created_at?: string | null;
-          current_streak?: number;
           description?: string | null;
           icon?: string;
           id?: string;
-          last_completed_on?: string | null;
-          streak_count?: number;
-          streak_interval?: string | null;
           title?: string;
           updated_at?: string | null;
           user_id?: string;
@@ -128,6 +122,7 @@ export type Database = {
           email: string;
           id: string;
           name: string | null;
+          timezone: string;
           updated_at: string;
           week_start: number;
         };
@@ -137,6 +132,7 @@ export type Database = {
           email: string;
           id: string;
           name?: string | null;
+          timezone?: string;
           updated_at?: string;
           week_start?: number;
         };
@@ -146,6 +142,7 @@ export type Database = {
           email?: string;
           id?: string;
           name?: string | null;
+          timezone?: string;
           updated_at?: string;
           week_start?: number;
         };
@@ -160,8 +157,8 @@ export type Database = {
         Args: {
           p_date: string;
           p_habit_id: string;
-          p_user_id: string;
           p_value: number;
+          p_week_start?: number;
         };
         Returns: undefined;
       };

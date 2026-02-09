@@ -1,7 +1,7 @@
 <script setup lang="ts">
-const { draft, streakLabel } = useHabitEditDraft();
+const { draft, goalLabel } = useHabitEditDraft();
 </script>
 
 <template>
-  <HabitsFormBase v-model:draft="draft" :streak-label="streakLabel" />
+  <HabitsFormBase v-model:draft="draft" :goal-label="goalLabel" />
 </template>

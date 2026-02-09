@@ -10,10 +10,10 @@ interface Props {
     description: string;
     icon: string | null;
     color: HabitColor | null;
-    streak: StreakGoal | null;
+    goal: Goal | null;
   };
-  /** Label for the streak button */
-  streakLabel: string;
+  /** Label for the goal button */
+  goalLabel: string;
 }
 
 const props = defineProps<Props>();
@@ -25,13 +25,13 @@ const emit = defineEmits<{
       description: string;
       icon: string | null;
       color: HabitColor | null;
-      streak: StreakGoal | null;
+      goal: Goal | null;
     },
   ];
 }>();
 
-/** Streak editor open state */
-const streakEditorOpen = ref(false);
+/** Goal editor open state */
+const goalEditorOpen = ref(false);
 
 /** Icon picker open state */
 const iconPickerOpen = ref(false);
@@ -72,9 +72,9 @@ const selectIcon = (icon: string) => {
   updateField("icon", icon);
 };
 
-/** Handle streak change from editor */
-const handleStreakChange = (streak: StreakGoal | null) => {
-  updateField("streak", streak);
+/** Handle goal change from editor */
+const handleGoalChange = (goal: Goal | null) => {
+  updateField("goal", goal);
 };
 </script>
 
@@ -128,24 +128,24 @@ const handleStreakChange = (streak: StreakGoal | null) => {
       </UInput>
     </UFormField>
 
-    <!-- Streak Goal -->
-    <UFormField label="Streak Goal" name="streak">
+    <!-- Goal -->
+    <UFormField label="Goal" name="goal">
       <UButton
-        :label="streakLabel"
+        :label="goalLabel"
         trailing-icon="i-lucide-chevron-right"
         color="neutral"
         variant="subtle"
         block
         class="justify-between"
-        @click="streakEditorOpen = true"
+        @click="goalEditorOpen = true"
       />
     </UFormField>
 
-    <!-- Nested streak editor -->
-    <HabitsFormStreakEditor
-      v-model:open="streakEditorOpen"
-      :streak="localDraft.streak"
-      @update:streak="handleStreakChange"
+    <!-- Nested goal editor -->
+    <HabitsFormGoalEditor
+      v-model:open="goalEditorOpen"
+      :goal="localDraft.goal"
+      @update:goal="handleGoalChange"
     />
 
     <!-- Icon -->

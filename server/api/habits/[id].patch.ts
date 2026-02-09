@@ -1,15 +1,12 @@
 /**
  * PATCH /api/habits/:id
  * Update an existing habit for the authenticated user.
- * Recalculates streaks if streak configuration changes.
+ * Handles goal version transitions when the goal changes.
  */
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 
 import { parseBody } from "~~/server/utils/validate";
-import {
-  HabitStreakSchema,
-  HabitUpdatePayloadSchema,
-} from "~~/shared/validation/habit";
+import { HabitUpdatePayloadSchema } from "~~/shared/validation/habit";
 
 export default defineEventHandler(async (event): Promise<Habit> => {
   const client = await serverSupabaseClient<Database>(event);
@@ -28,7 +25,7 @@ export default defineEventHandler(async (event): Promise<Habit> => {
   // Verify habit exists and belongs to user
   const { data: existingHabit, error: habitError } = await client
     .from("habits")
-    .select("*")
+    .select("id, title, description, icon, color, created_at")
     .eq("id", habitId)
     .eq("user_id", user.sub)
     .single();
@@ -40,31 +37,7 @@ export default defineEventHandler(async (event): Promise<Habit> => {
   // Parse and validate body
   const body = await parseBody(event, HabitUpdatePayloadSchema);
 
-  // Determine the final streak configuration
-  const finalStreakInterval = (
-    body.streakInterval !== undefined
-      ? body.streakInterval
-      : existingHabit.streak_interval
-  ) as StreakInterval | null;
-  const finalStreakCount =
-    body.streakCount !== undefined
-      ? body.streakCount
-      : existingHabit.streak_count;
-
-  const streakValidation = HabitStreakSchema.safeParse({
-    streakInterval: finalStreakInterval,
-    streakCount: finalStreakCount,
-  });
-
-  if (!streakValidation.success) {
-    const issue = streakValidation.error.issues[0];
-    throw createError({
-      statusCode: 400,
-      message: issue?.message ?? "Invalid streak configuration",
-    });
-  }
-
-  // Build update object with only provided fields
+  // Build update object with only provided metadata fields
   const updateData: Record<string, unknown> = {
     updated_at: new Date().toISOString(),
   };
@@ -81,60 +54,8 @@ export default defineEventHandler(async (event): Promise<Habit> => {
   if (body.color !== undefined) {
     updateData.color = body.color;
   }
-  if (body.streakInterval !== undefined) {
-    updateData.streak_interval = body.streakInterval;
-  }
-  if (body.streakCount !== undefined) {
-    updateData.streak_count = body.streakCount;
-  }
 
-  // Check if streak configuration changed - need to recalculate streaks
-  const streakConfigChanged =
-    body.streakInterval !== undefined || body.streakCount !== undefined;
-
-  if (streakConfigChanged) {
-    // Get user's week_start setting
-    const { data: profile } = await client
-      .from("profiles")
-      .select("week_start")
-      .eq("id", user.sub)
-      .single();
-
-    const weekStart = (profile?.week_start ?? 0) as WeekStartDay;
-
-    // Fetch all completions for this habit to recompute streaks
-    const { data: completionRows, error: fetchError } = await client
-      .from("completions")
-      .select("year, bitmap")
-      .eq("habit_id", habitId)
-      .eq("user_id", user.sub);
-
-    if (fetchError) {
-      throw createError({
-        statusCode: 500,
-        message: "Failed to fetch completions for streak calculation",
-      });
-    }
-
-    // Compute streaks with the new configuration
-    const allCompletions = decodeCompletionRowsToRecords(completionRows || []);
-
-    const streakResult = computeStreaks(
-      allCompletions,
-      {
-        streakInterval: finalStreakInterval as StreakInterval | null,
-        streakCount: finalStreakCount,
-      },
-      weekStart,
-    );
-
-    // Include recalculated streak values in the update
-    updateData.current_streak = streakResult.currentStreak;
-    updateData.best_streak = streakResult.bestStreak;
-    updateData.last_completed_on = streakResult.lastCompletedOn;
-  }
-
-  // Perform the update
+  // Perform the habit metadata update
   const { data: updatedHabit, error: updateError } = await client
     .from("habits")
     .update(updateData)
@@ -150,10 +71,81 @@ export default defineEventHandler(async (event): Promise<Habit> => {
     });
   }
 
+  // Handle goal changes if goal was provided in the body
+  let currentGoal: HabitGoalVersion | null = null;
+  const todayStr = toISODateString(new Date());
+
+  if (body.goal !== undefined) {
+    // Close the current active goal version (if any)
+    await client
+      .from("habit_goal_versions")
+      .update({ effective_to: todayStr })
+      .eq("habit_id", habitId)
+      .is("effective_to", null);
+
+    // Insert new goal version if goal is non-null
+    if (body.goal !== null) {
+      const { data: goalRow, error: goalError } = await client
+        .from("habit_goal_versions")
+        .insert({
+          habit_id: habitId,
+          period_type: body.goal.periodType,
+          target_count: body.goal.targetCount,
+          effective_from: todayStr,
+          effective_to: null,
+        })
+        .select()
+        .single();
+
+      if (goalError || !goalRow) {
+        throw createError({
+          statusCode: 500,
+          message: "Failed to create goal version",
+        });
+      }
+
+      currentGoal = {
+        id: goalRow.id,
+        periodType: goalRow.period_type as PeriodType,
+        targetCount: goalRow.target_count,
+        effectiveFrom: goalRow.effective_from,
+        effectiveTo: goalRow.effective_to,
+      };
+    }
+  } else {
+    // goal not in payload — fetch current goal version
+    const { data: goalRows } = await client
+      .from("habit_goal_versions")
+      .select("id, period_type, target_count, effective_from, effective_to")
+      .eq("habit_id", habitId)
+      .is("effective_to", null)
+      .limit(1);
+
+    if (goalRows && goalRows.length > 0) {
+      const gv = goalRows[0]!;
+      currentGoal = {
+        id: gv.id,
+        periodType: gv.period_type as PeriodType,
+        targetCount: gv.target_count,
+        effectiveFrom: gv.effective_from,
+        effectiveTo: gv.effective_to,
+      };
+    }
+  }
+
+  // Fetch user profile for week_start (needed for streak computation)
+  const { data: profile } = await client
+    .from("profiles")
+    .select("week_start")
+    .eq("id", user.sub)
+    .single();
+
+  const weekStart = (profile?.week_start ?? 0) as WeekStartDay;
+
   // Fetch completions for the response (same range as GET /api/habits)
   const today = new Date();
   const defaultFrom = new Date(today);
-  defaultFrom.setDate(defaultFrom.getDate() - 364); // 365 days including today
+  defaultFrom.setDate(defaultFrom.getDate() - 364);
   const fromStr = toISODateString(defaultFrom);
   const toStr = toISODateString(today);
 
@@ -170,13 +162,13 @@ export default defineEventHandler(async (event): Promise<Habit> => {
 
   const { data: completionRows } = await client
     .from("completions")
-    .select("year, bitmap")
+    .select("year, bitmap, week_counts, month_counts")
     .eq("habit_id", habitId)
-    .eq("user_id", user.sub)
     .in("year", years);
 
   // Decode completions into date map
   const completions: Record<string, boolean> = {};
+  const bitmapRows: CompletionBitmapRow[] = [];
   for (const row of completionRows || []) {
     const decoded = decodeBitmapToCompletionMap(
       row.bitmap,
@@ -185,6 +177,28 @@ export default defineEventHandler(async (event): Promise<Habit> => {
       toStr,
     );
     Object.assign(completions, decoded);
+    bitmapRows.push({
+      year: row.year,
+      bitmap: row.bitmap,
+      week_counts: row.week_counts,
+      month_counts: row.month_counts,
+    });
+  }
+
+  // Compute streaks if a goal is set
+  let currentStreak = 0;
+  let bestStreak = 0;
+  if (currentGoal) {
+    const streakResult = computeStreaks(
+      bitmapRows,
+      {
+        periodType: currentGoal.periodType,
+        targetCount: currentGoal.targetCount,
+      },
+      weekStart,
+    );
+    currentStreak = streakResult.currentStreak;
+    bestStreak = streakResult.bestStreak;
   }
 
   // Return full DTO
@@ -194,11 +208,9 @@ export default defineEventHandler(async (event): Promise<Habit> => {
     description: updatedHabit.description,
     icon: updatedHabit.icon,
     color: updatedHabit.color,
-    streakInterval: updatedHabit.streak_interval as StreakInterval | null,
-    streakCount: updatedHabit.streak_count,
-    currentStreak: updatedHabit.current_streak,
-    bestStreak: updatedHabit.best_streak,
-    lastCompletedOn: updatedHabit.last_completed_on,
+    goal: currentGoal,
+    currentStreak,
+    bestStreak,
     completions,
     createdAt: updatedHabit.created_at || new Date().toISOString(),
   };

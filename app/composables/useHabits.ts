@@ -168,19 +168,19 @@ export const useHabits = () => {
         );
       }
 
-      // Update streak values from server response
+      // Update streaks from server response
       if (data.value) {
         data.value = {
           ...data.value,
-          habits: data.value.habits.map((h) => {
-            if (h.id !== habitId) return h;
-            return {
-              ...h,
-              currentStreak: response.currentStreak,
-              bestStreak: response.bestStreak,
-              lastCompletedOn: response.lastCompletedOn,
-            };
-          }),
+          habits: data.value.habits.map((h) =>
+            h.id === habitId
+              ? {
+                  ...h,
+                  currentStreak: response.currentStreak,
+                  bestStreak: response.bestStreak,
+                }
+              : h,
+          ),
         };
       }
 

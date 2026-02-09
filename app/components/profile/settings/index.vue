@@ -1,8 +1,11 @@
 <script setup lang="ts">
 const { profile } = defineProps<{ profile: Profile }>();
-const emit = defineEmits<{
-  (e: "update:weekStart", value: number): void;
-}>();
+
+const { settings, updateWeekStart } = useSettings();
+
+const handleWeekStartChange = async (value: number): Promise<void> => {
+  await updateWeekStart(value);
+};
 </script>
 
 <template>
@@ -20,8 +23,8 @@ const emit = defineEmits<{
     <!-- Calendar Preferences -->
     <div class="pt-3">
       <ProfileSettingsWeekStart
-        :model-value="profile.weekStart"
-        @update:model-value="emit('update:weekStart', $event)"
+        :model-value="settings?.weekStart ?? 0"
+        @update:model-value="handleWeekStartChange"
       />
     </div>
   </div>

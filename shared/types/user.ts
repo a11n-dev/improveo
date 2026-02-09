@@ -14,7 +14,6 @@ export interface Profile {
   email: Tables<"profiles">["email"];
   name: Tables<"profiles">["name"];
   avatarPath: Tables<"profiles">["avatar_path"];
-  weekStart: Tables<"profiles">["week_start"];
   timezone: Tables<"profiles">["timezone"];
   createdAt: Tables<"profiles">["created_at"];
 }
@@ -24,7 +23,6 @@ export interface Profile {
  * Fields that can be updated by the client.
  */
 export interface ProfileUpdatePayload {
-  weekStart?: TablesUpdate<"profiles">["week_start"];
   name?: TablesUpdate<"profiles">["name"];
   avatarPath?: TablesUpdate<"profiles">["avatar_path"];
   timezone?: TablesUpdate<"profiles">["timezone"];

@@ -31,21 +31,9 @@ export default defineEventHandler(
     const toStr =
       typeof query.to === "string" ? query.to : toISODateString(today);
 
-    // Fetch user profile for week_start
-    const { data: profile, error: profileError } = await client
-      .from("profiles")
-      .select("week_start")
-      .eq("id", user.sub)
-      .single();
-
-    if (profileError) {
-      throw createError({
-        statusCode: 500,
-        message: "Failed to fetch user profile",
-      });
-    }
-
-    const weekStart = (profile?.week_start ?? 0) as WeekStartDay;
+    // Fetch user settings for week_start (cached)
+    const settings = await getUserSettings(event);
+    const weekStart = settings.weekStart as WeekStartDay;
 
     // Fetch all habits for user (metadata only — no streak columns)
     const { data: habitsData, error: habitsError } = await client

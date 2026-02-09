@@ -1,6 +1,6 @@
 /**
  * PATCH /api/profile
- * Updates the authenticated user's profile settings.
+ * Updates the authenticated user's profile fields (name, avatar, timezone).
  */
 
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
@@ -18,7 +18,6 @@ export default defineEventHandler(async (event): Promise<Profile> => {
   const payload = await parseBody(event, ProfileUpdatePayloadSchema);
 
   const updatePayload: TablesUpdate<"profiles"> = {
-    ...(payload.weekStart !== undefined && { week_start: payload.weekStart }),
     ...(payload.name !== undefined && { name: payload.name }),
     ...(payload.avatarPath !== undefined && {
       avatar_path: payload.avatarPath,
@@ -30,7 +29,7 @@ export default defineEventHandler(async (event): Promise<Profile> => {
     .from("profiles")
     .update(updatePayload)
     .eq("id", user.sub)
-    .select("id, email, name, avatar_path, week_start, timezone, created_at")
+    .select("id, email, name, avatar_path, timezone, created_at")
     .single();
 
   if (error) {

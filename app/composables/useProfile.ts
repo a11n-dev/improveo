@@ -6,7 +6,6 @@
  */
 export const useProfile = () => {
   const profileStore = useProfileStore();
-  const { notifyError } = useToastNotify();
   const { error, pending, profile } = storeToRefs(profileStore);
 
   /**
@@ -26,25 +25,6 @@ export const useProfile = () => {
   };
 
   /**
-   * Updates week start and emits user-friendly validation errors.
-   */
-  const updateWeekStart = async (value: number): Promise<boolean> => {
-    const isUpdated = await profileStore.updateWeekStart(value);
-
-    if (isUpdated) {
-      return true;
-    }
-
-    if (value < 0 || value > 6) {
-      notifyError("Invalid value", "Choose a day from Monday to Sunday");
-      return false;
-    }
-
-    notifyError("Update failed", "Please try again.");
-    return false;
-  };
-
-  /**
    * Permanently deletes the authenticated account profile.
    */
   const deleteProfile = async (): Promise<boolean> => {
@@ -58,6 +38,5 @@ export const useProfile = () => {
     pending,
     profile,
     updateProfile,
-    updateWeekStart,
   };
 };

@@ -5,6 +5,7 @@ definePageMeta({
 
 const { habits, weekStart, pending, toggleCompletion, deleteHabit } =
   useHabits();
+const { tap: tapHaptic } = useHaptics();
 
 const {
   isOpen: infoOpen,
@@ -34,7 +35,10 @@ const isCompletedToday = (habitId: string): boolean => {
 
 /** Toggle today's completion for a habit */
 const handleTodayToggle = async (habitId: string, _value: boolean) => {
-  await toggleCompletion(habitId, todayStr);
+  const isUpdated = await toggleCompletion(habitId, todayStr);
+  if (isUpdated) {
+    tapHaptic("base");
+  }
 };
 
 /** Open info overlay for a habit */
@@ -48,7 +52,12 @@ const handleInfo = (habitId: string) => {
 /** Handle date toggle from info overlay */
 const handleToggleDate = async (date: string) => {
   if (!selectedHabit.value) return;
-  await toggleCompletion(selectedHabit.value.id, date);
+
+  const isUpdated = await toggleCompletion(selectedHabit.value.id, date);
+
+  if (isUpdated) {
+    tapHaptic("base");
+  }
 };
 
 /** Handle delete from info overlay */

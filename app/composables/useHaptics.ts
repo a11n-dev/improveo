@@ -1,14 +1,28 @@
-type HapticTapType = "check" | "uncheck";
+/**
+ * Named haptic profiles available to callers.
+ * Keep this union small and explicit to avoid ad-hoc vibration values.
+ */
+type HapticPatternName = "base";
 
-const HAPTIC_PATTERNS: Record<HapticTapType, number | number[]> = {
-  check: 12,
-  uncheck: [8, 24, 8],
+/**
+ * Vibration patterns used by the Web Vibration API.
+ * `base` is intentionally short to feel like a subtle tap.
+ */
+const HAPTIC_PATTERNS: Record<HapticPatternName, number | number[]> = {
+  base: 8,
 };
 
+/** Minimum time between taps to avoid haptic spam on rapid interactions. */
 const HAPTIC_MIN_INTERVAL_MS = 80;
 const FALLBACK_CONTAINER_ID = "haptic-switch-fallback";
 const FALLBACK_INPUT_ID = "haptic-switch-fallback-input";
 
+/**
+ * Ensures a hidden checkbox+label pair exists for best-effort haptic fallback.
+ *
+ * Some browsers may provide light tactile feedback when a native-like control
+ * is toggled, even if `navigator.vibrate` is unavailable.
+ */
 const ensureFallbackLabel = (): HTMLLabelElement | null => {
   if (!import.meta.client) {
     return null;
@@ -52,10 +66,23 @@ const triggerFallbackHaptic = (): void => {
   label.click();
 };
 
+/**
+ * Provides a single haptic trigger API for UI interactions.
+ *
+ * Behavior:
+ * - Uses `navigator.vibrate` when supported.
+ * - Falls back to hidden control activation when not supported.
+ * - Applies a shared throttle across the app.
+ */
 export const useHaptics = () => {
   const lastTapAt = useState<number>("haptics-last-tap-at", () => 0);
 
-  const tap = (type: HapticTapType): void => {
+  /**
+   * Triggers haptic feedback with the requested named pattern.
+   *
+   * @param pattern - Named haptic profile to play. Defaults to `base`.
+   */
+  const tap = (pattern: HapticPatternName = "base"): void => {
     if (!import.meta.client) {
       return;
     }
@@ -68,7 +95,7 @@ export const useHaptics = () => {
     lastTapAt.value = now;
 
     if (typeof navigator.vibrate === "function") {
-      navigator.vibrate(HAPTIC_PATTERNS[type]);
+      navigator.vibrate(HAPTIC_PATTERNS[pattern]);
       return;
     }
 

@@ -49,6 +49,7 @@ const canRequestCode = computed(() => !props.isSending && !props.isVerifying);
         :loading="props.isVerifying"
         :disabled="!canVerify"
         label="Verify and continue"
+        variant="solid"
         @click="emit('verify')"
       />
       <UButton

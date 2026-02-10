@@ -72,7 +72,7 @@ watch(
           : "Build better habits with a focused tracker that helps you stay consistent."
       }}
     </p>
-    <div class="flex flex-col gap-2">
+    <div class="space-y-3">
       <UFormField
         v-if="props.isRegister"
         label="Display name"
@@ -113,6 +113,7 @@ watch(
       :loading="props.isSending"
       :disabled="props.isSending || !props.canSubmit"
       :label="props.isRegister ? 'Sign up' : 'Sign in'"
+      variant="solid"
       block
     />
 

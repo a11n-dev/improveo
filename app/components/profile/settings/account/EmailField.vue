@@ -16,7 +16,6 @@ const emit = defineEmits<{
   >
     <UButton
       color="neutral"
-      variant="subtle"
       block
       class="justify-between"
       :disabled="disabled"

@@ -11,10 +11,10 @@ const { openOverlay } = useHabitCreateOverlay();
       variant="link"
       color="neutral"
       orientation="horizontal"
-      class="rounded-full border border-muted/50 bg-muted/80 px-2 shadow-lg shadow-neutral-950/5 backdrop-blur-sm sm:px-4"
+      class="rounded-full border border-muted/50 bg-muted/80 px-2.5 py-0.5 shadow-lg shadow-neutral-950/5 backdrop-blur-sm"
       :ui="{
-        link: 'px-2 py-1 flex items-center gap-2',
-        linkLeadingIcon: 'size-4',
+        link: 'flex items-center gap-2 px-2.25 py-1.25',
+        linkLeadingIcon: 'size-4.5',
       }"
     />
 
@@ -22,7 +22,8 @@ const { openOverlay } = useHabitCreateOverlay();
       icon="i-lucide-plus"
       square
       size="xl"
-      class="hidden rounded-full shadow-lg md:inline-flex"
+      variant="solid"
+      class="hidden rounded-full p-3 shadow-lg md:inline-flex"
       aria-label="Create habit"
       @click="openOverlay"
     />

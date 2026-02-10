@@ -48,6 +48,48 @@ const localDraft = computed({
   set: (value) => emit("update:draft", value),
 });
 
+const isCustomIconSelected = computed(() => {
+  if (!localDraft.value.icon) {
+    return false;
+  }
+
+  return !habitIconPresets.includes(
+    localDraft.value.icon as (typeof habitIconPresets)[number],
+  );
+});
+
+const displayedIconPresets = computed(() => {
+  if (!isCustomIconSelected.value || !localDraft.value.icon) {
+    return habitIconPresets;
+  }
+
+  return [
+    ...habitIconPresets.slice(0, -1),
+    localDraft.value.icon,
+  ] as ReadonlyArray<string>;
+});
+
+const isCustomColorSelected = computed(() => {
+  if (!localDraft.value.color) {
+    return false;
+  }
+
+  return !habitColorPresets.includes(
+    localDraft.value.color as (typeof habitColorPresets)[number],
+  );
+});
+
+const displayedColorPresets = computed(() => {
+  if (!isCustomColorSelected.value || !localDraft.value.color) {
+    return habitColorPresets;
+  }
+
+  return [
+    ...habitColorPresets.slice(0, -1),
+    localDraft.value.color,
+  ] as ReadonlyArray<string>;
+});
+
 /** Update a specific field in the draft */
 const updateField = <K extends keyof typeof props.draft>(
   field: K,
@@ -134,7 +176,6 @@ const handleGoalChange = (goal: Goal | null) => {
         :label="goalLabel"
         trailing-icon="i-lucide-chevron-right"
         color="neutral"
-        variant="subtle"
         block
         class="justify-between"
         @click="goalEditorOpen = true"
@@ -153,41 +194,22 @@ const handleGoalChange = (goal: Goal | null) => {
       <div class="flex flex-col gap-4">
         <!-- Icon presets grid -->
         <div
-          class="grid gap-1.5"
-          style="grid-template-columns: repeat(auto-fill, minmax(32px, 1fr))"
+          class="grid grid-cols-[repeat(auto-fill,minmax(36px,1fr))] gap-1.5 md:grid-cols-12"
         >
           <UButton
-            v-for="icon in habitIconPresets"
+            v-for="icon in displayedIconPresets"
             :key="icon"
             :icon="icon"
             square
             size="md"
             color="neutral"
             variant="soft"
-            class="flex size-8 items-center justify-center rounded-md p-0"
+            class="flex size-9 items-center justify-center rounded-md p-0 md:size-8"
             :class="{
-              'ring-2 ring-primary ring-offset-2 ring-offset-default':
-                localDraft.icon === icon,
+              'ring-2 ring-primary': localDraft.icon === icon,
             }"
             :aria-label="icon.replace('i-lucide-', '')"
             @click="selectIcon(icon)"
-          />
-          <!-- Show selected custom icon in the grid -->
-          <UButton
-            v-if="
-              localDraft.icon &&
-              !habitIconPresets.includes(
-                localDraft.icon as (typeof habitIconPresets)[number],
-              )
-            "
-            :icon="localDraft.icon"
-            square
-            size="md"
-            color="neutral"
-            variant="soft"
-            class="flex size-8 items-center justify-center rounded-md p-0 ring-2 ring-primary ring-offset-2 ring-offset-default"
-            :aria-label="localDraft.icon.replace('i-lucide-', '')"
-            @click="iconPickerOpen = true"
           />
         </div>
         <!-- Browse all icons button -->
@@ -195,7 +217,6 @@ const handleGoalChange = (goal: Goal | null) => {
           label="Browse all icons"
           icon="i-lucide-layout-grid"
           color="neutral"
-          variant="subtle"
           block
           class="justify-center"
           @click="iconPickerOpen = true"
@@ -213,20 +234,18 @@ const handleGoalChange = (goal: Goal | null) => {
     <!-- Color -->
     <UFormField label="Color" name="color" required>
       <div
-        class="grid gap-1.5"
-        style="grid-template-columns: repeat(auto-fill, minmax(32px, 1fr))"
+        class="grid grid-cols-[repeat(auto-fill,minmax(36px,1fr))] gap-1.5 md:grid-cols-12"
       >
         <UButton
-          v-for="color in habitColorPresets"
+          v-for="color in displayedColorPresets"
           :key="color"
           square
           size="md"
           color="neutral"
           variant="ghost"
-          class="size-8 rounded-md p-0"
+          class="size-9 rounded-md p-0 md:size-8"
           :class="{
-            'ring-2 ring-primary ring-offset-2 ring-offset-default':
-              localDraft.color === color,
+            'ring-2 ring-primary': localDraft.color === color,
           }"
           :style="{ backgroundColor: color }"
           :aria-label="`Select color ${color}`"
@@ -239,7 +258,7 @@ const handleGoalChange = (goal: Goal | null) => {
             size="md"
             color="neutral"
             variant="soft"
-            class="flex size-8 items-center justify-center rounded-md p-0"
+            class="flex size-9 items-center justify-center rounded-md p-0 md:size-8"
             aria-label="Custom color"
           />
           <template #content>
@@ -249,27 +268,12 @@ const handleGoalChange = (goal: Goal | null) => {
                 label="Apply"
                 size="sm"
                 color="neutral"
+                variant="solid"
                 @click="applyCustomColor"
               />
             </div>
           </template>
         </UPopover>
-        <UButton
-          v-if="
-            localDraft.color &&
-            !habitColorPresets.includes(
-              localDraft.color as (typeof habitColorPresets)[number],
-            )
-          "
-          square
-          size="md"
-          color="neutral"
-          variant="ghost"
-          class="size-8 rounded-md p-0 ring-2 ring-primary ring-offset-2 ring-offset-default"
-          :style="{ backgroundColor: localDraft.color }"
-          aria-label="Selected custom color"
-          @click="colorPickerOpen = true"
-        />
       </div>
     </UFormField>
   </div>

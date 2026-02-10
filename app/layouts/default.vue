@@ -16,7 +16,7 @@ const handleHabitCreated = async () => {
 </script>
 
 <template>
-  <div class="min-h-dvh pb-20">
+  <div class="min-h-dvh pb-22">
     <slot />
     <NavigationMenu />
     <HabitsCreateFab />

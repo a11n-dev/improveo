@@ -140,8 +140,7 @@ const drawerProps = {
 
         <div ref="scrollContainerRef" class="max-h-64 overflow-y-auto pt-3">
           <div
-            class="grid gap-1.5 p-0.5"
-            style="grid-template-columns: repeat(auto-fill, minmax(32px, 1fr))"
+            class="grid grid-cols-[repeat(auto-fill,minmax(36px,1fr))] gap-1.5 p-0.5 md:grid-cols-[repeat(auto-fill,minmax(32px,1fr))]"
           >
             <UButton
               v-for="icon in displayedIcons"
@@ -151,7 +150,7 @@ const drawerProps = {
               size="md"
               color="neutral"
               variant="soft"
-              class="flex size-8 items-center justify-center rounded-md p-0"
+              class="flex size-9 items-center justify-center rounded-md p-0 md:size-8"
               :class="{
                 'ring-2 ring-primary': selectedIcon === icon,
               }"

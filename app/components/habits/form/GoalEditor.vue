@@ -152,7 +152,6 @@ const drawerProps = {
             <UButton
               icon="i-lucide-minus"
               color="neutral"
-              variant="subtle"
               :disabled="completionsCount <= 1"
               aria-label="Decrease"
               @click="decrement"
@@ -160,7 +159,6 @@ const drawerProps = {
             <UButton
               icon="i-lucide-plus"
               color="neutral"
-              variant="subtle"
               :disabled="completionsCount >= maxCompletions"
               aria-label="Increase"
               @click="increment"

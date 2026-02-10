@@ -5,9 +5,11 @@
 export const useHabitCreateOverlay = () => {
   const isOpen = useState("habit-create-open", () => false);
   const { resetDraft } = useHabitDraft();
+  const { tap: tapHaptic } = useHaptics();
 
   /** Open the overlay and reset draft to defaults */
   const openOverlay = () => {
+    tapHaptic("base");
     resetDraft();
     isOpen.value = true;
   };

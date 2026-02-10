@@ -2,6 +2,7 @@
 const { isOpen, closeOverlay } = useHabitCreateOverlay();
 const { draft, isValid, resetDraft } = useHabitDraft();
 const { createHabit } = useHabits();
+const { tap: tapHaptic } = useHaptics();
 
 const emit = defineEmits<{
   created: [];
@@ -33,6 +34,7 @@ const handleCreate = async () => {
     const created = await createHabit(payload);
 
     if (created) {
+      tapHaptic("base");
       resetDraft();
       closeOverlay();
       emit("created");

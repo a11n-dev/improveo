@@ -1,7 +1,3 @@
-/**
- * Named haptic profiles available to callers.
- * Keep this union small and explicit to avoid ad-hoc vibration values.
- */
 type HapticPatternName = "base";
 
 /**
@@ -66,14 +62,7 @@ const triggerFallbackHaptic = (): void => {
   label.click();
 };
 
-/**
- * Provides a single haptic trigger API for UI interactions.
- *
- * Behavior:
- * - Uses `navigator.vibrate` when supported.
- * - Falls back to hidden control activation when not supported.
- * - Applies a shared throttle across the app.
- */
+
 export const useHaptics = () => {
   const lastTapAt = useState<number>("haptics-last-tap-at", () => 0);
 

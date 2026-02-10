@@ -26,7 +26,6 @@ const handleLogout = async (): Promise<void> => {
         v-if="showInstallButton"
         color="primary"
         icon="i-lucide-download"
-        variant="subtle"
         block
         @click="install"
       >
@@ -35,13 +34,7 @@ const handleLogout = async (): Promise<void> => {
     </ClientOnly>
 
     <!-- Logout button -->
-    <UButton
-      color="error"
-      icon="i-lucide-log-out"
-      variant="subtle"
-      block
-      @click="handleLogout"
-    >
+    <UButton color="error" icon="i-lucide-log-out" block @click="handleLogout">
       Log out
     </UButton>
   </div>

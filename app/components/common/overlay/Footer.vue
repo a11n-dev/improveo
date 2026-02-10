@@ -31,6 +31,11 @@ export interface ConfirmAction extends BaseAction {
 
 export type FooterAction = ButtonAction | ConfirmAction;
 
+type ButtonPreset = {
+  color: "neutral" | "error";
+  variant?: "outline" | "solid";
+};
+
 interface Props {
   actions: FooterAction[];
 }
@@ -43,10 +48,10 @@ const { actions } = defineProps<Props>();
  */
 const buttonPresets = {
   primary: { color: "neutral", variant: "solid" },
-  secondary: { color: "neutral", variant: "subtle" },
-  danger: { color: "error", variant: "subtle" },
+  secondary: { color: "neutral", variant: undefined },
+  danger: { color: "error", variant: undefined },
   outline: { color: "neutral", variant: "outline" },
-} as const;
+} as const satisfies Record<NonNullable<ButtonAction["color"]>, ButtonPreset>;
 
 /**
  * Filter actions by visibility, defaulting to visible.

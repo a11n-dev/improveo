@@ -37,7 +37,6 @@ watch(
           {
             label: "Install",
             color: "primary",
-            variant: "subtle",
             size: "lg",
             block: true,
             onClick: () => {
@@ -98,7 +97,6 @@ const showGuideToastIfNeeded = () => {
         {
           label: "Show me how",
           color: "primary",
-          variant: "subtle",
           size: "lg",
           block: true,
           onClick: () => {
@@ -147,7 +145,6 @@ watch(
           {
             label: "Update now",
             color: "primary",
-            variant: "subtle",
             size: "lg",
             block: true,
             onClick: () => {

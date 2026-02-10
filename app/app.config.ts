@@ -1,5 +1,10 @@
 export default defineAppConfig({
   ui: {
+    toast: {
+      slots: {
+        root: "rounded-xl",
+      },
+    },
     modal: {
       slots: {
         header: "pb-0!",
@@ -22,6 +27,14 @@ export default defineAppConfig({
     button: {
       defaultVariants: {
         size: "lg",
+        variant: "subtle",
+      },
+      variants: {
+        size: {
+          lg: {
+            base: "px-3 py-2.5 md:py-2",
+          },
+        },
       },
       slots: {
         base: "cursor-pointer",
@@ -32,11 +45,28 @@ export default defineAppConfig({
         size: "lg",
         variant: "subtle",
       },
+      variants: {
+        size: {
+          lg: {
+            base: "px-3 py-2.5 md:py-2",
+          },
+        },
+      },
     },
     select: {
       defaultVariants: {
         size: "lg",
         variant: "subtle",
+      },
+      variants: {
+        size: {
+          lg: {
+            base: "px-3 py-2.5",
+            label: "p-2.5",
+            item: "p-2.5",
+            empty: "p-2.5",
+          },
+        },
       },
     },
     empty: {

@@ -115,6 +115,7 @@ watch(
               label="Create Habit"
               icon="i-lucide-plus"
               color="primary"
+              variant="solid"
               @click="openCreate"
             />
           </template>

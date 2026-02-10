@@ -3,7 +3,7 @@ const isDesktop = useIsDesktop();
 const colorMode = useColorMode();
 
 const themeColor = computed(() =>
-  colorMode.value === "dark" ? "#020617" : "#ffffff",
+  colorMode.value === "dark" ? "#0f172a" : "#ffffff",
 );
 
 useHead({
@@ -35,6 +35,12 @@ const toasterConfig = computed(() => {
 </script>
 <template>
   <VitePwaManifest />
+
+  <ClientOnly>
+    <Teleport to="body">
+      <div class="statusbar-probe" aria-hidden="true" />
+    </Teleport>
+  </ClientOnly>
 
   <UApp :toaster="toasterConfig">
     <NuxtRouteAnnouncer />

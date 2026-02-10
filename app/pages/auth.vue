@@ -198,7 +198,7 @@ onBeforeUnmount(() => {
           light="/logo-light.svg"
           dark="/logo-dark.svg"
           alt="Improveo Logo"
-          class="h-10 w-10"
+          class="h-11 w-11"
         />
         <span class="text-lg text-highlighted">
           {{ isRegister ? "Sign up to Improveo" : "Log in to Improveo" }}

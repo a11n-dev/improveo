@@ -26,7 +26,7 @@ export const habitIconPresets = [
   "i-lucide-cigarette-off", // quit smoking
   "i-lucide-wallet", // finances
   "i-lucide-languages", // language learning
-  "i-lucide-palette", // creative/art
+  "i-lucide-star", // creative/highlight
 ] as const;
 
 /**

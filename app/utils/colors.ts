@@ -1,7 +1,7 @@
 /**
  * Preset habit colors for the color picker swatches.
  * Users can also choose a custom color via UColorPicker.
- * 24 balanced hues covering the spectrum.
+ * 23 balanced hues covering the spectrum.
  */
 export const habitColorPresets = [
   // Reds & Pinks
@@ -30,7 +30,6 @@ export const habitColorPresets = [
   "#F59E0B", // amber-500
   "#F97316", // orange-500
   // Neutrals & Browns
-  "#FB923C", // orange-400
   "#78716C", // stone-500
   "#64748B", // slate-500
   "#475569", // slate-600

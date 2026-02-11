@@ -62,7 +62,6 @@ const triggerFallbackHaptic = (): void => {
   label.click();
 };
 
-
 export const useHaptics = () => {
   const lastTapAt = useState<number>("haptics-last-tap-at", () => 0);
 

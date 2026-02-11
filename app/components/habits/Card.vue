@@ -6,6 +6,7 @@ interface Props {
 }
 
 const { habit, weekStart = 0, completed = false } = defineProps<Props>();
+const { tap: tapHaptic } = useHaptics();
 
 const emit = defineEmits<{
   "update:completed": [value: boolean];
@@ -31,6 +32,7 @@ const handleInfoClick = () => {
 /** Handle checkbox click (stop propagation to prevent double toggle) */
 const handleCheckboxClick = (event: Event) => {
   event.stopPropagation();
+  tapHaptic("base");
 };
 </script>
 

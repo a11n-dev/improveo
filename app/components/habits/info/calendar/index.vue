@@ -20,6 +20,7 @@ const { habit, weekStart = 0, open = true } = defineProps<Props>();
 const emit = defineEmits<{
   "toggle-date": [date: string];
 }>();
+const { tap: tapHaptic } = useHaptics();
 
 /** Today's CalendarDate for max constraint */
 const todayDate = getToday(getLocalTimeZone());
@@ -179,6 +180,8 @@ const monthYearLabel = computed(() => {
       class="w-full"
       @update:model-value="
         (v: unknown) => {
+          tapHaptic('base');
+
           if (Array.isArray(v)) {
             localSelectedDates = v.map(
               (d: DateValue) => new CalendarDate(d.year, d.month, d.day),

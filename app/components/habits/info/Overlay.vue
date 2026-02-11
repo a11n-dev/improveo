@@ -15,6 +15,7 @@ const emit = defineEmits<{
 const open = defineModel<boolean>("open", { default: false });
 
 const { openOverlay: openEditOverlay } = useHabitEditOverlay();
+const { tap: tapHaptic } = useHaptics();
 
 const modalProps = {
   close: false,
@@ -49,6 +50,7 @@ const handleEditOverlayAfterLeave = () => {
 
 /** Handle delete button click */
 const handleDelete = () => {
+  tapHaptic("base");
   showDeleteConfirm.value = true;
 };
 

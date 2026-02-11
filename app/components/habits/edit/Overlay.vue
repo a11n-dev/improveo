@@ -66,18 +66,11 @@ const handleCancel = () => {
     :drawer-props="drawerProps"
     :actions="[
       {
-        label: 'Save changes',
+        label: 'Save',
         color: 'primary',
-        visible: hasChanges,
-        disabled: !isValid,
+        disabled: !hasChanges || !isValid,
         loading: isSaving,
         onClick: handleSave,
-      },
-      {
-        label: 'Cancel',
-        color: 'secondary',
-        disabled: isSaving,
-        onClick: handleCancel,
       },
     ]"
     @after:leave="resetDraft"

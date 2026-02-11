@@ -100,31 +100,18 @@ watch(iconSearch, () => {
   loadedCount.value = BATCH_SIZE;
   canLoadMore.value = true;
 });
-
-const title = "Choose Icon";
-
-const modalProps = {
-  ui: { footer: "justify-end pt-0" },
-};
-
-const drawerProps = {
-  nested: true,
-};
 </script>
 
 <template>
   <CommonOverlay
     v-model:open="open"
-    :title="title"
-    :modal-props="modalProps"
-    :drawer-props="drawerProps"
-    :actions="[
-      {
-        label: 'Cancel',
-        color: 'secondary',
-        onClick: () => (open = false),
-      },
-    ]"
+    title="Choose Icon"
+    :modal-props="{
+      ui: { footer: 'justify-end pt-0' },
+    }"
+    :drawer-props="{
+      nested: true,
+    }"
   >
     <template #body>
       <div class="flex flex-col">
@@ -138,7 +125,7 @@ const drawerProps = {
           />
         </div>
 
-        <div ref="scrollContainerRef" class="max-h-64 overflow-y-auto pt-3">
+        <div ref="scrollContainerRef" class="max-h-100 overflow-y-auto pt-3">
           <div
             class="grid grid-cols-[repeat(auto-fill,minmax(36px,1fr))] gap-1.5 p-0.5 md:grid-cols-[repeat(auto-fill,minmax(32px,1fr))]"
           >

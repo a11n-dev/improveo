@@ -119,12 +119,6 @@ const handleClose = () => {
             visible: !showDeleteConfirm,
             onClick: handleDelete,
           },
-          {
-            label: 'Close',
-            color: 'secondary',
-            visible: !showDeleteConfirm,
-            onClick: handleClose,
-          },
         ]"
       />
     </template>

@@ -64,7 +64,7 @@ const increment = () => {
 };
 
 /** Sync local state from props on open */
-watch(open, (isOpen) => {
+watch(open, (isOpen, wasOpen) => {
   if (isOpen) {
     isInitializing.value = true;
     if (props.goal) {
@@ -79,6 +79,8 @@ watch(open, (isOpen) => {
       isInitializing.value = false;
     });
   }
+
+  if (wasOpen) save();
 });
 
 /** Reset completions when period type changes (but not during initialization) */
@@ -101,31 +103,15 @@ const save = () => {
   }
   open.value = false;
 };
-
-const title = "Goal";
-
-const drawerProps = {
-  nested: true,
-};
 </script>
 
 <template>
   <CommonOverlay
     v-model:open="open"
-    :title="title"
-    :drawer-props="drawerProps"
-    :actions="[
-      {
-        label: 'Save',
-        color: 'primary',
-        onClick: save,
-      },
-      {
-        label: 'Cancel',
-        color: 'secondary',
-        onClick: () => (open = false),
-      },
-    ]"
+    title="Goal"
+    :drawer-props="{
+      nested: true,
+    }"
   >
     <template #body>
       <div class="flex flex-col gap-4">

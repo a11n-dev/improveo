@@ -116,14 +116,6 @@ const isSaveActionVisible = computed(
               loading: isDeleting,
             },
             {
-              label: 'Save changes',
-              color: 'primary',
-              visible: isSaveActionVisible,
-              loading: isSaving,
-              disabled: !canSave,
-              onClick: saveAccount,
-            },
-            {
               label: 'Delete account',
               color: 'danger',
               visible: !showDeleteConfirm,
@@ -131,11 +123,12 @@ const isSaveActionVisible = computed(
               onClick: handleDelete,
             },
             {
-              label: 'Cancel',
-              color: 'secondary',
-              visible: !showDeleteConfirm,
-              disabled: isSaving || isDeleting,
-              onClick: () => (open = false),
+              label: 'Save',
+              color: 'primary',
+              visible: isSaveActionVisible,
+              loading: isSaving,
+              disabled: !canSave,
+              onClick: saveAccount,
             },
           ]"
         />

@@ -20,10 +20,6 @@ const modalProps = {
   close: false,
 };
 
-const drawerProps = {
-  nested: true,
-};
-
 /** Handle save */
 const handleSave = async () => {
   // Don't call API if nothing changed
@@ -72,7 +68,6 @@ const handleAfterLeave = () => {
   <CommonOverlay
     v-model:open="isOpen"
     :modal-props="modalProps"
-    :drawer-props="drawerProps"
     :actions="[
       {
         label: 'Save',

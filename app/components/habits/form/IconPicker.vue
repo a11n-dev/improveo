@@ -16,7 +16,7 @@ const isDesktop = useIsDesktop();
 const open = defineModel<boolean>("open", { default: false });
 
 /** Number of icons to load per batch */
-const BATCH_SIZE = 64;
+const BATCH_SIZE = 56;
 
 /** Icon search term */
 const iconSearch = ref("");
@@ -108,9 +108,6 @@ watch(iconSearch, () => {
     title="Choose Icon"
     :modal-props="{
       ui: { footer: 'justify-end pt-0' },
-    }"
-    :drawer-props="{
-      nested: true,
     }"
   >
     <template #body>

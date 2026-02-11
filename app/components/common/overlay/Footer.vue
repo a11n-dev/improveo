@@ -78,7 +78,7 @@ const buttonActions = computed(() =>
 </script>
 
 <template>
-  <div class="flex w-full flex-col gap-2">
+  <div class="relative z-10 flex w-full flex-col gap-2">
     <!-- Top slot for custom content above buttons -->
     <slot name="top" />
 

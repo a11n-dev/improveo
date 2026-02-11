@@ -11,8 +11,7 @@ export default defineAppConfig({
         container: "transform-gpu",
         content:
           "safe-drawer-content [--drawer-max-ratio:0.96] will-change-transform",
-        body: "pb-4",
-        footer: "py-4",
+        footer: "pb-10 pt-6",
       },
     },
     card: {

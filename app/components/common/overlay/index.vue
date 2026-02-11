@@ -188,7 +188,11 @@ onBeforeUnmount(() => {
       :description="description"
       v-bind="drawerProps"
       :ui="{
-        footer: 'sticky bottom-0',
+        container:
+          (actions && (actions?.length ?? 0) > 0) || $slots.footer
+            ? 'pb-0'
+            : 'pb-8',
+        footer: `sticky bottom-0 z-20 -mx-4 px-4 before:absolute before:-z-1 before:inset-0 before:backdrop-blur-xs before:mask-[linear-gradient(to_top,black_0%,black_86%,transparent_100%)] before:content-['']`,
       }"
       :scroll-lock-timeout="250"
       @after:leave="emit('after:leave')"

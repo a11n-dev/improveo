@@ -9,7 +9,7 @@ const {
   cancelDelete,
   confirmDelete,
   draftName,
-  handleDelete,
+  handleDelete: openDeleteConfirmation,
   hasUnsavedChanges,
   hasStoredAvatar,
   isDeleting,
@@ -23,6 +23,7 @@ const {
   selectedAvatarFile,
   showDeleteConfirm,
 } = useProfileAccountEditor(profileRef);
+const { tap: tapHaptic } = useHaptics();
 
 const {
   canRequestEmailChange,
@@ -61,6 +62,11 @@ const handleOpenEmailOverlay = async () => {
 
 const handleEmailOverlayAfterLeave = () => {
   isEmailOverlayMounted.value = false;
+};
+
+const handleDeleteClick = () => {
+  tapHaptic("base");
+  openDeleteConfirmation();
 };
 </script>
 
@@ -132,7 +138,7 @@ const handleEmailOverlayAfterLeave = () => {
               color: 'danger',
               visible: !showDeleteConfirm,
               disabled: isSaving || isDeleting,
-              onClick: handleDelete,
+              onClick: handleDeleteClick,
             },
             {
               label: 'Save',

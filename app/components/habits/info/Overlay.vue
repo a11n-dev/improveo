@@ -30,6 +30,12 @@ const goalLabel = computed(() =>
 const showDeleteConfirm = ref(false);
 const isEditOverlayMounted = ref(false);
 
+watch(open, (isOpen) => {
+  if (!isOpen) {
+    showDeleteConfirm.value = false;
+  }
+});
+
 /** Handle edit button click - opens nested edit overlay */
 const handleEdit = async () => {
   isEditOverlayMounted.value = true;
@@ -63,11 +69,7 @@ const handleClose = () => {
 </script>
 
 <template>
-  <CommonOverlay
-    v-model:open="open"
-    :modal-props="modalProps"
-    @after:leave="showDeleteConfirm = false"
-  >
+  <CommonOverlay v-model:open="open" :modal-props="modalProps">
     <template #header>
       <HabitsInfoHeader :habit="habit" @close="handleClose" />
     </template>

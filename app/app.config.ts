@@ -13,6 +13,7 @@ export default defineAppConfig({
     },
     drawer: {
       slots: {
+        content: "safe-drawer-content [--drawer-max-ratio:0.96]",
         footer: "py-4",
       },
     },

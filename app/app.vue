@@ -36,12 +36,6 @@ const toasterConfig = computed(() => {
 <template>
   <VitePwaManifest />
 
-  <ClientOnly>
-    <Teleport to="body">
-      <div class="statusbar-probe" aria-hidden="true" />
-    </Teleport>
-  </ClientOnly>
-
   <UApp :toaster="toasterConfig">
     <NuxtRouteAnnouncer />
     <NuxtLayout>

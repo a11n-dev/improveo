@@ -4,10 +4,7 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 import type { AuthMode, AuthStep } from "~/types/auth";
 
 import { AuthLoginSchema, AuthRegisterSchema } from "~~/shared/validation/auth";
-import type {
-  AuthLoginInput,
-  AuthRegisterInput,
-} from "~~/shared/validation/auth";
+import type { AuthLoginInput, AuthRegisterInput } from "~~/shared/validation/auth";
 
 definePageMeta({
   layout: "auth",
@@ -31,27 +28,17 @@ const formState = reactive({
 
 // OTP input and resend cooldown
 const otpValue = ref<string[]>([]);
-const {
-  isActive: isResendCooldownActive,
-  secondsLeft: resendSeconds,
-  start: startResendCountdown,
-  stop: stopResendCountdown,
-} = useResendCooldown();
+const { isActive: isResendCooldownActive, secondsLeft: resendSeconds, start: startResendCountdown, stop: stopResendCountdown } = useResendCooldown();
 
 const isRegister = computed(() => activeTab.value === "register");
-const authSchema = computed(() =>
-  isRegister.value ? AuthRegisterSchema : AuthLoginSchema,
-);
+const authSchema = computed(() => (isRegister.value ? AuthRegisterSchema : AuthLoginSchema));
 
 /** Normalize OTP input array into a single string token. */
 const otpToken = computed(() => otpValue.value.join(""));
 
-const hasValidOtp = () =>
-  formState.email.trim().length > 0 && otpToken.value.length === 6;
+const hasValidOtp = () => formState.email.trim().length > 0 && otpToken.value.length === 6;
 
-const canRequestOtp = computed(
-  () => !isSending.value && !isVerifying.value && !isResendCooldownActive.value,
-);
+const canRequestOtp = computed(() => !isSending.value && !isVerifying.value && !isResendCooldownActive.value);
 
 /** Reset form state when switching between login and register modes. */
 watch(activeTab, () => {
@@ -64,10 +51,7 @@ watch(activeTab, () => {
 
 const notifyRequestError = (message: string): void => {
   if (/signups not allowed/i.test(message)) {
-    notifyError(
-      "Account not found",
-      "No account found. Please register first.",
-    );
+    notifyError("Account not found", "No account found. Please register first.");
     return;
   }
 
@@ -95,9 +79,7 @@ const requestOtp = async (payload: AuthFormOutput): Promise<boolean> => {
     email: payload.email,
     options: {
       shouldCreateUser: isRegister.value,
-      ...(isRegister.value && payload.name
-        ? { data: { name: payload.name } }
-        : {}),
+      ...(isRegister.value && payload.name ? { data: { name: payload.name } } : {}),
     },
   });
 
@@ -191,67 +173,68 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex min-h-dvh items-center justify-center">
-    <UContainer class="flex w-full max-w-md flex-col gap-3 text-left">
-      <div class="flex flex-col gap-3">
-        <UColorModeImage
-          light="/logo-light.svg"
-          dark="/logo-dark.svg"
-          alt="Improveo Logo"
-          class="h-11 w-11"
-        />
-        <span class="text-lg text-highlighted">
-          {{ isRegister ? "Sign up to Improveo" : "Log in to Improveo" }}
-        </span>
-      </div>
-
-      <AuthRequestForm
-        v-if="step === 'request'"
-        v-model:state="formState"
-        :schema="authSchema"
-        :is-register="isRegister"
-        :is-sending="isSending"
-        :can-submit="canRequestOtp"
-        :resend-seconds="resendSeconds"
-        @submit="handleSubmit"
+  <UContainer class="flex w-full max-w-md flex-col gap-3 text-left">
+    <div class="flex flex-col gap-3">
+      <UColorModeImage
+        light="/logo-light.svg"
+        dark="/logo-dark.svg"
+        alt="Improveo Logo"
+        class="h-11 w-11"
       />
-      <AuthVerifyForm
-        v-else
-        v-model:otp-value="otpValue"
-        :email="formState.email"
-        :resend-seconds="resendSeconds"
-        :is-sending="isSending"
-        :is-verifying="isVerifying"
-        @verify="handleVerify"
-        @back="handleBack"
-        @request="handleOtpRequest()"
-      />
+      <span class="text-lg text-highlighted">
+        {{ isRegister ? "Sign up to Improveo" : "Log in to Improveo" }}
+      </span>
+    </div>
 
-      <p v-if="step === 'request'" class="text-sm text-muted">
-        <template v-if="isRegister">
-          <span>Already have an account?</span>
-          <UButton
-            type="button"
-            variant="link"
-            class="ml-1 px-0 py-0 text-primary"
-            @click="toggleAuthMode"
-          >
-            Log in
-          </UButton>
-        </template>
+    <AuthRequestForm
+      v-if="step === 'request'"
+      v-model:state="formState"
+      :schema="authSchema"
+      :is-register="isRegister"
+      :is-sending="isSending"
+      :can-submit="canRequestOtp"
+      :resend-seconds="resendSeconds"
+      @submit="handleSubmit"
+    />
+    <AuthVerifyForm
+      v-else
+      v-model:otp-value="otpValue"
+      :email="formState.email"
+      :resend-seconds="resendSeconds"
+      :is-sending="isSending"
+      :is-verifying="isVerifying"
+      @verify="handleVerify"
+      @back="handleBack"
+      @request="handleOtpRequest()"
+    />
 
-        <template v-else>
-          <span>Don’t have an account?</span>
-          <UButton
-            type="button"
-            variant="link"
-            class="ml-1 px-0 py-0 text-primary"
-            @click="toggleAuthMode"
-          >
-            Create one
-          </UButton>
-        </template>
-      </p>
-    </UContainer>
-  </div>
+    <p
+      v-if="step === 'request'"
+      class="text-sm text-muted"
+    >
+      <template v-if="isRegister">
+        <span>Already have an account?</span>
+        <UButton
+          type="button"
+          variant="link"
+          class="ml-1 px-0 py-0 text-primary"
+          @click="toggleAuthMode"
+        >
+          Log in
+        </UButton>
+      </template>
+
+      <template v-else>
+        <span>Don’t have an account?</span>
+        <UButton
+          type="button"
+          variant="link"
+          class="ml-1 px-0 py-0 text-primary"
+          @click="toggleAuthMode"
+        >
+          Create one
+        </UButton>
+      </template>
+    </p>
+  </UContainer>
 </template>

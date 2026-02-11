@@ -69,6 +69,7 @@ const confirmActions = computed(() =>
     (action): action is ConfirmAction => action.type === "confirm",
   ),
 );
+const activeConfirmAction = computed(() => confirmActions.value[0]);
 
 const buttonActions = computed(() =>
   visibleActions.value.filter(
@@ -78,57 +79,69 @@ const buttonActions = computed(() =>
 </script>
 
 <template>
-  <div class="relative z-10 flex w-full flex-col gap-2">
-    <!-- Top slot for custom content above buttons -->
-    <slot name="top" />
+  <div class="relative z-10 w-full">
+    <button
+      v-if="activeConfirmAction"
+      type="button"
+      aria-label="Cancel confirmation"
+      class="absolute inset-x-0 bottom-full z-0 h-dvh bg-transparent touch-pan-y -mx-4"
+      @click="activeConfirmAction.onCancel"
+    />
+    <div class="relative z-10 flex w-full flex-col gap-2">
+      <!-- Top slot for custom content above buttons -->
+      <slot name="top" />
 
-    <!-- Confirmation actions (always rendered first/on top) -->
-    <template
-      v-for="(action, index) in confirmActions"
-      :key="`confirm-${index}`"
-    >
-      <!-- Confirmation text -->
-      <div class="mb-2 text-center text-sm text-muted">
-        <p>{{ action.confirmText }}</p>
-        <p v-if="action.confirmSubtext">{{ action.confirmSubtext }}</p>
-      </div>
+      <!-- Confirmation actions (always rendered first/on top) -->
+      <template
+        v-for="(action, index) in confirmActions"
+        :key="`confirm-${index}`"
+      >
+        <!-- Confirmation text -->
+        <div
+          data-overlay-confirm
+          class="mb-2 text-center text-sm text-muted -mt-14"
+        >
+          <p>{{ action.confirmText }}</p>
+          <p v-if="action.confirmSubtext">{{ action.confirmSubtext }}</p>
+        </div>
 
-      <!-- Confirm button (on top) -->
+        <!-- Confirm button (on top) -->
+        <UButton
+          label="Confirm"
+          :color="buttonPresets[action.color || 'primary'].color"
+          :variant="buttonPresets[action.color || 'primary'].variant"
+          block
+          :disabled="action.disabled"
+          :loading="action.loading"
+          @click="action.onConfirm"
+        />
+
+        <!-- Cancel button (below confirm) -->
+        <UButton
+          label="Cancel"
+          :color="buttonPresets.secondary.color"
+          :variant="buttonPresets.secondary.variant"
+          block
+          :disabled="action.loading"
+          @click="action.onCancel"
+        />
+      </template>
+
+      <!-- Regular button actions -->
       <UButton
-        label="Confirm"
+        v-for="(action, index) in buttonActions"
+        :key="`button-${index}`"
+        :label="action.label"
         :color="buttonPresets[action.color || 'primary'].color"
         :variant="buttonPresets[action.color || 'primary'].variant"
         block
         :disabled="action.disabled"
         :loading="action.loading"
-        @click="action.onConfirm"
+        @click="action.onClick"
       />
 
-      <!-- Cancel button (below confirm) -->
-      <UButton
-        label="Cancel"
-        :color="buttonPresets.secondary.color"
-        :variant="buttonPresets.secondary.variant"
-        block
-        :disabled="action.loading"
-        @click="action.onCancel"
-      />
-    </template>
-
-    <!-- Regular button actions -->
-    <UButton
-      v-for="(action, index) in buttonActions"
-      :key="`button-${index}`"
-      :label="action.label"
-      :color="buttonPresets[action.color || 'primary'].color"
-      :variant="buttonPresets[action.color || 'primary'].variant"
-      block
-      :disabled="action.disabled"
-      :loading="action.loading"
-      @click="action.onClick"
-    />
-
-    <!-- Bottom slot for custom content below buttons -->
-    <slot name="bottom" />
+      <!-- Bottom slot for custom content below buttons -->
+      <slot name="bottom" />
+    </div>
   </div>
 </template>

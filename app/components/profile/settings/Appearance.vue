@@ -2,6 +2,7 @@
 const colorMode = useColorMode();
 const { settings, updateColorMode } = useSettings();
 const open = ref(false);
+const isSaving = ref(false);
 
 const colorModeOptions = [
   {
@@ -96,12 +97,22 @@ const save = async (): Promise<void> => {
 };
 
 const handleSave = async (): Promise<void> => {
+  if (isSaving.value) {
+    return;
+  }
+
   if (!hasChanges.value) {
     open.value = false;
     return;
   }
 
-  await save();
+  isSaving.value = true;
+
+  try {
+    await save();
+  } finally {
+    isSaving.value = false;
+  }
 };
 </script>
 
@@ -125,6 +136,8 @@ const handleSave = async (): Promise<void> => {
         {
           label: 'Save',
           color: 'primary',
+          loading: isSaving,
+          disabled: isSaving,
           onClick: handleSave,
         },
       ]"

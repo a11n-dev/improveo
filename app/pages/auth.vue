@@ -4,7 +4,10 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 import type { AuthMode, AuthStep } from "~/types/auth";
 
 import { AuthLoginSchema, AuthRegisterSchema } from "~~/shared/validation/auth";
-import type { AuthLoginInput, AuthRegisterInput } from "~~/shared/validation/auth";
+import type {
+  AuthLoginInput,
+  AuthRegisterInput,
+} from "~~/shared/validation/auth";
 
 definePageMeta({
   layout: "auth",
@@ -28,17 +31,27 @@ const formState = reactive({
 
 // OTP input and resend cooldown
 const otpValue = ref<string[]>([]);
-const { isActive: isResendCooldownActive, secondsLeft: resendSeconds, start: startResendCountdown, stop: stopResendCountdown } = useResendCooldown();
+const {
+  isActive: isResendCooldownActive,
+  secondsLeft: resendSeconds,
+  start: startResendCountdown,
+  stop: stopResendCountdown,
+} = useResendCooldown();
 
 const isRegister = computed(() => activeTab.value === "register");
-const authSchema = computed(() => (isRegister.value ? AuthRegisterSchema : AuthLoginSchema));
+const authSchema = computed(() =>
+  isRegister.value ? AuthRegisterSchema : AuthLoginSchema,
+);
 
 /** Normalize OTP input array into a single string token. */
 const otpToken = computed(() => otpValue.value.join(""));
 
-const hasValidOtp = () => formState.email.trim().length > 0 && otpToken.value.length === 6;
+const hasValidOtp = () =>
+  formState.email.trim().length > 0 && otpToken.value.length === 6;
 
-const canRequestOtp = computed(() => !isSending.value && !isVerifying.value && !isResendCooldownActive.value);
+const canRequestOtp = computed(
+  () => !isSending.value && !isVerifying.value && !isResendCooldownActive.value,
+);
 
 /** Reset form state when switching between login and register modes. */
 watch(activeTab, () => {
@@ -51,7 +64,10 @@ watch(activeTab, () => {
 
 const notifyRequestError = (message: string): void => {
   if (/signups not allowed/i.test(message)) {
-    notifyError("Account not found", "No account found. Please register first.");
+    notifyError(
+      "Account not found",
+      "No account found. Please register first.",
+    );
     return;
   }
 
@@ -79,7 +95,9 @@ const requestOtp = async (payload: AuthFormOutput): Promise<boolean> => {
     email: payload.email,
     options: {
       shouldCreateUser: isRegister.value,
-      ...(isRegister.value && payload.name ? { data: { name: payload.name } } : {}),
+      ...(isRegister.value && payload.name
+        ? { data: { name: payload.name } }
+        : {}),
     },
   });
 
@@ -208,10 +226,7 @@ onBeforeUnmount(() => {
       @request="handleOtpRequest()"
     />
 
-    <p
-      v-if="step === 'request'"
-      class="text-sm text-muted"
-    >
+    <p v-if="step === 'request'" class="text-sm text-muted">
       <template v-if="isRegister">
         <span>Already have an account?</span>
         <UButton

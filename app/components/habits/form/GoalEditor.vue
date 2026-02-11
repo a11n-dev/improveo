@@ -133,7 +133,7 @@ const drawerProps = {
           <URadioGroup
             v-model="selectedPeriodType"
             :items="periodItems"
-            variant="table"
+            variant="card"
             color="neutral"
           />
         </UFormField>

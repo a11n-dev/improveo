@@ -4,9 +4,17 @@ const { settings, updateColorMode } = useSettings();
 const open = ref(false);
 
 const colorModeOptions = [
-  { label: "Light", value: "light", description: "Use light mode" },
-  { label: "Dark", value: "dark", description: "Use dark mode" },
-  { label: "System", value: "system", description: "Follow system settings" },
+  {
+    label: "Light",
+    value: "light",
+    description: "Theme will be in light mode",
+  },
+  { label: "Dark", value: "dark", description: "Theme will be in dark mode" },
+  {
+    label: "System",
+    value: "system",
+    description: "Theme will follow the system settings",
+  },
 ];
 
 const toColorModePreference = (
@@ -133,7 +141,7 @@ const cancel = (): void => {
           :items="colorModeOptions"
           value-key="value"
           color="neutral"
-          variant="table"
+          variant="card"
         />
       </template>
     </CommonOverlay>

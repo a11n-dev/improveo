@@ -1,10 +1,5 @@
 export default defineAppConfig({
   ui: {
-    toast: {
-      slots: {
-        root: "rounded-xl",
-      },
-    },
     modal: {
       slots: {
         header: "pb-0!",
@@ -19,7 +14,6 @@ export default defineAppConfig({
     },
     card: {
       slots: {
-        root: "rounded-xl",
         header: "sm:p-4 pb-0! border-none",
         body: "sm:p-4 border-none",
         footer: "sm:p-4 pt-0! border-none",

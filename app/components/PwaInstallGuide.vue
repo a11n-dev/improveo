@@ -33,7 +33,7 @@ const description = "Add to your home screen for quick access";
         <!-- Browser/Device header -->
         <div class="flex items-center gap-3">
           <div
-            class="flex size-10 items-center justify-center rounded-lg bg-info-500/10 border border-info-500"
+            class="flex size-10 items-center justify-center rounded-md bg-info-500/10 border border-info-500"
           >
             <UIcon :name="guide.headerIcon" class="size-5 text-info-500" />
           </div>
@@ -51,7 +51,7 @@ const description = "Add to your home screen for quick access";
             class="flex items-start gap-3"
           >
             <div
-              class="flex size-7 shrink-0 items-center justify-center rounded-md border border-muted bg-muted/50 text-xs font-medium text-muted"
+              class="flex size-7 shrink-0 items-center justify-center rounded-sm border border-muted bg-muted/50 text-xs font-medium text-muted"
             >
               {{ index + 1 }}
             </div>

@@ -44,7 +44,7 @@ const descriptionClass = computed(() =>
     <div class="flex min-w-0 flex-1 items-center gap-3">
       <div
         v-if="icon"
-        class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-info/15"
+        class="flex size-10 shrink-0 items-center justify-center rounded-md bg-info/15"
       >
         <UIcon :name="icon" class="size-5 text-info" />
       </div>

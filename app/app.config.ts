@@ -8,7 +8,9 @@ export default defineAppConfig({
     },
     drawer: {
       slots: {
-        content: "safe-drawer-content [--drawer-max-ratio:0.96]",
+        container: "transform-gpu",
+        content:
+          "safe-drawer-content [--drawer-max-ratio:0.96] will-change-transform",
         body: "pb-4",
         footer: "py-4",
       },

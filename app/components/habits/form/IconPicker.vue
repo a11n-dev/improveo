@@ -16,7 +16,7 @@ const isDesktop = useIsDesktop();
 const open = defineModel<boolean>("open", { default: false });
 
 /** Number of icons to load per batch */
-const BATCH_SIZE = 80;
+const BATCH_SIZE = 64;
 
 /** Icon search term */
 const iconSearch = ref("");
@@ -125,7 +125,7 @@ watch(iconSearch, () => {
           />
         </div>
 
-        <div ref="scrollContainerRef" class="max-h-100 overflow-y-auto pt-3">
+        <div ref="scrollContainerRef" class="max-h-80 overflow-y-auto pt-3">
           <div
             class="grid grid-cols-[repeat(auto-fill,minmax(36px,1fr))] gap-1.5 p-0.5 md:grid-cols-[repeat(auto-fill,minmax(32px,1fr))]"
           >

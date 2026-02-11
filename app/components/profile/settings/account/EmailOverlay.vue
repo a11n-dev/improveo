@@ -24,7 +24,7 @@ const {
 
 const emit = defineEmits<{
   (e: "request", email: string): void;
-  (e: "back" | "verify"): void;
+  (e: "back" | "verify" | "after:leave"): void;
 }>();
 const open = defineModel<boolean>("open", { default: false });
 const otpValue = defineModel<number[]>("otpValue", { default: () => [] });
@@ -132,6 +132,7 @@ const submitRequestForm = async (): Promise<void> => {
     "
     :modal-props="{ ui: { footer: 'flex-col gap-2' } }"
     :drawer-props="{ ui: { footer: 'flex-col gap-2' } }"
+    @after:leave="emit('after:leave')"
   >
     <template #body>
       <UForm

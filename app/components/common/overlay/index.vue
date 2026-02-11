@@ -190,6 +190,7 @@ onBeforeUnmount(() => {
       :ui="{
         footer: 'sticky bottom-0',
       }"
+      :scroll-lock-timeout="250"
       @after:leave="emit('after:leave')"
     >
       <template #header>

@@ -28,10 +28,17 @@ const goalLabel = computed(() =>
 
 /** Delete confirmation state */
 const showDeleteConfirm = ref(false);
+const isEditOverlayMounted = ref(false);
 
 /** Handle edit button click - opens nested edit overlay */
-const handleEdit = () => {
+const handleEdit = async () => {
+  isEditOverlayMounted.value = true;
+  await nextTick();
   openEditOverlay(habit);
+};
+
+const handleEditOverlayAfterLeave = () => {
+  isEditOverlayMounted.value = false;
 };
 
 /** Handle delete button click */
@@ -124,6 +131,10 @@ const handleClose = () => {
     </template>
 
     <!-- Nested edit overlay (default slot for drawer context) -->
-    <HabitsEditOverlay :habit="habit" />
+    <HabitsEditOverlay
+      v-if="isEditOverlayMounted"
+      :habit="habit"
+      @after:leave="handleEditOverlayAfterLeave"
+    />
   </CommonOverlay>
 </template>

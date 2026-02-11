@@ -5,6 +5,10 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+  (e: "after:leave"): void;
+}>();
+
 const { isOpen, closeOverlay } = useHabitEditOverlay();
 const { draft, hasChanges, isValid, resetDraft } = useHabitEditDraft();
 const { updateHabit } = useHabits();
@@ -57,6 +61,11 @@ const handleSave = async () => {
 const handleCancel = () => {
   closeOverlay();
 };
+
+const handleAfterLeave = () => {
+  resetDraft();
+  emit("after:leave");
+};
 </script>
 
 <template>
@@ -73,7 +82,7 @@ const handleCancel = () => {
         onClick: handleSave,
       },
     ]"
-    @after:leave="resetDraft"
+    @after:leave="handleAfterLeave"
   >
     <template #header>
       <HabitsEditHeader @close="handleCancel" />

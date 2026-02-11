@@ -9,6 +9,7 @@ import type { FooterAction } from "./Footer.vue";
 interface Props {
   title?: string;
   description?: string;
+  icon?: string;
   modalProps?: Record<string, unknown>;
   drawerProps?: Record<string, unknown>;
   /** Declarative footer actions - renders CommonOverlayFooter automatically when provided */
@@ -18,6 +19,7 @@ interface Props {
 const {
   title = undefined,
   description = undefined,
+  icon = undefined,
   modalProps = {},
   drawerProps = {},
   actions = undefined,
@@ -153,8 +155,15 @@ onBeforeUnmount(() => {
       v-bind="modalProps"
       @after:leave="emit('after:leave')"
     >
-      <template v-if="$slots.header" #header>
-        <slot name="header" />
+      <template #header>
+        <slot v-if="$slots.header" name="header" />
+        <CommonOverlayHeader
+          v-else
+          :title="title"
+          :description="description"
+          :icon="icon"
+          @close="open = false"
+        />
       </template>
       <template #body>
         <slot name="body" />
@@ -178,25 +187,37 @@ onBeforeUnmount(() => {
       :title="title"
       :description="description"
       v-bind="drawerProps"
+      :ui="{
+        footer: 'sticky bottom-0',
+      }"
       @after:leave="emit('after:leave')"
     >
-      <template v-if="$slots.header" #header>
-        <slot name="header" />
+      <template #header>
+        <slot v-if="$slots.header" name="header" />
+        <CommonOverlayHeader
+          v-else
+          :title="title"
+          :description="description"
+          :icon="icon"
+          @close="open = false"
+        />
       </template>
       <template #body>
         <div ref="drawerBodyRef">
           <slot name="body" />
         </div>
       </template>
-      <template #footer>
+
+      <template v-if="(actions?.length ?? 0) > 0 || $slots.footer" #footer>
         <!-- Auto-render footer when :actions prop provided and no custom slot -->
         <CommonOverlayFooter
-          v-if="actions && !$slots.footer"
+          v-if="actions && (actions?.length ?? 0) > 0 && !$slots.footer"
           :actions="actions"
         />
         <!-- Custom footer slot takes precedence -->
         <slot v-else name="footer" />
       </template>
+
       <!-- Default slot for nested overlays -->
       <slot />
     </UDrawer>

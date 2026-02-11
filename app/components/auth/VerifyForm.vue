@@ -8,7 +8,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const otpValue = defineModel<string[]>("otpValue", { default: () => [] });
+const otpValue = defineModel<number[]>("otpValue", { default: () => [] });
 
 const emit = defineEmits<{
   verify: [];
@@ -39,6 +39,7 @@ const canRequestCode = computed(() => !props.isSending && !props.isVerifying);
       placeholder="·"
       autofocus
       class="justify-between"
+      type="number"
       @complete="emit('verify')"
     />
 

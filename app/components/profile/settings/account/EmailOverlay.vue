@@ -24,10 +24,10 @@ const {
 
 const emit = defineEmits<{
   (e: "request", email: string): void;
-  (e: "back" | "verify"): void;
+  (e: "back" | "verify" | "after:leave"): void;
 }>();
 const open = defineModel<boolean>("open", { default: false });
-const otpValue = defineModel<string[]>("otpValue", { default: () => [] });
+const otpValue = defineModel<number[]>("otpValue", { default: () => [] });
 
 const EmailChangeFormSchema = z
   .object({
@@ -132,6 +132,7 @@ const submitRequestForm = async (): Promise<void> => {
     "
     :modal-props="{ ui: { footer: 'flex-col gap-2' } }"
     :drawer-props="{ ui: { footer: 'flex-col gap-2' } }"
+    @after:leave="emit('after:leave')"
   >
     <template #body>
       <UForm
@@ -184,6 +185,7 @@ const submitRequestForm = async (): Promise<void> => {
           :length="6"
           otp
           size="xl"
+          type="number"
           placeholder="·"
           class="w-full justify-between"
           :disabled="isVerifying"
@@ -198,17 +200,11 @@ const submitRequestForm = async (): Promise<void> => {
           step === 'form'
             ? [
                 {
-                  label: 'Send confirmation',
+                  label: 'Save',
                   color: 'primary',
                   loading: isRequesting,
                   disabled: !canSendConfirmation,
                   onClick: submitRequestForm,
-                },
-                {
-                  label: 'Back',
-                  color: 'secondary',
-                  disabled: isRequesting,
-                  onClick: () => emit('back'),
                 },
               ]
             : [

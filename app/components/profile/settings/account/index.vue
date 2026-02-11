@@ -31,7 +31,7 @@ const {
   isEmailOverlayOpen,
   isRequesting,
   isVerifying,
-  openOverlay,
+  openOverlay: openEmailOverlay,
   otpValue,
   pendingEmail,
   requestEmailChange,
@@ -50,6 +50,18 @@ const isBusy = computed(
 const isSaveActionVisible = computed(
   () => (hasUnsavedChanges.value || isSaving.value) && !showDeleteConfirm.value,
 );
+
+const isEmailOverlayMounted = ref(false);
+
+const handleOpenEmailOverlay = async () => {
+  isEmailOverlayMounted.value = true;
+  await nextTick();
+  openEmailOverlay();
+};
+
+const handleEmailOverlayAfterLeave = () => {
+  isEmailOverlayMounted.value = false;
+};
 </script>
 
 <template>
@@ -97,7 +109,7 @@ const isSaveActionVisible = computed(
           <ProfileSettingsAccountEmailField
             :email="profile.email"
             :disabled="isBusy"
-            @open="openOverlay"
+            @open="handleOpenEmailOverlay"
           />
         </div>
       </template>
@@ -116,14 +128,6 @@ const isSaveActionVisible = computed(
               loading: isDeleting,
             },
             {
-              label: 'Save changes',
-              color: 'primary',
-              visible: isSaveActionVisible,
-              loading: isSaving,
-              disabled: !canSave,
-              onClick: saveAccount,
-            },
-            {
               label: 'Delete account',
               color: 'danger',
               visible: !showDeleteConfirm,
@@ -131,11 +135,12 @@ const isSaveActionVisible = computed(
               onClick: handleDelete,
             },
             {
-              label: 'Cancel',
-              color: 'secondary',
-              visible: !showDeleteConfirm,
-              disabled: isSaving || isDeleting,
-              onClick: () => (open = false),
+              label: 'Save',
+              color: 'primary',
+              visible: isSaveActionVisible,
+              loading: isSaving,
+              disabled: !canSave,
+              onClick: saveAccount,
             },
           ]"
         />
@@ -143,6 +148,7 @@ const isSaveActionVisible = computed(
 
       <!-- Email Verification Overlay -->
       <ProfileSettingsAccountEmailOverlay
+        v-if="isEmailOverlayMounted"
         v-model:open="isEmailOverlayOpen"
         v-model:otp-value="otpValue"
         :current-email="profile.email"
@@ -155,6 +161,7 @@ const isSaveActionVisible = computed(
         @request="requestEmailChange"
         @back="handleBack"
         @verify="verifyCode"
+        @after:leave="handleEmailOverlayAfterLeave"
       />
     </CommonOverlay>
   </div>

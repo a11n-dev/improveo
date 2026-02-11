@@ -7,8 +7,6 @@ import {
   today as getToday,
 } from "@internationalized/date";
 
-import { toCalendarWeekStart } from "~~/shared/utils/weekStart";
-
 interface Props {
   habit: Habit;
   weekStart?: WeekStartDay;
@@ -166,7 +164,7 @@ const monthYearLabel = computed(() => {
         header: 'hidden',
         headCell: 'text-(--habit-color)',
         cellTrigger: [
-          'rounded-md!',
+          'rounded-sm!',
           'hover:bg-(--habit-color-light)!',
           'data-selected:bg-(--habit-color-light)!',
           'data-selected:text-(--habit-color)!',

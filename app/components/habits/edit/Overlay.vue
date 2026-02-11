@@ -5,6 +5,10 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+  (e: "after:leave"): void;
+}>();
+
 const { isOpen, closeOverlay } = useHabitEditOverlay();
 const { draft, hasChanges, isValid, resetDraft } = useHabitEditDraft();
 const { updateHabit } = useHabits();
@@ -14,10 +18,6 @@ const isSaving = ref(false);
 
 const modalProps = {
   close: false,
-};
-
-const drawerProps = {
-  nested: true,
 };
 
 /** Handle save */
@@ -57,30 +57,27 @@ const handleSave = async () => {
 const handleCancel = () => {
   closeOverlay();
 };
+
+const handleAfterLeave = () => {
+  resetDraft();
+  emit("after:leave");
+};
 </script>
 
 <template>
   <CommonOverlay
     v-model:open="isOpen"
     :modal-props="modalProps"
-    :drawer-props="drawerProps"
     :actions="[
       {
-        label: 'Save changes',
+        label: 'Save',
         color: 'primary',
-        visible: hasChanges,
-        disabled: !isValid,
+        disabled: !hasChanges || !isValid,
         loading: isSaving,
         onClick: handleSave,
       },
-      {
-        label: 'Cancel',
-        color: 'secondary',
-        disabled: isSaving,
-        onClick: handleCancel,
-      },
     ]"
-    @after:leave="resetDraft"
+    @after:leave="handleAfterLeave"
   >
     <template #header>
       <HabitsEditHeader @close="handleCancel" />

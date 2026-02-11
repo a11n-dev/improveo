@@ -48,7 +48,7 @@ const handleCheckboxClick = (event: Event) => {
         <div class="flex min-w-0 items-center gap-3">
           <!-- Icon circle with habit color -->
           <div
-            class="flex size-11 shrink-0 items-center justify-center rounded-lg"
+            class="flex size-11 shrink-0 items-center justify-center rounded-md"
             :style="{ backgroundColor: `${habit.color}20` }"
           >
             <UIcon
@@ -81,7 +81,7 @@ const handleCheckboxClick = (event: Event) => {
               }"
               :color="isChecked ? 'success' : 'neutral'"
               :ui="{
-                base: `size-11 rounded-lg bg-(--habit-color-dimmed)`,
+                base: `size-11 rounded-md bg-(--habit-color-dimmed)`,
                 icon: 'size-5.5',
                 indicator: `bg-(--habit-color)`,
               }"

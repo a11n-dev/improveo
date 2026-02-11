@@ -54,7 +54,7 @@ describe("Auth VerifyForm", () => {
         email: "",
         isSending: false,
         isVerifying: false,
-        otpValue: ["1", "2", "3"],
+        otpValue: [1, 2, 3],
         resendSeconds: 0,
       },
       global: {
@@ -76,7 +76,7 @@ describe("Auth VerifyForm", () => {
         email: "user@example.com",
         isSending: false,
         isVerifying: false,
-        otpValue: ["1", "2", "3", "4", "5", "6"],
+        otpValue: [1, 2, 3, 4, 5, 6],
         resendSeconds: 0,
       },
       global: {
@@ -110,7 +110,7 @@ describe("Auth VerifyForm", () => {
         email: "user@example.com",
         isSending: false,
         isVerifying: false,
-        otpValue: ["1", "2", "3", "4", "5", "6"],
+        otpValue: [1, 2, 3, 4, 5, 6],
         resendSeconds: 30,
       },
       global: {

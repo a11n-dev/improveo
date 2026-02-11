@@ -1,10 +1,5 @@
 export default defineAppConfig({
   ui: {
-    toast: {
-      slots: {
-        root: "rounded-xl",
-      },
-    },
     modal: {
       slots: {
         header: "pb-0!",
@@ -13,13 +8,14 @@ export default defineAppConfig({
     },
     drawer: {
       slots: {
-        content: "safe-drawer-content [--drawer-max-ratio:0.96]",
-        footer: "py-4",
+        container: "transform-gpu",
+        content:
+          "safe-drawer-content [--drawer-max-ratio:0.96] will-change-transform",
+        footer: "pb-10 pt-6",
       },
     },
     card: {
       slots: {
-        root: "rounded-xl",
         header: "sm:p-4 pb-0! border-none",
         body: "sm:p-4 border-none",
         footer: "sm:p-4 pt-0! border-none",

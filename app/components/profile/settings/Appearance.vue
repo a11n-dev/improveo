@@ -2,11 +2,20 @@
 const colorMode = useColorMode();
 const { settings, updateColorMode } = useSettings();
 const open = ref(false);
+const isSaving = ref(false);
 
 const colorModeOptions = [
-  { label: "Light", value: "light", description: "Use light mode" },
-  { label: "Dark", value: "dark", description: "Use dark mode" },
-  { label: "System", value: "system", description: "Follow system settings" },
+  {
+    label: "Light",
+    value: "light",
+    description: "Theme will be in light mode",
+  },
+  { label: "Dark", value: "dark", description: "Theme will be in dark mode" },
+  {
+    label: "System",
+    value: "system",
+    description: "Theme will follow the system settings",
+  },
 ];
 
 const toColorModePreference = (
@@ -87,13 +96,23 @@ const save = async (): Promise<void> => {
   open.value = false;
 };
 
-/**
- * Reverts the preview back to the saved preference and closes.
- */
-const cancel = (): void => {
-  colorMode.preference = savedPreference.value;
-  draftPreference.value = savedPreference.value;
-  open.value = false;
+const handleSave = async (): Promise<void> => {
+  if (isSaving.value) {
+    return;
+  }
+
+  if (!hasChanges.value) {
+    open.value = false;
+    return;
+  }
+
+  isSaving.value = true;
+
+  try {
+    await save();
+  } finally {
+    isSaving.value = false;
+  }
 };
 </script>
 
@@ -117,24 +136,22 @@ const cancel = (): void => {
         {
           label: 'Save',
           color: 'primary',
-          visible: hasChanges,
-          onClick: save,
-        },
-        {
-          label: hasChanges ? 'Cancel' : 'Close',
-          color: 'secondary',
-          onClick: cancel,
+          loading: isSaving,
+          disabled: isSaving,
+          onClick: handleSave,
         },
       ]"
     >
       <template #body>
-        <URadioGroup
-          v-model="draftPreference"
-          :items="colorModeOptions"
-          value-key="value"
-          color="neutral"
-          variant="table"
-        />
+        <UFormField label="Theme" name="theme">
+          <URadioGroup
+            v-model="draftPreference"
+            :items="colorModeOptions"
+            value-key="value"
+            color="neutral"
+            variant="card"
+          />
+        </UFormField>
       </template>
     </CommonOverlay>
   </div>

@@ -16,7 +16,7 @@ const isDesktop = useIsDesktop();
 const open = defineModel<boolean>("open", { default: false });
 
 /** Number of icons to load per batch */
-const BATCH_SIZE = 80;
+const BATCH_SIZE = 56;
 
 /** Icon search term */
 const iconSearch = ref("");
@@ -100,31 +100,15 @@ watch(iconSearch, () => {
   loadedCount.value = BATCH_SIZE;
   canLoadMore.value = true;
 });
-
-const title = "Choose Icon";
-
-const modalProps = {
-  ui: { footer: "justify-end pt-0" },
-};
-
-const drawerProps = {
-  nested: true,
-};
 </script>
 
 <template>
   <CommonOverlay
     v-model:open="open"
-    :title="title"
-    :modal-props="modalProps"
-    :drawer-props="drawerProps"
-    :actions="[
-      {
-        label: 'Cancel',
-        color: 'secondary',
-        onClick: () => (open = false),
-      },
-    ]"
+    title="Choose Icon"
+    :modal-props="{
+      ui: { footer: 'justify-end pt-0' },
+    }"
   >
     <template #body>
       <div class="flex flex-col">
@@ -138,7 +122,7 @@ const drawerProps = {
           />
         </div>
 
-        <div ref="scrollContainerRef" class="max-h-64 overflow-y-auto pt-3">
+        <div ref="scrollContainerRef" class="max-h-80 overflow-y-auto pt-3">
           <div
             class="grid grid-cols-[repeat(auto-fill,minmax(36px,1fr))] gap-1.5 p-0.5 md:grid-cols-[repeat(auto-fill,minmax(32px,1fr))]"
           >
@@ -150,7 +134,7 @@ const drawerProps = {
               size="md"
               color="neutral"
               variant="soft"
-              class="flex size-9 items-center justify-center rounded-md p-0 md:size-8"
+              class="flex size-9.5 items-center justify-center rounded-md p-0 md:size-8.5"
               :class="{
                 'ring-2 ring-primary': selectedIcon === icon,
               }"

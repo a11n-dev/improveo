@@ -3,17 +3,13 @@
 
 :root {
   --ui-container: var(--container-3xl);
-  --ui-radius: 0.375rem;
+  --ui-radius: 0.5rem;
   --app-vh: 100dvh;
   --drawer-max-ratio: 0.96;
 }
 
 @theme {
   --font-sans: "Space Grotesk", sans-serif;
-}
-
-.dark {
-  --ui-radius: 0.375rem;
 }
 
 @media (display-mode: standalone) {

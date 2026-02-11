@@ -49,17 +49,11 @@ const handleCreate = async () => {
     :modal-props="modalProps"
     :actions="[
       {
-        label: 'Create habit',
+        label: 'Create',
         color: 'primary',
         disabled: !isValid,
         loading: isCreating,
         onClick: handleCreate,
-      },
-      {
-        label: 'Cancel',
-        color: 'secondary',
-        disabled: isCreating,
-        onClick: closeOverlay,
       },
     ]"
     @after:leave="resetDraft"

@@ -204,7 +204,7 @@ const handleGoalChange = (goal: Goal | null) => {
             size="md"
             color="neutral"
             variant="soft"
-            class="flex size-9 items-center justify-center rounded-md p-0 md:size-8"
+            class="flex size-9.5 items-center justify-center rounded-md p-0 md:size-8.5"
             :class="{
               'ring-2 ring-primary': localDraft.icon === icon,
             }"
@@ -258,7 +258,7 @@ const handleGoalChange = (goal: Goal | null) => {
             size="md"
             color="neutral"
             variant="soft"
-            class="flex size-9 items-center justify-center rounded-md p-0 md:size-8"
+            class="flex size-9.5 items-center justify-center rounded-md p-0 md:size-8.5"
             aria-label="Custom color"
           />
           <template #content>

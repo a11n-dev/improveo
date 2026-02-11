@@ -101,29 +101,17 @@ const save = () => {
   }
   open.value = false;
 };
-
-const title = "Goal";
-
-const drawerProps = {
-  nested: true,
-};
 </script>
 
 <template>
   <CommonOverlay
     v-model:open="open"
-    :title="title"
-    :drawer-props="drawerProps"
+    title="Goal"
     :actions="[
       {
         label: 'Save',
         color: 'primary',
         onClick: save,
-      },
-      {
-        label: 'Cancel',
-        color: 'secondary',
-        onClick: () => (open = false),
       },
     ]"
   >
@@ -133,7 +121,7 @@ const drawerProps = {
           <URadioGroup
             v-model="selectedPeriodType"
             :items="periodItems"
-            variant="table"
+            variant="card"
             color="neutral"
           />
         </UFormField>

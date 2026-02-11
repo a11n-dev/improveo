@@ -17,7 +17,7 @@ export const useProfileEmailChange = () => {
   const isFinalizingConfirmation = ref(false);
   const pendingEmail = ref("");
   const step = ref<EmailChangeStep>("form");
-  const otpValue = ref<string[]>([]);
+  const otpValue = ref<number[]>([]);
   const {
     isActive: isResendCooldownActive,
     secondsLeft: resendSeconds,

@@ -30,7 +30,7 @@ const formState = reactive({
 });
 
 // OTP input and resend cooldown
-const otpValue = ref<string[]>([]);
+const otpValue = ref<number[]>([]);
 const {
   isActive: isResendCooldownActive,
   secondsLeft: resendSeconds,

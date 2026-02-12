@@ -43,7 +43,7 @@ const handleCheckboxClick = (event: Event) => {
     @click="handleInfoClick"
   >
     <template #header>
-      <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center justify-between gap-4">
         <!-- Left: Icon + Title/Description -->
         <div class="flex min-w-0 items-center gap-3">
           <!-- Icon circle with habit color -->

@@ -162,13 +162,12 @@ describe("Auth RequestForm", () => {
     });
   });
 
-  it("disables submit and shows cooldown message while resend cooldown is active", async () => {
+  it("disables submit only while isSending is true", async () => {
     const wrapper = await mountSuspended(AuthRequestForm, {
       props: {
         isRegister: false,
-        isSending: false,
+        isSending: true,
         canSubmit: false,
-        resendSeconds: 30,
         schema: AuthLoginSchema,
         state: {
           email: "user@example.com",
@@ -182,6 +181,26 @@ describe("Auth RequestForm", () => {
 
     const submitButton = wrapper.find('button[type="submit"]');
     expect(submitButton.attributes("disabled")).toBeDefined();
-    expect(wrapper.text()).toContain("You can request another code in 0:30.");
+  });
+
+  it("enables submit when isSending is false regardless of canSubmit", async () => {
+    const wrapper = await mountSuspended(AuthRequestForm, {
+      props: {
+        isRegister: false,
+        isSending: false,
+        canSubmit: false,
+        schema: AuthLoginSchema,
+        state: {
+          email: "user@example.com",
+          name: "",
+        },
+      },
+      global: {
+        stubs: globalStubs,
+      },
+    });
+
+    const submitButton = wrapper.find('button[type="submit"]');
+    expect(submitButton.attributes("disabled")).toBeUndefined();
   });
 });

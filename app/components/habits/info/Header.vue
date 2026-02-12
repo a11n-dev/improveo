@@ -11,7 +11,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex w-full items-start justify-between gap-3">
+  <div class="flex w-full items-start justify-between gap-4">
     <div class="flex flex-1 items-start gap-3">
       <div
         class="flex size-11 shrink-0 items-center justify-center rounded-md"

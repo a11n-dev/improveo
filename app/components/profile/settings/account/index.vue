@@ -71,104 +71,102 @@ const handleDeleteClick = () => {
 </script>
 
 <template>
-  <div class="space-y-3">
-    <!-- Account Trigger -->
-    <ProfileSettingsField
-      title="Account"
-      description="Manage your profile details"
-      icon="i-lucide-user-round"
-      clickable
-      show-chevron
-      @click="open = true"
-    />
+  <!-- Account Trigger -->
+  <ProfileSettingsField
+    title="Account"
+    description="Manage your profile details"
+    icon="i-lucide-user-round"
+    clickable
+    show-chevron
+    @click="open = true"
+  />
 
-    <!-- Account Editor -->
-    <CommonOverlay
-      v-model:open="open"
-      title="Account"
-      description="Update your name, email, and avatar"
-      :modal-props="{ ui: { footer: 'flex-col gap-2' } }"
-      :drawer-props="{ ui: { footer: 'flex-col gap-2' } }"
-      @after:leave="resetDrafts"
-    >
-      <template #body>
-        <div class="space-y-3">
-          <!-- Avatar -->
-          <ProfileSettingsAccountAvatarUpload
-            v-model="selectedAvatarFile"
-            :avatar-url="avatarUrl"
-            :avatar-alt="avatarAlt"
-            :has-stored-avatar="hasStoredAvatar"
-            :remove-current-avatar="removeCurrentAvatar"
-            :disabled="isBusy"
-            @remove-avatar="markAvatarForRemoval"
-          />
-
-          <!-- Profile Form -->
-          <ProfileSettingsAccountNameField
-            v-model:name="draftName"
-            :name-error="nameError"
-            :disabled="isBusy"
-          />
-
-          <!-- Email Change -->
-          <ProfileSettingsAccountEmailField
-            :email="profile.email"
-            :disabled="isBusy"
-            @open="handleOpenEmailOverlay"
-          />
-        </div>
-      </template>
-
-      <template #footer>
-        <CommonOverlayFooter
-          :actions="[
-            {
-              type: 'confirm',
-              color: 'danger',
-              confirmText: 'Are you sure you want to delete your account?',
-              confirmSubtext: 'This action cannot be undone.',
-              visible: showDeleteConfirm,
-              onConfirm: confirmDelete,
-              onCancel: cancelDelete,
-              loading: isDeleting,
-            },
-            {
-              label: 'Delete account',
-              color: 'danger',
-              visible: !showDeleteConfirm,
-              disabled: isSaving || isDeleting,
-              onClick: handleDeleteClick,
-            },
-            {
-              label: 'Save',
-              color: 'primary',
-              visible: isSaveActionVisible,
-              loading: isSaving,
-              disabled: !canSave,
-              onClick: saveAccount,
-            },
-          ]"
+  <!-- Account Editor -->
+  <CommonOverlay
+    v-model:open="open"
+    title="Account"
+    description="Update your name, email, and avatar"
+    :modal-props="{ ui: { footer: 'flex-col gap-2' } }"
+    :drawer-props="{ ui: { footer: 'flex-col gap-2' } }"
+    @after:leave="resetDrafts"
+  >
+    <template #body>
+      <div class="space-y-4">
+        <!-- Avatar -->
+        <ProfileSettingsAccountAvatarUpload
+          v-model="selectedAvatarFile"
+          :avatar-url="avatarUrl"
+          :avatar-alt="avatarAlt"
+          :has-stored-avatar="hasStoredAvatar"
+          :remove-current-avatar="removeCurrentAvatar"
+          :disabled="isBusy"
+          @remove-avatar="markAvatarForRemoval"
         />
-      </template>
 
-      <!-- Email Verification Overlay -->
-      <ProfileSettingsAccountEmailOverlay
-        v-if="isEmailOverlayMounted"
-        v-model:open="isEmailOverlayOpen"
-        v-model:otp-value="otpValue"
-        :current-email="profile.email"
-        :pending-email="pendingEmail"
-        :step="step"
-        :can-request-email-change="canRequestEmailChange"
-        :resend-seconds="resendSeconds"
-        :is-requesting="isRequesting"
-        :is-verifying="isVerifying"
-        @request="requestEmailChange"
-        @back="handleBack"
-        @verify="verifyCode"
-        @after:leave="handleEmailOverlayAfterLeave"
+        <!-- Profile Form -->
+        <ProfileSettingsAccountNameField
+          v-model:name="draftName"
+          :name-error="nameError"
+          :disabled="isBusy"
+        />
+
+        <!-- Email Change -->
+        <ProfileSettingsAccountEmailField
+          :email="profile.email"
+          :disabled="isBusy"
+          @open="handleOpenEmailOverlay"
+        />
+      </div>
+    </template>
+
+    <template #footer>
+      <CommonOverlayFooter
+        :actions="[
+          {
+            type: 'confirm',
+            color: 'danger',
+            confirmText: 'Are you sure you want to delete your account?',
+            confirmSubtext: 'This action cannot be undone.',
+            visible: showDeleteConfirm,
+            onConfirm: confirmDelete,
+            onCancel: cancelDelete,
+            loading: isDeleting,
+          },
+          {
+            label: 'Delete account',
+            color: 'danger',
+            visible: !showDeleteConfirm,
+            disabled: isSaving || isDeleting,
+            onClick: handleDeleteClick,
+          },
+          {
+            label: 'Save',
+            color: 'primary',
+            visible: isSaveActionVisible,
+            loading: isSaving,
+            disabled: !canSave,
+            onClick: saveAccount,
+          },
+        ]"
       />
-    </CommonOverlay>
-  </div>
+    </template>
+
+    <!-- Email Verification Overlay -->
+    <ProfileSettingsAccountEmailOverlay
+      v-if="isEmailOverlayMounted"
+      v-model:open="isEmailOverlayOpen"
+      v-model:otp-value="otpValue"
+      :current-email="profile.email"
+      :pending-email="pendingEmail"
+      :step="step"
+      :can-request-email-change="canRequestEmailChange"
+      :resend-seconds="resendSeconds"
+      :is-requesting="isRequesting"
+      :is-verifying="isVerifying"
+      @request="requestEmailChange"
+      @back="handleBack"
+      @verify="verifyCode"
+      @after:leave="handleEmailOverlayAfterLeave"
+    />
+  </CommonOverlay>
 </template>

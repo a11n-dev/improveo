@@ -14,7 +14,7 @@ definePageMeta({
 });
 
 const supabaseClient = useSupabaseClient();
-const { notifyError } = useToastNotify();
+const { notifyError, notifyWarning } = useToastNotify();
 
 const isSending = ref(false);
 const isVerifying = ref(false);
@@ -116,6 +116,10 @@ type AuthFormOutput = AuthLoginInput | AuthRegisterInput;
 
 const handleOtpRequest = async (data?: AuthFormOutput) => {
   if (!canRequestOtp.value) {
+    notifyWarning(
+      "Please wait",
+      `You can request a new code in ${resendSeconds.value} seconds.`,
+    );
     return;
   }
 
@@ -191,8 +195,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <UContainer class="flex w-full max-w-md flex-col gap-3 text-left">
-    <div class="flex flex-col gap-3">
+  <UContainer class="flex w-full max-w-md flex-col text-left">
+    <div class="flex flex-col gap-2 mb-2">
       <UColorModeImage
         light="/logo-light.svg"
         dark="/logo-dark.svg"
@@ -244,7 +248,7 @@ onBeforeUnmount(() => {
         <UButton
           type="button"
           variant="link"
-          class="ml-1 px-0 py-0 text-primary"
+          class="ml-1 pl-0 text-primary"
           @click="toggleAuthMode"
         >
           Create one

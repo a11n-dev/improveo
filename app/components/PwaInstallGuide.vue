@@ -44,7 +44,7 @@ const description = "Add to your home screen for quick access";
         </div>
 
         <!-- Steps -->
-        <div class="space-y-3">
+        <div class="space-y-4">
           <div
             v-for="(step, index) in guide.steps"
             :key="index"

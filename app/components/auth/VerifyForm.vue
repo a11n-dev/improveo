@@ -23,7 +23,7 @@ const canRequestCode = computed(() => !props.isSending && !props.isVerifying);
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-4">
     <div class="text-sm text-muted">
       <p>Enter the 6-digit code sent to:</p>
       <p class="font-medium text-highlighted">
@@ -43,7 +43,7 @@ const canRequestCode = computed(() => !props.isSending && !props.isVerifying);
       @complete="emit('verify')"
     />
 
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-2">
       <UButton
         type="button"
         block
@@ -61,6 +61,7 @@ const canRequestCode = computed(() => !props.isSending && !props.isVerifying);
         label="Back"
         @click="emit('back')"
       />
+
       <CommonResendCodeAction
         :seconds-left="props.resendSeconds"
         :can-request="canRequestCode"

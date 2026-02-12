@@ -49,7 +49,7 @@ const isBusy = computed(
 );
 
 const isSaveActionVisible = computed(
-  () => (hasUnsavedChanges.value || isSaving.value) && !showDeleteConfirm.value,
+  () => hasUnsavedChanges.value || isSaving.value,
 );
 
 const isEmailOverlayMounted = ref(false);
@@ -135,7 +135,6 @@ const handleDeleteClick = () => {
           {
             label: 'Delete account',
             color: 'danger',
-            visible: !showDeleteConfirm,
             disabled: isSaving || isDeleting,
             onClick: handleDeleteClick,
           },

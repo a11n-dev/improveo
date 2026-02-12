@@ -121,13 +121,11 @@ const handleClose = () => {
           {
             label: 'Edit',
             color: 'outline',
-            visible: !showDeleteConfirm,
             onClick: handleEdit,
           },
           {
             label: 'Delete habit',
             color: 'danger',
-            visible: !showDeleteConfirm,
             onClick: handleDelete,
           },
         ]"

@@ -202,7 +202,7 @@ onBeforeUnmount(() => {
         ],
         footer: [
           'sticky bottom-0 z-20 -mx-4 px-4',
-          `before:absolute before:-z-1 before:inset-x-0 before:bottom-0 before:backdrop-blur-sm before:top-0 before:mask-[linear-gradient(to_top,black_0%,black_70%,transparent_100%)] before:content-[''] [&:has([data-overlay-confirm])]:before:-top-full`,
+          `before:absolute before:-z-1 before:inset-x-0 before:bottom-0 before:backdrop-blur-sm before:top-0 before:mask-[linear-gradient(to_top,black_0%,black_70%,transparent_100%)] before:content-['']`,
         ],
       }"
       :scroll-lock-timeout="250"

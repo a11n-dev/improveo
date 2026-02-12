@@ -10,6 +10,10 @@ export default defineNuxtPlugin(async () => {
   const settingsStore = useSettingsStore();
   const colorMode = useColorMode();
 
+  onNuxtReady(() => {
+    applySettingsColorMode();
+  });
+
   const applySettingsColorMode = (): void => {
     if (settingsStore.settings?.colorMode) {
       colorMode.preference = settingsStore.settings.colorMode;

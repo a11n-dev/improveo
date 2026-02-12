@@ -57,7 +57,9 @@ const descriptionClass = computed(() =>
 
     <div class="flex shrink-0 items-center gap-2">
       <slot name="trailing">
-        <span v-if="value" class="text-sm text-muted md:-mt-0.5">{{ value }}</span>
+        <span v-if="value" class="text-sm text-muted md:-mt-0.5">{{
+          value
+        }}</span>
       </slot>
 
       <UIcon

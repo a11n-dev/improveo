@@ -149,7 +149,7 @@ const monthYearLabel = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-3">
+  <div class="flex flex-col gap-4">
     <UCalendar
       :model-value="localSelectedDates as DateValue[]"
       :placeholder="placeholder as DateValue"

@@ -117,42 +117,40 @@ const handleSave = async (): Promise<void> => {
 </script>
 
 <template>
-  <div class="space-y-3">
-    <ProfileSettingsField
-      title="Appearance"
-      description="Choose your preferred color theme"
-      icon="i-lucide-palette"
-      :value="currentLabel"
-      clickable
-      show-chevron
-      @click="openEditor"
-    />
+  <ProfileSettingsField
+    title="Appearance"
+    description="Choose your preferred color theme"
+    icon="i-lucide-palette"
+    :value="currentLabel"
+    clickable
+    show-chevron
+    @click="openEditor"
+  />
 
-    <CommonOverlay
-      v-model:open="open"
-      title="Appearance"
-      description="Choose your preferred color theme"
-      :actions="[
-        {
-          label: 'Save',
-          color: 'primary',
-          loading: isSaving,
-          disabled: isSaving,
-          onClick: handleSave,
-        },
-      ]"
-    >
-      <template #body>
-        <UFormField label="Theme" name="theme">
-          <URadioGroup
-            v-model="draftPreference"
-            :items="colorModeOptions"
-            value-key="value"
-            color="neutral"
-            variant="card"
-          />
-        </UFormField>
-      </template>
-    </CommonOverlay>
-  </div>
+  <CommonOverlay
+    v-model:open="open"
+    title="Appearance"
+    description="Choose your preferred color theme"
+    :actions="[
+      {
+        label: 'Save',
+        color: 'primary',
+        loading: isSaving,
+        disabled: isSaving,
+        onClick: handleSave,
+      },
+    ]"
+  >
+    <template #body>
+      <UFormField label="Theme" name="theme">
+        <URadioGroup
+          v-model="draftPreference"
+          :items="colorModeOptions"
+          value-key="value"
+          color="neutral"
+          variant="card"
+        />
+      </UFormField>
+    </template>
+  </CommonOverlay>
 </template>

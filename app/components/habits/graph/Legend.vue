@@ -97,7 +97,7 @@ const badgeStyle = {
     </div>
 
     <!-- Right: Legend items -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-4">
       <div class="flex items-center gap-1">
         <div class="flex items-center gap-1">
           <div class="size-3 rounded-xs bg-(--habit-color) opacity-[0.15]" />

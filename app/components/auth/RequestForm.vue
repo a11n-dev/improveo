@@ -46,8 +46,6 @@ const handleSubmit = (event: FormSubmitEvent<unknown>) => {
   emit("submit", event as FormSubmitEvent<AuthFormOutput>);
 };
 
-const resendCountdown = computed(() => formatCountdown(props.resendSeconds));
-
 watch(
   () => props.isRegister,
   () => {
@@ -61,7 +59,7 @@ watch(
     ref="form"
     :state="state"
     :schema="props.schema"
-    class="flex flex-col gap-5"
+    class="flex flex-col gap-4"
     :validate-on="[]"
     @submit="handleSubmit"
   >
@@ -72,7 +70,7 @@ watch(
           : "Build better habits with a focused tracker that helps you stay consistent."
       }}
     </p>
-    <div class="space-y-3">
+    <div class="space-y-4">
       <UFormField
         v-if="props.isRegister"
         label="Display name"
@@ -111,14 +109,10 @@ watch(
     <UButton
       type="submit"
       :loading="props.isSending"
-      :disabled="props.isSending || !props.canSubmit"
+      :disabled="props.isSending"
       :label="props.isRegister ? 'Sign up' : 'Sign in'"
       variant="solid"
       block
     />
-
-    <p v-if="props.resendSeconds > 0" class="text-sm text-muted">
-      You can request another code in {{ resendCountdown }}.
-    </p>
   </UForm>
 </template>

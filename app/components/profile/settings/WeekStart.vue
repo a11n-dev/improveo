@@ -64,44 +64,42 @@ const saveWeekStart = (): void => {
 </script>
 
 <template>
-  <div class="space-y-3">
-    <ProfileSettingsField
-      title="Week start"
-      description="First day of the week in the calendar"
-      icon="i-lucide-calendar-days"
-      :value="selectedWeekStartLabel"
-      clickable
-      show-chevron
-      @click="openEditor"
-    />
+  <ProfileSettingsField
+    title="Week start"
+    description="First day of the week in the calendar"
+    icon="i-lucide-calendar-days"
+    :value="selectedWeekStartLabel"
+    clickable
+    show-chevron
+    @click="openEditor"
+  />
 
-    <CommonOverlay
-      v-model:open="open"
-      title="Week start"
-      description="First day of the week in the calendar"
-      :actions="[
-        {
-          label: 'Save',
-          color: 'primary',
-          onClick: saveWeekStart,
-        },
-      ]"
-    >
-      <template #body>
-        <URadioGroup
-          v-model="draftWeekStart"
-          :items="weekStartOptions"
-          value-key="value"
-          variant="card"
-          orientation="horizontal"
-          indicator="hidden"
-          color="neutral"
-          :ui="{
-            fieldset: 'gap-x-1 md:gap-x-2',
-            item: 'flex-1 p-2',
-          }"
-        />
-      </template>
-    </CommonOverlay>
-  </div>
+  <CommonOverlay
+    v-model:open="open"
+    title="Week start"
+    description="First day of the week in the calendar"
+    :actions="[
+      {
+        label: 'Save',
+        color: 'primary',
+        onClick: saveWeekStart,
+      },
+    ]"
+  >
+    <template #body>
+      <URadioGroup
+        v-model="draftWeekStart"
+        :items="weekStartOptions"
+        value-key="value"
+        variant="card"
+        orientation="horizontal"
+        indicator="hidden"
+        color="neutral"
+        :ui="{
+          fieldset: 'gap-x-1 md:gap-x-2',
+          item: 'flex-1 p-2',
+        }"
+      />
+    </template>
+  </CommonOverlay>
 </template>

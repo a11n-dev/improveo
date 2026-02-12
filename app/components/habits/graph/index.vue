@@ -131,7 +131,7 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
 
       <!-- Scrollable area (month labels + grid) -->
       <div
-        class="no-scrollbar min-w-0 flex-1 overflow-x-auto overflow-y-hidden [direction:rtl]"
+        class="no-scrollbar min-w-0 flex-1 overflow-x-auto overflow-y-none touch-pan-x [direction:rtl]"
         @scroll="handleGraphScroll"
       >
         <div

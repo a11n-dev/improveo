@@ -141,40 +141,36 @@ const submitRequestForm = async (): Promise<void> => {
         :state="formState"
         :schema="EmailChangeFormSchema"
         :validate-on="[]"
-        class="space-y-3"
+        class="space-y-4"
         @submit="handleRequest"
       >
-        <UFormField
-          label="New email"
-          name="nextEmail"
-          :hint="`Current: ${currentEmail}`"
-          help="Enter the new email address you want to use."
-          required
-        >
+        <UFormField label="New email" name="nextEmail" required>
           <UInput
             v-model="formState.nextEmail"
             class="w-full"
             type="email"
+            placeholder="name@example.com"
             :disabled="isRequesting"
           />
         </UFormField>
 
-        <UFormField
-          label="Confirm new email"
-          name="confirmEmail"
-          help="Repeat the same email to avoid typos."
-          required
-        >
+        <UFormField label="Confirm new email" name="confirmEmail" required>
           <UInput
             v-model="formState.confirmEmail"
             class="w-full"
             type="email"
+            placeholder="Repeat email"
             :disabled="isRequesting"
           />
         </UFormField>
+
+        <p class="text-sm text-muted break-all">
+          Current: {{ currentEmail }} <br />
+          Enter a new email address for your account.
+        </p>
       </UForm>
 
-      <div v-else class="space-y-3">
+      <div v-else class="space-y-4">
         <p class="text-sm text-muted">
           Enter the 6-digit code sent to
           <span class="font-medium text-highlighted">{{ pendingEmail }}</span>

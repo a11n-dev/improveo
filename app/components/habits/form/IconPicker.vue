@@ -1,114 +1,66 @@
 <script setup lang="ts">
-import { useInfiniteScroll } from "@vueuse/core";
-
-interface Props {
-  selectedIcon: string | null;
-}
-
-defineProps<Props>();
+defineProps<{ selectedIcon: string | null }>();
 
 const emit = defineEmits<{
   select: [icon: string];
 }>();
 
 const isDesktop = useIsDesktop();
-
 const open = defineModel<boolean>("open", { default: false });
 
-/** Number of icons to load per batch */
-const BATCH_SIZE = 56;
-
-/** Icon search term */
 const iconSearch = ref("");
-
-/** Number of icons currently loaded */
-const loadedCount = ref(BATCH_SIZE);
-
-/** Scroll container ref for infinite scroll */
-const scrollContainerRef = ref<HTMLElement | null>(null);
-
-/** Whether there are more icons to load */
-const canLoadMore = ref(true);
-
-/** Loaded icon list (lazy) */
-const iconClasses = ref<string[]>([]);
+const iconClasses = shallowRef<string[]>([]);
 const isLoadingIcons = ref(false);
+const loadError = ref<string | null>(null);
+const scrollArea = useTemplateRef("scrollArea");
 
-const loadIconsIfNeeded = async () => {
-  if (iconClasses.value.length > 0 || isLoadingIcons.value) {
-    return;
-  }
+const loadIcons = async () => {
+  if (iconClasses.value.length > 0 || isLoadingIcons.value) return;
+
   isLoadingIcons.value = true;
+  loadError.value = null;
+
   try {
     iconClasses.value = await loadLucideIconClasses();
+  } catch (error) {
+    loadError.value = "Failed to load icons. Please try again.";
+    console.error("Failed to load icons:", error);
   } finally {
     isLoadingIcons.value = false;
   }
 };
 
-/** All filtered icons (based on search) */
-const allFilteredIcons = computed(() => {
-  if (!iconSearch.value.trim()) {
-    return iconClasses.value;
-  }
+const filteredIcons = computed(() => {
+  if (!iconSearch.value.trim()) return iconClasses.value;
   const search = iconSearch.value.toLowerCase();
   return iconClasses.value.filter((icon) =>
     icon.toLowerCase().includes(search),
   );
 });
 
-/** Icons to display (paginated) */
-const displayedIcons = computed(() => {
-  return allFilteredIcons.value.slice(0, loadedCount.value);
-});
-
-/** Load more icons */
-const loadMore = () => {
-  if (loadedCount.value >= allFilteredIcons.value.length) {
-    canLoadMore.value = false;
-    return;
-  }
-  loadedCount.value = Math.min(
-    loadedCount.value + BATCH_SIZE,
-    allFilteredIcons.value.length,
-  );
+const scrollToTop = () => {
+  scrollArea.value?.virtualizer?.scrollToIndex(0, { behavior: "smooth" });
 };
 
-/** Setup infinite scroll */
-useInfiniteScroll(scrollContainerRef, loadMore, {
-  distance: 100,
-  canLoadMore: () => canLoadMore.value,
-});
-
-/** Select an icon and close */
-const selectIcon = (icon: string) => {
-  emit("select", icon);
-  open.value = false;
-};
-
-/** Reset state when opening or search changes */
 watch(open, async (isOpen) => {
   if (isOpen) {
-    await loadIconsIfNeeded();
+    await loadIcons();
     iconSearch.value = "";
-    loadedCount.value = BATCH_SIZE;
-    canLoadMore.value = true;
   }
 });
 
 watch(iconSearch, () => {
-  loadedCount.value = BATCH_SIZE;
-  canLoadMore.value = true;
+  scrollToTop();
 });
+
+const lanes = computed(() => (isDesktop.value ? 12 : 8));
 </script>
 
 <template>
   <CommonOverlay
     v-model:open="open"
     title="Choose Icon"
-    :modal-props="{
-      ui: { footer: 'justify-end pt-0' },
-    }"
+    :modal-props="{ ui: { footer: 'justify-end pt-0' } }"
   >
     <template #body>
       <div class="flex flex-col">
@@ -122,44 +74,55 @@ watch(iconSearch, () => {
           />
         </div>
 
-        <div ref="scrollContainerRef" class="max-h-80 overflow-y-auto pt-3">
-          <div
-            class="grid grid-cols-[repeat(auto-fill,minmax(36px,1fr))] gap-1.5 p-0.5 md:grid-cols-[repeat(auto-fill,minmax(32px,1fr))]"
+        <div class="h-80">
+          <LoadingState v-if="isLoadingIcons" class="h-full" />
+
+          <UEmpty
+            v-else-if="loadError"
+            title="Failed to load icons"
+            :description="loadError"
+            class="h-full"
+            :actions="[
+              {
+                icon: 'i-lucide-refresh-cw',
+                label: 'Retry',
+                color: 'neutral',
+                onClick: loadIcons,
+              },
+            ]"
+          />
+
+          <UEmpty
+            v-else-if="filteredIcons.length === 0"
+            title="No icons found"
+            description="Try adjusting your search terms"
+            class="h-full"
+          />
+
+          <UScrollArea
+            v-else
+            ref="scrollArea"
+            v-slot="{ item: icon }"
+            :items="filteredIcons"
+            :virtualize="{ lanes, estimateSize: 40, gap: 6 }"
+            class="h-full pt-3"
           >
             <UButton
-              v-for="icon in displayedIcons"
               :key="icon"
               :icon="icon"
               square
               size="md"
               color="neutral"
               variant="soft"
-              class="flex size-9.5 items-center justify-center rounded-md p-0 md:size-8.5"
-              :class="{
-                'ring-2 ring-primary': selectedIcon === icon,
-              }"
+              class="flex size-9 items-center justify-center rounded-md p-0"
+              :class="{ 'ring-2 ring-primary': selectedIcon === icon }"
               :aria-label="icon.replace('i-lucide-', '')"
-              @click="selectIcon(icon)"
+              @click="
+                emit('select', icon);
+                open = false;
+              "
             />
-          </div>
-
-          <p v-if="isLoadingIcons" class="py-8 text-center text-sm text-muted">
-            Loading icons...
-          </p>
-
-          <p
-            v-else-if="displayedIcons.length === 0"
-            class="py-8 text-center text-sm text-muted"
-          >
-            No icons found
-          </p>
-
-          <p
-            v-if="!canLoadMore && displayedIcons.length > 0"
-            class="py-2 text-center text-xs text-muted"
-          >
-            {{ displayedIcons.length }} icons
-          </p>
+          </UScrollArea>
         </div>
       </div>
     </template>

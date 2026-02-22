@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import type { AuthMode, AuthStep } from "~/types/auth";
 
+interface RequestPayload {
+  email: string;
+  name?: string;
+}
+
 definePageMeta({
   layout: "auth",
 });
@@ -29,11 +34,6 @@ const isSending = ref(false);
 const isVerifying = ref(false);
 
 const isRegister = computed(() => mode.value === "register");
-
-interface RequestPayload {
-  email: string;
-  name?: string;
-}
 
 /** Whether user is allowed to request a new OTP code. */
 const canRequestCode = computed(

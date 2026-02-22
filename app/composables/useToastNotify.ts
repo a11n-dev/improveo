@@ -1,15 +1,4 @@
-type ToastVariant = "success" | "error" | "warning" | "info";
-
-type ToastOverrides = {
-  icon?: string;
-  duration?: number;
-};
-
-type NotifyToast = (
-  title: string,
-  description?: string,
-  overrides?: ToastOverrides,
-) => void;
+import type { ToastOverrides, ToastVariant, NotifyToast } from "~/types/toast";
 
 const DEFAULT_ICONS: Record<ToastVariant, string> = {
   success: "i-lucide-check-circle",

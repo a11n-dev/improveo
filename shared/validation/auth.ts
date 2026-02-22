@@ -4,47 +4,38 @@ import {
   EMAIL_MAX_LENGTH,
   PROFILE_NAME_MAX_LENGTH,
   PROFILE_NAME_MIN_LENGTH,
+  PROFILE_USERNAME_PATTERN,
 } from "../constants/validation";
 
+/**
+ * Reusable email validator shared across auth and profile flows.
+ *
+ * Trims user input and applies format/length boundaries.
+ */
 export const EmailSchema = z
-  .string()
+  .email("Enter a valid email address.")
   .trim()
-  .min(1, "Email is required")
-  .max(EMAIL_MAX_LENGTH, `Email must be ${EMAIL_MAX_LENGTH} characters or less`)
-  .email("Enter a valid email address.");
+  .toLowerCase()
+  .max(
+    EMAIL_MAX_LENGTH,
+    `Email must be ${EMAIL_MAX_LENGTH} characters or less`,
+  );
 
-const NameSchema = z
+/**
+ * Reusable username validator for account creation and editing.
+ *
+ * Normalizes to lowercase and restricts input to allowed characters.
+ */
+export const UsernameSchema = z
   .string()
   .trim()
+  .toLowerCase()
   .min(
     PROFILE_NAME_MIN_LENGTH,
-    `Name must be at least ${PROFILE_NAME_MIN_LENGTH} characters`,
+    `Must be at least ${PROFILE_NAME_MIN_LENGTH} characters`,
   )
   .max(
     PROFILE_NAME_MAX_LENGTH,
-    `Name must be ${PROFILE_NAME_MAX_LENGTH} characters or less`,
-  );
-
-const OptionalNameSchema = z.preprocess((value) => {
-  if (typeof value === "string" && value.trim() === "") {
-    return undefined;
-  }
-  return value;
-}, NameSchema.optional());
-
-export const AuthLoginSchema = z
-  .object({
-    email: EmailSchema,
-    name: OptionalNameSchema,
-  })
-  .strict();
-
-export const AuthRegisterSchema = z
-  .object({
-    email: EmailSchema,
-    name: NameSchema,
-  })
-  .strict();
-
-export type AuthLoginInput = z.output<typeof AuthLoginSchema>;
-export type AuthRegisterInput = z.output<typeof AuthRegisterSchema>;
+    `Must be ${PROFILE_NAME_MAX_LENGTH} characters or less`,
+  )
+  .regex(PROFILE_USERNAME_PATTERN, "Can contain only letters and numbers");

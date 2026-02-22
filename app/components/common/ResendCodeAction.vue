@@ -32,7 +32,7 @@ const handleRequest = (): void => {
       v-if="!isCoolingDown"
       type="button"
       variant="link"
-      class="px-1 text-primary"
+      class="ml-1 p-0! text-primary"
       :disabled="!props.canRequest"
       @click="handleRequest"
     >

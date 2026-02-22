@@ -1,6 +1,7 @@
 export const EMAIL_MAX_LENGTH = 254;
 export const PROFILE_NAME_MIN_LENGTH = 3;
 export const PROFILE_NAME_MAX_LENGTH = 30;
+export const PROFILE_USERNAME_PATTERN = /^[a-z0-9]+$/;
 
 export const HABIT_TITLE_MIN_LENGTH = 1;
 export const HABIT_TITLE_MAX_LENGTH = 50;

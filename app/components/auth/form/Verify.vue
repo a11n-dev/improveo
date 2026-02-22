@@ -1,25 +1,29 @@
 <script setup lang="ts">
 interface Props {
   email: string;
-  resendSeconds: number;
-  isSending: boolean;
-  isVerifying: boolean;
+  isSending?: boolean;
+  isVerifying?: boolean;
 }
 
-const props = defineProps<Props>();
+const { email, isSending = false, isVerifying = false } = defineProps<Props>();
 
 const otpValue = defineModel<number[]>("otpValue", { default: () => [] });
 
 const emit = defineEmits<{
-  verify: [];
   back: [];
-  request: [];
+  verify: [];
 }>();
-const canVerify = computed(
-  () => props.email.trim().length > 0 && otpValue.value.length === 6,
+
+const otpToken = computed(() =>
+  otpValue.value
+    .map((digit) => (typeof digit === "number" ? String(digit) : ""))
+    .join(""),
 );
 
-const canRequestCode = computed(() => !props.isSending && !props.isVerifying);
+/** Enables verify action only when email exists and 6 digits are entered. */
+const canVerify = computed(
+  () => email.trim().length > 0 && /^\d{6}$/.test(otpToken.value),
+);
 </script>
 
 <template>
@@ -27,7 +31,7 @@ const canRequestCode = computed(() => !props.isSending && !props.isVerifying);
     <div class="text-sm text-muted">
       <p>Enter the 6-digit code sent to:</p>
       <p class="font-medium text-highlighted">
-        {{ props.email }}
+        {{ email }}
       </p>
     </div>
 
@@ -47,25 +51,21 @@ const canRequestCode = computed(() => !props.isSending && !props.isVerifying);
       <UButton
         type="button"
         block
-        :loading="props.isVerifying"
-        :disabled="!canVerify"
+        :loading="isVerifying"
+        :disabled="!canVerify || isSending"
         label="Verify and continue"
         variant="solid"
         @click="emit('verify')"
       />
+
       <UButton
         type="button"
         color="neutral"
         variant="soft"
         block
         label="Back"
+        :disabled="isVerifying"
         @click="emit('back')"
-      />
-
-      <CommonResendCodeAction
-        :seconds-left="props.resendSeconds"
-        :can-request="canRequestCode"
-        @request="emit('request')"
       />
     </div>
   </div>

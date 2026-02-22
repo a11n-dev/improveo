@@ -136,11 +136,9 @@ const handleVerify = async (): Promise<void> => {
   if (error) {
     switch (error.code) {
       case "otp_expired":
-        notifyError("Code expired", "Request a new code and try again.");
-        return;
       case "invalid_credentials":
         notifyError(
-          "Invalid code",
+          "Invalid or expired code",
           "Double-check the code or request a new one.",
         );
         return;

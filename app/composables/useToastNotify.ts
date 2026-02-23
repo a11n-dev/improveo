@@ -1,4 +1,5 @@
-import type { ToastOverrides, ToastVariant, NotifyToast } from "~/types/toast";
+import type { ToastVariant } from "~/types/notifications";
+import type { AddToast, NotifyToast } from "~/types/toast";
 
 const DEFAULT_ICONS: Record<ToastVariant, string> = {
   success: "i-lucide-check-circle",
@@ -10,12 +11,7 @@ const DEFAULT_ICONS: Record<ToastVariant, string> = {
 export const useToastNotify = () => {
   const toast = useToast();
 
-  const addToast = (
-    variant: ToastVariant,
-    title: string,
-    description?: string,
-    overrides?: ToastOverrides,
-  ): void => {
+  const addToast: AddToast = (variant, title, description, overrides): void => {
     toast.add({
       title,
       description,
@@ -42,6 +38,7 @@ export const useToastNotify = () => {
   };
 
   return {
+    addToast,
     notifyError,
     notifyInfo,
     notifySuccess,

@@ -11,14 +11,13 @@ definePageMeta({
 });
 
 const supabaseClient = useSupabaseClient();
-const { notifyError, notifyWarning } = useToastNotify();
+const { notifyMessage } = useNotify();
 
 const {
   isActive: isResendCooldownActive,
   secondsLeft: resendSeconds,
   start: startResendCountdown,
   stop: stopResendCountdown,
-  notifyResendNotReady,
 } = useCodeResend();
 
 const mode = ref<AuthMode>("login");
@@ -42,7 +41,15 @@ const canResend = computed(
 );
 
 const handleRequest = async (payload?: RequestPayload): Promise<void> => {
-  if (notifyResendNotReady()) {
+  if (isResendCooldownActive.value) {
+    notifyMessage({
+      scope: "supabase",
+      code: "resend_cooldown",
+      params: {
+        seconds: resendSeconds.value,
+      },
+    });
+
     return;
   }
 
@@ -65,45 +72,11 @@ const handleRequest = async (payload?: RequestPayload): Promise<void> => {
   isSending.value = false;
 
   if (error) {
-    switch (error.code) {
-      case "signup_disabled": {
-        if (isRegister.value) {
-          notifyError("Sign up is disabled", "Please try again later.");
-          return;
-        }
-
-        notifyError(
-          "Account not found",
-          "No account found. Please register first.",
-        );
-        return;
-      }
-      case "over_email_send_rate_limit":
-      case "over_request_rate_limit":
-        notifyWarning(
-          "Too many requests",
-          "Please wait before requesting again.",
-        );
-        return;
-      case "otp_disabled": {
-        if (!isRegister.value) {
-          notifyError(
-            "Account not found",
-            "No account found. Please register first.",
-          );
-          return;
-        }
-
-        notifyError(
-          "OTP is disabled",
-          "Email verification is currently unavailable.",
-        );
-        return;
-      }
-      default:
-        notifyError("Unable to send code", error.message);
-        return;
+    if (typeof error.code === "string") {
+      notifyMessage({ scope: "supabase", code: error.code });
     }
+
+    return;
   }
 
   if (step.value === "verify") {
@@ -131,18 +104,11 @@ const handleVerify = async (): Promise<void> => {
   isVerifying.value = false;
 
   if (error) {
-    switch (error.code) {
-      case "otp_expired":
-      case "invalid_credentials":
-        notifyError(
-          "Invalid or expired code",
-          "Double-check the code or request a new one.",
-        );
-        return;
-      default:
-        notifyError("Verification failed", error.message);
-        return;
+    if (typeof error.code === "string") {
+      notifyMessage({ scope: "supabase", code: error.code });
     }
+
+    return;
   }
 
   stopResendCountdown();

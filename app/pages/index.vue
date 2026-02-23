@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { motion } from "motion-v";
+
 definePageMeta({
   keepalive: true,
 });
@@ -99,8 +101,10 @@ watch(
       <LoadingState />
     </div>
 
-    <!-- Content with auto-animate for smooth transitions -->
-    <div v-else v-auto-animate class="contents">
+    <MotionConfig
+      reduced-motion="user"
+      :transition="{ duration: 0.2, ease: 'easeOut' }"
+    >
       <!-- Empty state -->
       <div
         v-if="habits.length === 0"
@@ -124,18 +128,27 @@ watch(
       </div>
 
       <!-- Habits list -->
-      <div v-else v-auto-animate class="flex flex-col gap-4">
-        <HabitsCard
-          v-for="habit in habits"
-          :key="habit.id"
-          :habit="habit"
-          :week-start="weekStart"
-          :completed="isCompletedToday(habit.id)"
-          @update:completed="handleTodayToggle(habit.id, $event)"
-          @info="handleInfo(habit.id)"
-        />
+      <div v-else class="flex flex-col gap-4">
+        <AnimatePresence :initial="false">
+          <motion.div
+            v-for="habit in habits"
+            :key="habit.id"
+            layout
+            :initial="{ opacity: 0, y: 8, scale: 0.9 }"
+            :animate="{ opacity: 1, y: 0, scale: 1 }"
+            :exit="{ opacity: 0, y: -8, scale: 0.9 }"
+          >
+            <HabitsCard
+              :habit="habit"
+              :week-start="weekStart"
+              :completed="isCompletedToday(habit.id)"
+              @update:completed="handleTodayToggle(habit.id, $event)"
+              @info="handleInfo(habit.id)"
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
-    </div>
+    </MotionConfig>
 
     <!-- Habit Info Overlay -->
     <HabitsInfoOverlay

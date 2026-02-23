@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@vite-pwa/nuxt",
     "@nuxt/ui",
+    "motion-v/nuxt",
   ],
 
   app: {

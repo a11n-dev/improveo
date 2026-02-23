@@ -30,7 +30,6 @@
     "supabase:gen:types": "supabase gen types typescript --local --schema public > shared/types/database.types.ts"
   },
   "dependencies": {
-    "@formkit/auto-animate": "^0.9.0",
     "@iconify-json/lucide": "^1.2.90",
     "@internationalized/date": "^3.11.0",
     "@nuxt/eslint": "^1.15.1",
@@ -42,6 +41,7 @@
     "@vite-pwa/nuxt": "1.1.1",
     "@vueuse/core": "^14.2.1",
     "eslint": "^9.39.2",
+    "motion-v": "2.0.0-beta.4",
     "nuxt": "^4.3.1",
     "pinia": "^3.0.4",
     "tailwindcss": "^4.1.18",

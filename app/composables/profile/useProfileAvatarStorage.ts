@@ -33,7 +33,7 @@ const getAvatarExtension = (file: File): string => {
  * Handles avatar object upload and cleanup operations in storage.
  */
 export const useProfileAvatarStorage = () => {
-  const { notifyError } = useToastNotify();
+  const { notifyMessage } = useNotify();
   const supabaseClient = useSupabaseClient();
 
   const uploadAvatar = async (userId: string, file: File): Promise<string> => {
@@ -69,7 +69,7 @@ export const useProfileAvatarStorage = () => {
       .remove([avatarPath]);
 
     if (error) {
-      notifyError("Avatar cleanup failed", "Please try again.");
+      notifyMessage({ scope: "profile", code: "avatar_cleanup_failed" });
       return false;
     }
 

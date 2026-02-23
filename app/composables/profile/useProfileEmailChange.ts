@@ -6,7 +6,7 @@ type EmailChangeStep = "form" | "otp";
  * Manages email change request and OTP verification workflow.
  */
 export const useProfileEmailChange = () => {
-  const { notifyError, notifySuccess } = useToastNotify();
+  const { notifyMessage } = useNotify();
   const supabaseClient = useSupabaseClient();
   const supabaseUser = useSupabaseUser();
   const profileStore = useProfileStore();
@@ -61,7 +61,7 @@ export const useProfileEmailChange = () => {
     isFinalizingConfirmation.value = true;
 
     try {
-      notifySuccess("Email updated", "Your new email is now active.");
+      notifyMessage({ scope: "profile", code: "email_updated" });
       stopResendCooldown();
       closeOverlay();
       await profileStore.fetchProfile();
@@ -98,7 +98,11 @@ export const useProfileEmailChange = () => {
       });
 
       if (error) {
-        notifyError("Email update failed", error.message);
+        notifyMessage({
+          scope: "profile",
+          code: "email_update_failed",
+          params: { message: error.message },
+        });
         return false;
       }
 
@@ -131,12 +135,12 @@ export const useProfileEmailChange = () => {
     const token = otpValue.value.join("").trim();
 
     if (token.length !== 6) {
-      notifyError("Invalid code", "Enter the 6-digit code from your email.");
+      notifyMessage({ scope: "profile", code: "invalid_code" });
       return false;
     }
 
     if (!pendingEmail.value) {
-      notifyError("Missing email", "Restart email change and try again.");
+      notifyMessage({ scope: "profile", code: "missing_email" });
       closeOverlay();
       return false;
     }
@@ -151,7 +155,11 @@ export const useProfileEmailChange = () => {
       });
 
       if (error) {
-        notifyError("Verification failed", error.message);
+        notifyMessage({
+          scope: "profile",
+          code: "verification_failed",
+          params: { message: error.message },
+        });
         return false;
       }
 

@@ -5,12 +5,16 @@ import type {
 } from "~/types/notifications";
 
 import { notifications as authNotifications } from "~/services/notifications/auth";
+import { notifications as habitsNotifications } from "~/services/notifications/habits";
 import { notifications as profileNotifications } from "~/services/notifications/profile";
+import { notifications as settingsNotifications } from "~/services/notifications/settings";
 import { notifications as supabaseNotifications } from "~/services/notifications/supabase";
 
 export const notificationScopes = {
   auth: authNotifications,
+  habits: habitsNotifications,
   profile: profileNotifications,
+  settings: settingsNotifications,
   supabase: supabaseNotifications,
 } as const;
 

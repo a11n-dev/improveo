@@ -6,7 +6,7 @@
 const HABITS_KEY = "habits";
 
 export const useHabits = () => {
-  const { notifyError } = useToastNotify();
+  const { notifyMessage } = useNotify();
   const { data: cachedHabits } = useNuxtData<HabitsListResponse>(HABITS_KEY);
 
   // Main data fetcher
@@ -51,7 +51,7 @@ export const useHabits = () => {
 
       return created;
     } catch {
-      notifyError("Failed to create habit", "Please try again.");
+      notifyMessage({ scope: "habits", code: "create_failed" });
       return null;
     }
   };
@@ -75,7 +75,7 @@ export const useHabits = () => {
 
       return true;
     } catch {
-      notifyError("Failed to delete habit", "Please try again.");
+      notifyMessage({ scope: "habits", code: "delete_failed" });
       return false;
     }
   };
@@ -105,7 +105,7 @@ export const useHabits = () => {
 
       return updated;
     } catch {
-      notifyError("Failed to update habit", "Please try again.");
+      notifyMessage({ scope: "habits", code: "update_failed" });
       return null;
     }
   };
@@ -121,7 +121,7 @@ export const useHabits = () => {
     const habit = currentHabits.find((h) => h.id === habitId);
 
     if (!habit) {
-      notifyError("Habit not found", "Could not find the habit.");
+      notifyMessage({ scope: "habits", code: "not_found" });
       return false;
     }
 
@@ -205,7 +205,7 @@ export const useHabits = () => {
           }),
         };
       }
-      notifyError("Failed to update completion", "Please try again.");
+      notifyMessage({ scope: "habits", code: "completion_update_failed" });
       return false;
     }
   };

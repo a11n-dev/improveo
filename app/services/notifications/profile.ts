@@ -64,6 +64,13 @@ export const notifications = {
       description: "Please try again.",
     }),
   }),
+  update_failed_with_message: defineNotification<{ message: string }>({
+    defaultVariant: "error",
+    build: ({ message }) => ({
+      title: "Update failed",
+      description: message,
+    }),
+  }),
   verification_failed: defineNotification<{ message: string }>({
     defaultVariant: "error",
     build: ({ message }) => ({

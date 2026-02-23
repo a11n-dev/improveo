@@ -5,7 +5,7 @@
  */
 export const useSettings = () => {
   const settingsStore = useSettingsStore();
-  const { notifyError } = useToastNotify();
+  const { notifyMessage } = useNotify();
   const { error, pending, settings } = storeToRefs(settingsStore);
 
   /**
@@ -35,11 +35,11 @@ export const useSettings = () => {
     }
 
     if (value < 0 || value > 6) {
-      notifyError("Invalid value", "Choose a day from Monday to Sunday");
+      notifyMessage({ scope: "settings", code: "invalid_value" });
       return false;
     }
 
-    notifyError("Update failed", "Please try again.");
+    notifyMessage({ scope: "settings", code: "update_failed" });
     return false;
   };
 
@@ -52,7 +52,7 @@ export const useSettings = () => {
     const isUpdated = await settingsStore.updateColorMode(value);
 
     if (!isUpdated) {
-      notifyError("Update failed", "Please try again.");
+      notifyMessage({ scope: "settings", code: "update_failed" });
     }
 
     return isUpdated;

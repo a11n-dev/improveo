@@ -9,7 +9,7 @@ import { useProfileNameDraft } from "./useProfileNameDraft";
  */
 export const useProfileAccountEditor = (profile: Ref<Profile>) => {
   const profileStore = useProfileStore();
-  const { notifyError, notifySuccess } = useToastNotify();
+  const { notifyMessage } = useNotify();
   const supabaseClient = useSupabaseClient();
 
   const open = ref(false);
@@ -125,7 +125,7 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
             await avatarStorage.removeAvatarObject(uploadedAvatarPath);
           }
 
-          notifyError("Update failed", "Please try again.");
+          notifyMessage({ scope: "profile", code: "update_failed" });
           return;
         }
       }
@@ -142,7 +142,7 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
       }
 
       if (hasProfilePayload) {
-        notifySuccess("Account updated", "Your profile changes were saved.");
+        notifyMessage({ scope: "profile", code: "account_updated" });
       }
 
       open.value = false;
@@ -151,10 +151,13 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
         await avatarStorage.removeAvatarObject(uploadedAvatarPath);
       }
 
-      notifyError(
-        "Update failed",
-        error instanceof Error ? error.message : "Please try again.",
-      );
+      notifyMessage({
+        scope: "profile",
+        code: "update_failed_with_message",
+        params: {
+          message: error instanceof Error ? error.message : "Please try again.",
+        },
+      });
     } finally {
       isSaving.value = false;
     }
@@ -183,11 +186,11 @@ export const useProfileAccountEditor = (profile: Ref<Profile>) => {
       const deleted = await profileStore.deleteProfile();
 
       if (!deleted) {
-        notifyError("Delete failed", "Please try again.");
+        notifyMessage({ scope: "profile", code: "delete_failed" });
         return;
       }
 
-      notifySuccess("Account deleted", "Your data has been removed.");
+      notifyMessage({ scope: "profile", code: "account_deleted" });
       showDeleteConfirm.value = false;
       open.value = false;
       await supabaseClient.auth.signOut({ scope: "global" });

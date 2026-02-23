@@ -15,4 +15,11 @@ export const notifications = {
       description: "Double-check the code or request a new one.",
     }),
   }),
+  logout_failed: defineNotification({
+    defaultVariant: "error",
+    build: () => ({
+      title: "Logout failed",
+      description: "Please try again.",
+    }),
+  }),
 } as const;

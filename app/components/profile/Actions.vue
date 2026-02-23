@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const supabaseClient = useSupabaseClient();
-const { notifyError } = useToastNotify();
+const { notifyMessage } = useNotify();
 const { install, showInstallButton } = usePwaInstall();
 
 /**
@@ -10,7 +10,7 @@ const handleLogout = async (): Promise<void> => {
   const { error } = await supabaseClient.auth.signOut({ scope: "global" });
 
   if (error) {
-    notifyError("Logout failed", "Please try again.");
+    notifyMessage({ scope: "auth", code: "logout_failed" });
     return;
   }
 

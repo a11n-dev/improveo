@@ -2,7 +2,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { defineComponent } from "vue";
 import { describe, expect, it } from "vitest";
 
-import { CommonResendCodeAction } from "#components";
+import { CommonCodeResendAction } from "#components";
 
 const UButtonStub = defineComponent({
   name: "UButton",
@@ -21,12 +21,12 @@ const UButtonStub = defineComponent({
     '<button :disabled="disabled" :type="type" @click="$emit(\'click\')"><slot /></button>',
 });
 
-describe("Common ResendCodeAction", () => {
-  it("emits request when button is available", async () => {
-    const wrapper = await mountSuspended(CommonResendCodeAction, {
+describe("Common CodeResendAction", () => {
+  it("emits resend when button is available", async () => {
+    const wrapper = await mountSuspended(CommonCodeResendAction, {
       props: {
         secondsLeft: 0,
-        canRequest: true,
+        canResend: true,
       },
       global: {
         stubs: {
@@ -37,17 +37,17 @@ describe("Common ResendCodeAction", () => {
 
     const button = wrapper.find("button");
     expect(button.exists()).toBe(true);
-    expect(button.text()).toContain("Request another code");
+    expect(button.text()).toContain("Resend code");
 
     await button.trigger("click");
-    expect(wrapper.emitted("request")).toHaveLength(1);
+    expect(wrapper.emitted("resend")).toHaveLength(1);
   });
 
-  it("disables request button when request is not allowed", async () => {
-    const wrapper = await mountSuspended(CommonResendCodeAction, {
+  it("disables resend button when resend is not allowed", async () => {
+    const wrapper = await mountSuspended(CommonCodeResendAction, {
       props: {
         secondsLeft: 0,
-        canRequest: false,
+        canResend: false,
       },
       global: {
         stubs: {
@@ -60,14 +60,14 @@ describe("Common ResendCodeAction", () => {
     expect(button.attributes("disabled")).toBeDefined();
 
     await button.trigger("click");
-    expect(wrapper.emitted("request")).toBeUndefined();
+    expect(wrapper.emitted("resend")).toBeUndefined();
   });
 
   it("shows countdown text during cooldown", async () => {
-    const wrapper = await mountSuspended(CommonResendCodeAction, {
+    const wrapper = await mountSuspended(CommonCodeResendAction, {
       props: {
         secondsLeft: 30,
-        canRequest: true,
+        canResend: true,
       },
       global: {
         stubs: {
@@ -77,6 +77,6 @@ describe("Common ResendCodeAction", () => {
     });
 
     expect(wrapper.find("button").exists()).toBe(false);
-    expect(wrapper.text()).toContain("Request another code in 0:30");
+    expect(wrapper.text()).toContain("Resend code in 0:30");
   });
 });

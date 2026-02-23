@@ -1,27 +1,27 @@
 <script setup lang="ts">
 interface Props {
   secondsLeft: number;
-  canRequest: boolean;
+  canResend: boolean;
   label?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  label: "Request another code",
+  label: "Resend code",
 });
 
 const emit = defineEmits<{
-  request: [];
+  resend: [];
 }>();
 
 const resendCountdown = computed(() => formatCountdown(props.secondsLeft));
 const isCoolingDown = computed(() => props.secondsLeft > 0);
 
-const handleRequest = (): void => {
-  if (isCoolingDown.value || !props.canRequest) {
+const handleResend = (): void => {
+  if (isCoolingDown.value || !props.canResend) {
     return;
   }
 
-  emit("request");
+  emit("resend");
 };
 </script>
 
@@ -33,8 +33,8 @@ const handleRequest = (): void => {
       type="button"
       variant="link"
       class="ml-1 p-0! text-primary"
-      :disabled="!props.canRequest"
-      @click="handleRequest"
+      :disabled="!props.canResend"
+      @click="handleResend"
     >
       {{ props.label }}
     </UButton>

@@ -23,7 +23,7 @@ export const useProfileEmailChange = () => {
     secondsLeft: resendSeconds,
     start: startResendCooldown,
     stop: stopResendCooldown,
-  } = useResendCooldown();
+  } = useCodeResend();
 
   const isBusy = computed(
     () =>

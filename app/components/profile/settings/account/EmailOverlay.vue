@@ -227,15 +227,15 @@ const submitRequestForm = async (): Promise<void> => {
             </p>
           </template>
           <template v-else>
-            <CommonResendCodeAction
+            <CommonCodeResendAction
               :seconds-left="resendSeconds"
-              :can-request="
+              :can-resend="
                 Boolean(pendingEmail) &&
                 canRequestEmailChange &&
                 !isRequesting &&
                 !isVerifying
               "
-              @request="emit('request', pendingEmail)"
+              @resend="emit('request', pendingEmail)"
             />
           </template>
         </template>

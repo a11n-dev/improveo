@@ -5,24 +5,19 @@ interface Props {
   mode: AuthMode;
   step: AuthStep;
   resendSeconds: number;
-  canRequestCode?: boolean;
+  canResend?: boolean;
 }
 
-const {
-  mode,
-  step,
-  resendSeconds,
-  canRequestCode = true,
-} = defineProps<Props>();
+const { mode, step, resendSeconds, canResend = true } = defineProps<Props>();
 
 const emit = defineEmits<{
-  request: [];
+  resend: [];
   "toggle-mode": [];
 }>();
 </script>
 
 <template>
-  <div class="mt-2">
+  <div class="mt-3 text-center">
     <p v-if="step === 'request'" class="text-sm text-muted">
       <template v-if="mode === 'register'">
         <span>Already have an account?</span>
@@ -49,11 +44,11 @@ const emit = defineEmits<{
       </template>
     </p>
 
-    <CommonResendCodeAction
+    <CommonCodeResendAction
       v-else
       :seconds-left="resendSeconds"
-      :can-request="canRequestCode"
-      @request="emit('request')"
+      :can-resend="canResend"
+      @resend="emit('resend')"
     />
   </div>
 </template>

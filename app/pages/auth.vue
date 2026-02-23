@@ -18,7 +18,8 @@ const {
   secondsLeft: resendSeconds,
   start: startResendCountdown,
   stop: stopResendCountdown,
-} = useResendCooldown();
+  notifyResendNotReady,
+} = useCodeResend();
 
 const mode = ref<AuthMode>("login");
 const step = ref<AuthStep>("request");
@@ -36,16 +37,12 @@ const isVerifying = ref(false);
 const isRegister = computed(() => mode.value === "register");
 
 /** Whether user is allowed to request a new OTP code. */
-const canRequestCode = computed(
+const canResend = computed(
   () => !isResendCooldownActive.value && !isSending.value && !isVerifying.value,
 );
 
 const handleRequest = async (payload?: RequestPayload): Promise<void> => {
-  if (!canRequestCode.value) {
-    notifyWarning(
-      "Please wait",
-      `You can request a new code in ${resendSeconds.value} seconds.`,
-    );
+  if (notifyResendNotReady()) {
     return;
   }
 
@@ -189,8 +186,8 @@ const handleToggleMode = (): void => {
       :mode="mode"
       :step="step"
       :resend-seconds="resendSeconds"
-      :can-request-code="canRequestCode"
-      @request="handleRequest"
+      :can-resend="canResend"
+      @resend="handleRequest"
       @toggle-mode="handleToggleMode"
     />
   </UContainer>

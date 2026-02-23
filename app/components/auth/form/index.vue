@@ -36,7 +36,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div>
     <AuthFormLogin
       v-if="step === 'request' && mode === 'login'"
       v-model:state="state"

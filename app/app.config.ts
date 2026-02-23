@@ -1,5 +1,8 @@
 export default defineAppConfig({
   ui: {
+    colors: {
+      neutral: "neutral",
+    },
     modal: {
       slots: {
         header: "pb-0!",

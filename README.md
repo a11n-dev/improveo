@@ -33,7 +33,7 @@ Improveo is a modern habit tracking application designed to help you build and m
     ```
 
 3.  **Install and start Docker:**
-    Local Supabase runs in Docker containers, so Docker Desktop (or Docker Engine) must be installed and running.
+    Local Supabase and local Redis run in Docker containers, so Docker Desktop (or Docker Engine) must be installed and running.
 
 4.  **Run one-time local setup:**
 
@@ -75,6 +75,22 @@ pnpm run supabase:env:sync
 
 # Reset local DB and re-run migrations/seeds
 pnpm run supabase:reset
+```
+
+## 🧠 Redis Commands
+
+```bash
+# Start local Redis container (create if missing)
+pnpm run redis:start
+
+# Stop local Redis container
+pnpm run redis:stop
+
+# Tail Redis logs
+pnpm run redis:logs
+
+# Open redis-cli inside the container
+pnpm run redis:cli
 ```
 
 ## 🔐 Environment Variables

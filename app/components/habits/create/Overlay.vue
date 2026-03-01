@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { isOpen, closeOverlay } = useHabitCreateOverlay();
-const { draft, isValid, resetDraft } = useHabitDraft();
+const { draft, goalLabel, isValid, resetDraft } = useHabitDraft();
 const { createHabit } = useHabits();
 
 const emit = defineEmits<{
@@ -11,17 +11,18 @@ const modalProps = {
   close: false,
 };
 
-/** Loading state for create action */
+/** Tracks create request progress to prevent duplicate submissions. */
 const isCreating = ref(false);
 
-/** Handle create */
-const handleCreate = async () => {
-  if (!isValid.value || isCreating.value) return;
+/** Submits the current draft and closes the overlay when creation succeeds. */
+const handleCreate = async (): Promise<void> => {
+  if (!isValid.value || isCreating.value) {
+    return;
+  }
 
   isCreating.value = true;
 
   try {
-    // Build payload from draft
     const payload: HabitCreatePayload = {
       title: draft.value.name,
       description: draft.value.description || undefined,
@@ -63,7 +64,7 @@ const handleCreate = async () => {
     </template>
 
     <template #body>
-      <HabitsCreateForm />
+      <HabitsFormBase v-model:draft="draft" :goal-label="goalLabel" />
     </template>
   </CommonOverlay>
 </template>

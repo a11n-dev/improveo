@@ -3,37 +3,41 @@ interface Props {
   habit: Habit;
 }
 
-const props = defineProps<Props>();
+const { habit } = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: "after:leave"): void;
+  "after:leave": [];
 }>();
 
 const { isOpen, closeOverlay } = useHabitEditOverlay();
-const { draft, hasChanges, isValid, resetDraft } = useHabitEditDraft();
+const { draft, goalLabel, hasChanges, isValid, resetDraft } =
+  useHabitEditDraft();
 const { updateHabit } = useHabits();
 
-/** Loading state for save action */
+/** Tracks save request progress to prevent duplicate submissions. */
 const isSaving = ref(false);
 
 const modalProps = {
   close: false,
 };
 
-/** Handle save */
-const handleSave = async () => {
-  // Don't call API if nothing changed
+/**
+ * Persists habit changes and closes the overlay when save succeeds.
+ * If no fields changed, closes immediately without calling the API.
+ */
+const handleSave = async (): Promise<void> => {
   if (!hasChanges.value) {
     closeOverlay();
     return;
   }
 
-  if (!isValid.value || isSaving.value) return;
+  if (!isValid.value || isSaving.value) {
+    return;
+  }
 
   isSaving.value = true;
 
   try {
-    // Build payload with all fields
     const payload: HabitUpdatePayload = {
       title: draft.value.name,
       description: draft.value.description || null,
@@ -42,23 +46,23 @@ const handleSave = async () => {
       goal: draft.value.goal,
     };
 
-    const updated = await updateHabit(props.habit.id, payload);
+    const updated = await updateHabit(habit.id, payload);
 
     if (updated) {
       closeOverlay();
-      // No success toast - user sees changes immediately
     }
   } finally {
     isSaving.value = false;
   }
 };
 
-/** Handle cancel */
-const handleCancel = () => {
+/** Closes the edit overlay without persisting changes. */
+const handleCancel = (): void => {
   closeOverlay();
 };
 
-const handleAfterLeave = () => {
+/** Clears edit draft state after overlay transition completes. */
+const handleAfterLeave = (): void => {
   resetDraft();
   emit("after:leave");
 };
@@ -84,7 +88,7 @@ const handleAfterLeave = () => {
     </template>
 
     <template #body>
-      <HabitsEditForm />
+      <HabitsFormBase v-model:draft="draft" :goal-label="goalLabel" />
     </template>
   </CommonOverlay>
 </template>

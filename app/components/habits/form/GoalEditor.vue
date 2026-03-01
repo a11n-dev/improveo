@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { RadioGroupItem } from "@nuxt/ui";
 
+type GoalPeriodSelection = PeriodType | "none";
+
 interface Props {
   goal: Goal | null;
 }
 
-const props = defineProps<Props>();
+const { goal } = defineProps<Props>();
 
 const emit = defineEmits<{
   "update:goal": [goal: Goal | null];
@@ -13,7 +15,7 @@ const emit = defineEmits<{
 
 const open = defineModel<boolean>("open", { default: false });
 
-/** Radio options for goal period type */
+/** Available goal period options shown in the interval selector. */
 const periodItems: RadioGroupItem[] = [
   { label: "None", value: "none" },
   { label: "Daily", value: "day" },
@@ -21,84 +23,98 @@ const periodItems: RadioGroupItem[] = [
   { label: "Monthly", value: "month" },
 ];
 
-/** Current period type selection (bound to radio group) */
-const selectedPeriodType = ref<string>("none");
-
-/** Completions count for weekly/monthly */
+const selectedPeriodType = ref<GoalPeriodSelection>("none");
 const completionsCount = ref(1);
-
-/** Flag to skip resetting completions during initialization */
 const isInitializing = ref(false);
 
-/** Max completions based on period type */
-const maxCompletions = computed(() => {
-  if (selectedPeriodType.value === "week") return 7;
-  if (selectedPeriodType.value === "month") return 31;
+/** Returns maximum allowed completions for the selected period. */
+const maxCompletions = computed<number>(() => {
+  if (selectedPeriodType.value === "week") {
+    return 7;
+  }
+
+  if (selectedPeriodType.value === "month") {
+    return 31;
+  }
+
   return 1;
 });
 
-/** Period label for display */
-const periodLabel = computed(() => {
-  if (selectedPeriodType.value === "week") return "Week";
-  if (selectedPeriodType.value === "month") return "Month";
+/** Returns period label shown next to completions count. */
+const periodLabel = computed<string>(() => {
+  if (selectedPeriodType.value === "week") {
+    return "Week";
+  }
+
+  if (selectedPeriodType.value === "month") {
+    return "Month";
+  }
+
   return "";
 });
 
-/** Whether to show completions counter */
-const showCompletions = computed(() =>
-  ["week", "month"].includes(selectedPeriodType.value),
+/** Controls visibility of completions stepper for week/month goals. */
+const showCompletions = computed<boolean>(
+  () =>
+    selectedPeriodType.value === "week" || selectedPeriodType.value === "month",
 );
 
-/** Decrement completions (min 1) */
-const decrement = () => {
+/** Decreases completions count while keeping minimum of 1. */
+const handleDecrement = (): void => {
   if (completionsCount.value > 1) {
     completionsCount.value--;
   }
 };
 
-/** Increment completions (max based on period type) */
-const increment = () => {
+/** Increases completions count while respecting selected period max. */
+const handleIncrement = (): void => {
   if (completionsCount.value < maxCompletions.value) {
     completionsCount.value++;
   }
 };
 
-/** Sync local state from props on open */
-watch(open, (isOpen) => {
-  if (isOpen) {
-    isInitializing.value = true;
-    if (props.goal) {
-      selectedPeriodType.value = props.goal.periodType;
-      completionsCount.value = props.goal.targetCount;
-    } else {
-      selectedPeriodType.value = "none";
-      completionsCount.value = 1;
-    }
-    // Reset flag after Vue processes the period type change
-    nextTick(() => {
-      isInitializing.value = false;
-    });
+/** Initializes local editor state each time the goal overlay opens. */
+watch(open, (isOpen): void => {
+  if (!isOpen) {
+    return;
   }
-});
 
-/** Reset completions when period type changes (but not during initialization) */
-watch(selectedPeriodType, () => {
-  if (!isInitializing.value) {
+  isInitializing.value = true;
+
+  if (goal) {
+    selectedPeriodType.value = goal.periodType;
+    completionsCount.value = goal.targetCount;
+  } else {
+    selectedPeriodType.value = "none";
     completionsCount.value = 1;
   }
+
+  nextTick(() => {
+    isInitializing.value = false;
+  });
 });
 
-/** Save selection and close */
-const save = () => {
+/** Resets completions count when user changes period type manually. */
+watch(selectedPeriodType, (): void => {
+  if (isInitializing.value) {
+    return;
+  }
+
+  completionsCount.value = 1;
+});
+
+/** Persists goal settings and closes the overlay. */
+const handleSave = (): void => {
   if (selectedPeriodType.value === "none") {
     emit("update:goal", null);
   } else {
     emit("update:goal", {
-      periodType: selectedPeriodType.value as PeriodType,
+      periodType: selectedPeriodType.value,
       targetCount:
         selectedPeriodType.value === "day" ? 1 : completionsCount.value,
     });
   }
+
   open.value = false;
 };
 </script>
@@ -111,7 +127,7 @@ const save = () => {
       {
         label: 'Save',
         color: 'primary',
-        onClick: save,
+        onClick: handleSave,
       },
     ]"
   >
@@ -142,14 +158,14 @@ const save = () => {
               color="neutral"
               :disabled="completionsCount <= 1"
               aria-label="Decrease"
-              @click="decrement"
+              @click="handleDecrement"
             />
             <UButton
               icon="i-lucide-plus"
               color="neutral"
               :disabled="completionsCount >= maxCompletions"
               aria-label="Increase"
-              @click="increment"
+              @click="handleIncrement"
             />
           </div>
         </UFormField>

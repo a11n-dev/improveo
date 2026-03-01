@@ -14,7 +14,6 @@ const emit = defineEmits<{
 
 const open = defineModel<boolean>("open", { default: false });
 
-const { openOverlay: openEditOverlay } = useHabitEditOverlay();
 const { tap: tapHaptic } = useHaptics();
 
 const modalProps = {
@@ -30,42 +29,48 @@ const goalLabel = computed(() =>
 /** Delete confirmation state */
 const showDeleteConfirm = ref(false);
 const isEditOverlayMounted = ref(false);
+const isEditOverlayOpen = ref(false);
 
-watch(open, (isOpen) => {
+/** Clears transient UI state whenever the info overlay closes. */
+watch(open, (isOpen): void => {
   if (!isOpen) {
     showDeleteConfirm.value = false;
+    isEditOverlayOpen.value = false;
+    isEditOverlayMounted.value = false;
   }
 });
 
 /** Handle edit button click - opens nested edit overlay */
-const handleEdit = async () => {
+const handleEdit = async (): Promise<void> => {
   isEditOverlayMounted.value = true;
   await nextTick();
-  openEditOverlay(habit);
+  isEditOverlayOpen.value = true;
 };
 
-const handleEditOverlayAfterLeave = () => {
+/** Unmounts nested edit overlay after leave transition finishes. */
+const handleEditOverlayAfterLeave = (): void => {
+  isEditOverlayOpen.value = false;
   isEditOverlayMounted.value = false;
 };
 
 /** Handle delete button click */
-const handleDelete = () => {
+const handleDelete = (): void => {
   tapHaptic("base");
   showDeleteConfirm.value = true;
 };
 
 /** Confirm delete */
-const confirmDelete = () => {
+const confirmDelete = (): void => {
   emit("delete");
 };
 
 /** Cancel delete */
-const cancelDelete = () => {
+const cancelDelete = (): void => {
   showDeleteConfirm.value = false;
 };
 
 /** Close overlay */
-const handleClose = () => {
+const handleClose = (): void => {
   open.value = false;
 };
 </script>
@@ -135,6 +140,7 @@ const handleClose = () => {
     <!-- Nested edit overlay (default slot for drawer context) -->
     <HabitsEditOverlay
       v-if="isEditOverlayMounted"
+      v-model:open="isEditOverlayOpen"
       :habit="habit"
       @after:leave="handleEditOverlayAfterLeave"
     />

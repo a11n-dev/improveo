@@ -4,18 +4,16 @@
  */
 export const useHabitCreateOverlay = () => {
   const isOpen = useState("habit-create-open", () => false);
-  const { resetDraft } = useHabitDraft();
   const { tap: tapHaptic } = useHaptics();
 
-  /** Open the overlay and reset draft to defaults */
-  const openOverlay = () => {
+  /** Opens create overlay from any trigger location in the app. */
+  const openOverlay = (): void => {
     tapHaptic("base");
-    resetDraft();
     isOpen.value = true;
   };
 
-  /** Close the overlay */
-  const closeOverlay = () => {
+  /** Closes create overlay. */
+  const closeOverlay = (): void => {
     isOpen.value = false;
   };
 

@@ -5,16 +5,38 @@ definePageMeta({
   keepalive: true,
 });
 
-const { habits, weekStart, pending, toggleCompletion, deleteHabit } =
-  useHabits();
+const HABITS_KEY = "habits";
+
+const habitsStore = useHabitsStore();
+const { habits, weekStart } = storeToRefs(habitsStore);
+const { data: cachedHabits } = useNuxtData<HabitsListResponse>(HABITS_KEY);
+
+const { status } = useAsyncData<HabitsListResponse>(
+  HABITS_KEY,
+  (_nuxtApp, { signal }) =>
+    $fetch<HabitsListResponse>("/api/habits", {
+      headers: useRequestHeaders(["cookie"]),
+      signal,
+    }),
+  {
+    default: () =>
+      cachedHabits.value ?? { habits: [], weekStart: 0 as WeekStartDay },
+  },
+);
+
+const pending = computed(() => status.value === "pending");
 const { motionReducedPolicy } = useMotionPreference();
 
-const {
-  isOpen: infoOpen,
-  selectedHabit,
-  openOverlay: openInfo,
-  closeOverlay: closeInfo,
-} = useHabitInfoOverlay();
+const infoOpen = ref(false);
+const selectedHabitId = ref<string | null>(null);
+
+const selectedHabit = computed<Habit | null>(() => {
+  if (!selectedHabitId.value) {
+    return null;
+  }
+
+  return habitsStore.getHabitById(selectedHabitId.value) ?? null;
+});
 
 const { openOverlay: openCreate } = useHabitCreateOverlay();
 const route = useRoute();
@@ -23,44 +45,61 @@ const shouldScrollAfterHabitCreate = useState<boolean>(
   () => false,
 );
 
-/** Today's date string for checking completion */
+/** Today's date string used for card completion toggle. */
 const todayStr = toISODateString(new Date());
 
-/** Delete loading state */
+/** Tracks delete request progress for the info overlay footer action. */
 const isDeleting = ref(false);
 
-/** Check if a habit is completed today */
+/** Returns whether a habit has a completion record for today. */
 const isCompletedToday = (habitId: string): boolean => {
-  const habit = habits.value.find((h) => h.id === habitId);
+  const habit = habitsStore.getHabitById(habitId);
   return habit?.completions[todayStr] ?? false;
 };
 
-/** Toggle today's completion for a habit */
-const handleTodayToggle = async (habitId: string, _value: boolean) => {
-  await toggleCompletion(habitId, todayStr);
+/** Toggles today's completion state for the provided habit. */
+const handleTodayToggle = async (
+  habitId: string,
+  _value: boolean,
+): Promise<void> => {
+  await habitsStore.toggleCompletion(habitId, todayStr);
 };
 
-/** Open info overlay for a habit */
-const handleInfo = (habitId: string) => {
-  const habit = habits.value.find((h) => h.id === habitId);
-  if (habit) {
-    openInfo(habit);
+/** Opens habit info overlay for the selected habit id. */
+const handleInfo = (habitId: string): void => {
+  if (!habitsStore.getHabitById(habitId)) {
+    return;
   }
+
+  selectedHabitId.value = habitId;
+  infoOpen.value = true;
 };
 
-/** Handle date toggle from info overlay */
-const handleToggleDate = async (date: string) => {
-  if (!selectedHabit.value) return;
+/** Toggles completion for a date selected from the info calendar. */
+const handleToggleDate = async (date: string): Promise<void> => {
+  if (!selectedHabit.value) {
+    return;
+  }
 
-  await toggleCompletion(selectedHabit.value.id, date);
+  await habitsStore.toggleCompletion(selectedHabit.value.id, date);
 };
 
-/** Handle delete from info overlay */
-const handleDelete = async () => {
-  if (!selectedHabit.value) return;
+/** Closes the info overlay. */
+const closeInfo = (): void => {
+  infoOpen.value = false;
+};
+
+/** Deletes currently selected habit and closes overlay on success. */
+const handleDelete = async (): Promise<void> => {
+  if (!selectedHabit.value) {
+    return;
+  }
+
   isDeleting.value = true;
+
   try {
-    const success = await deleteHabit(selectedHabit.value.id);
+    const success = await habitsStore.deleteHabit(selectedHabit.value.id);
+
     if (success) {
       closeInfo();
     }
@@ -69,13 +108,19 @@ const handleDelete = async () => {
   }
 };
 
-/** Scroll to bottom of page smoothly */
-const scrollToBottom = () => {
+/** Scrolls to the bottom of the page after creating a new habit. */
+const scrollToBottom = (): void => {
   window.scrollTo({
     top: document.body.scrollHeight,
     behavior: "smooth",
   });
 };
+
+watch(infoOpen, (isOpen): void => {
+  if (!isOpen) {
+    selectedHabitId.value = null;
+  }
+});
 
 watch(
   [shouldScrollAfterHabitCreate, () => route.path, pending],

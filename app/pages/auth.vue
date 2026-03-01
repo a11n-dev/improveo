@@ -3,7 +3,7 @@ import type { AuthMode, AuthStep } from "~/types/auth";
 
 interface RequestPayload {
   email: string;
-  name?: string;
+  username?: string;
 }
 
 definePageMeta({
@@ -24,7 +24,7 @@ const mode = ref<AuthMode>("login");
 const step = ref<AuthStep>("request");
 
 const state = reactive({
-  name: "",
+  username: "",
   email: "",
 });
 
@@ -57,7 +57,7 @@ const handleRequest = async (payload?: RequestPayload): Promise<void> => {
     state.email = payload.email;
 
     if (isRegister.value) {
-      state.name = payload.name ?? "";
+      state.username = payload.username ?? "";
     }
   }
 
@@ -66,7 +66,9 @@ const handleRequest = async (payload?: RequestPayload): Promise<void> => {
     email: state.email,
     options: {
       shouldCreateUser: isRegister.value,
-      ...(isRegister.value && state.name ? { data: { name: state.name } } : {}),
+      ...(isRegister.value && state.username
+        ? { data: { username: state.username } }
+        : {}),
     },
   });
   isSending.value = false;
@@ -125,7 +127,7 @@ const handleBack = (): void => {
 const handleToggleMode = (): void => {
   mode.value = mode.value === "login" ? "register" : "login";
   step.value = "request";
-  state.name = "";
+  state.username = "";
   state.email = "";
   otpValue.value = [];
   stopResendCountdown();

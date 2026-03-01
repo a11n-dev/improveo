@@ -1,5 +1,5 @@
 /**
- * Loads profile + settings for authenticated users in both SSR and CSR.
+ * Loads profile and settings data for authenticated users in both SSR and CSR.
  *
  * - SSR: prefetches data for faster first render.
  * - CSR: loads data after sign-in and resets stores on sign-out.
@@ -21,10 +21,7 @@ export default defineNuxtPlugin(async () => {
   };
 
   const fetchProfileAndSettings = async (): Promise<void> => {
-    await Promise.all([
-      profileStore.fetchProfile(),
-      settingsStore.fetchSettings(),
-    ]);
+    await profileStore.fetchProfile();
     applySettingsColorMode();
   };
 
@@ -36,6 +33,11 @@ export default defineNuxtPlugin(async () => {
     }
 
     await fetchProfileAndSettings();
+    return;
+  }
+
+  if (typeof supabase.auth.getSession !== "function") {
+    applySettingsColorMode();
     return;
   }
 

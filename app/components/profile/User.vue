@@ -1,9 +1,16 @@
 <script setup lang="ts">
-const { profile } = defineProps<{ profile: Profile }>();
+interface Props {
+  profile: Profile;
+}
+
+const { profile } = defineProps<Props>();
 const supabaseClient = useSupabaseClient();
 
-const displayName = computed(() => profile.name ?? "User");
+/** Username fallback used when account username is not set. */
+const displayName = computed(() => profile.username ?? "User");
+/** Human-friendly account creation date. */
 const joinedLabel = computed(() => formatMemberSince(profile.createdAt));
+/** Public URL for the user avatar image. */
 const avatarUrl = computed(() =>
   getAvatarPublicUrl(supabaseClient, profile.avatarPath),
 );

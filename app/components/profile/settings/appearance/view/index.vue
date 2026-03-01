@@ -1,0 +1,4 @@
+<template>
+  <ProfileSettingsAppearanceViewTheme />
+  <ProfileSettingsAppearanceViewAnimations />
+</template>

@@ -3,9 +3,7 @@ const supabaseClient = useSupabaseClient();
 const { notifyMessage } = useNotify();
 const { install, showInstallButton } = usePwaInstall();
 
-/**
- * Handle logout action.
- */
+/** Signs the user out and redirects to the auth page. */
 const handleLogout = async (): Promise<void> => {
   const { error } = await supabaseClient.auth.signOut({ scope: "global" });
 
@@ -20,7 +18,6 @@ const handleLogout = async (): Promise<void> => {
 
 <template>
   <div class="flex flex-col gap-2">
-    <!-- Install PWA button (shown when not installed) -->
     <ClientOnly>
       <UButton
         v-if="showInstallButton"
@@ -33,7 +30,6 @@ const handleLogout = async (): Promise<void> => {
       </UButton>
     </ClientOnly>
 
-    <!-- Logout button -->
     <UButton color="error" icon="i-lucide-log-out" block @click="handleLogout">
       Log out
     </UButton>

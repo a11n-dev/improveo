@@ -2,7 +2,7 @@
 
 with member1 as (
   select id as user_id
-  from public.profiles
+  from auth.users
   where email = 'member1@example.test'
 )
 insert into public.habits (
@@ -41,7 +41,7 @@ set
 
 with member2 as (
   select id as user_id
-  from public.profiles
+  from auth.users
   where email = 'member2@example.test'
 )
 insert into public.habits (

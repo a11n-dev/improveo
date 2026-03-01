@@ -2,13 +2,13 @@
 import type { AuthMode, AuthStep } from "~/types/auth";
 
 interface RequestState {
-  name: string;
+  username: string;
   email: string;
 }
 
 interface RequestPayload {
   email: string;
-  name?: string;
+  username?: string;
 }
 
 interface Props {

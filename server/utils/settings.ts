@@ -18,6 +18,7 @@ export const mapSettingsRowToDto = (
 ): ProfileSettings => {
   return {
     colorMode: row.color_mode as ColorModePreference,
+    reduceAnimations: row.reduce_animations,
     weekStart: row.week_start,
     updatedAt: row.updated_at,
   };
@@ -29,6 +30,7 @@ export const mapSettingsRowToDto = (
  */
 const DEFAULT_SETTINGS: ProfileSettings = {
   colorMode: "system",
+  reduceAnimations: false,
   weekStart: 0,
   updatedAt: new Date().toISOString(),
 };
@@ -62,7 +64,7 @@ export const getUserSettings = async (
   const client = await serverSupabaseClient<Database>(event);
   const { data, error } = await client
     .from("profile_settings")
-    .select("id, color_mode, week_start, updated_at")
+    .select("id, color_mode, reduce_animations, week_start, updated_at")
     .eq("id", user.sub)
     .single();
 
@@ -73,7 +75,7 @@ export const getUserSettings = async (
 
   const settings = mapSettingsRowToDto(data);
 
-  // Store in cache with TTL
+  // Store in cache
   await storage.setItem(cacheKey, settings);
 
   return settings;

@@ -33,7 +33,7 @@ const subtitle = computed(() =>
       light="/logo-light.svg"
       dark="/logo-dark.svg"
       alt="Improveo Logo"
-      class="h-11 w-11"
+      class="h-12 w-12"
     />
 
     <div>

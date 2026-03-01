@@ -17,21 +17,21 @@ const { isSending = false } = defineProps<Props>();
 
 const schema = z.object({
   email: EmailSchema,
-  name: UsernameSchema,
+  username: UsernameSchema,
 });
 
 type Schema = z.output<typeof schema>;
 
 const state = defineModel<{
   email: string;
-  name: string;
+  username: string;
 }>("state", { required: true });
 
 /** Normalizes username to lowercase on input. */
 const username = computed({
-  get: () => state.value.name ?? "",
+  get: () => state.value.username ?? "",
   set: (value: string) => {
-    state.value.name = value.toLowerCase();
+    state.value.username = value.toLowerCase();
   },
 });
 
@@ -53,11 +53,11 @@ const handleSubmit = (event: FormSubmitEvent<Schema>): void => {
     class="flex flex-col gap-4"
     @submit="handleSubmit"
   >
-    <UFormField label="Username" name="name" required>
+    <UFormField label="Username" name="username" required>
       <UInput
         v-model="username"
         class="w-full"
-        placeholder="alexdoe27"
+        placeholder="e.g. johndoe"
         autocomplete="username"
         :minlength="PROFILE_NAME_MIN_LENGTH"
         :maxlength="PROFILE_NAME_MAX_LENGTH"

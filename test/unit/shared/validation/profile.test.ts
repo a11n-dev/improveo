@@ -7,9 +7,9 @@ import {
 import { ProfileUpdatePayloadSchema } from "../../../../shared/validation/profile";
 
 describe("ProfileUpdatePayloadSchema", () => {
-  it("accepts a valid payload and trims name", () => {
+  it("accepts a valid payload and trims username", () => {
     const result = ProfileUpdatePayloadSchema.safeParse({
-      name: "  Jamie  ",
+      username: "  jamie123  ",
       avatarPath: "  user-id/avatar.jpg  ",
     });
 
@@ -18,7 +18,7 @@ describe("ProfileUpdatePayloadSchema", () => {
       return;
     }
 
-    expect(result.data.name).toBe("Jamie");
+    expect(result.data.username).toBe("jamie123");
     expect(result.data.avatarPath).toBe("user-id/avatar.jpg");
   });
 
@@ -39,32 +39,45 @@ describe("ProfileUpdatePayloadSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("enforces name min and max bounds", () => {
+  it("enforces username min and max bounds", () => {
     const tooShort = ProfileUpdatePayloadSchema.safeParse({
-      name: "a".repeat(PROFILE_NAME_MIN_LENGTH - 1),
+      username: "a".repeat(PROFILE_NAME_MIN_LENGTH - 1),
     });
     const tooLong = ProfileUpdatePayloadSchema.safeParse({
-      name: "a".repeat(PROFILE_NAME_MAX_LENGTH + 1),
+      username: "a".repeat(PROFILE_NAME_MAX_LENGTH + 1),
     });
 
     expect(tooShort.success).toBe(false);
     if (!tooShort.success) {
       expect(tooShort.error.issues[0]?.message).toBe(
-        `Name must be at least ${PROFILE_NAME_MIN_LENGTH} characters`,
+        `Must be at least ${PROFILE_NAME_MIN_LENGTH} characters`,
       );
     }
 
     expect(tooLong.success).toBe(false);
     if (!tooLong.success) {
       expect(tooLong.error.issues[0]?.message).toBe(
-        `Name must be ${PROFILE_NAME_MAX_LENGTH} characters or less`,
+        `Must be ${PROFILE_NAME_MAX_LENGTH} characters or less`,
+      );
+    }
+  });
+
+  it("rejects unsupported username characters", () => {
+    const result = ProfileUpdatePayloadSchema.safeParse({
+      username: "user_name",
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(
+        "Can contain only lowercase letters and numbers",
       );
     }
   });
 
   it("rejects unknown keys", () => {
     const result = ProfileUpdatePayloadSchema.safeParse({
-      name: "Jamie",
+      username: "jamie",
       extra: "unexpected",
     });
 

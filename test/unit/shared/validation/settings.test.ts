@@ -6,6 +6,7 @@ describe("ProfileSettingsUpdatePayloadSchema", () => {
   it("accepts a valid full payload", () => {
     const result = ProfileSettingsUpdatePayloadSchema.safeParse({
       colorMode: "dark",
+      reduceAnimations: true,
       weekStart: 1,
     });
 
@@ -15,6 +16,7 @@ describe("ProfileSettingsUpdatePayloadSchema", () => {
     }
 
     expect(result.data.colorMode).toBe("dark");
+    expect(result.data.reduceAnimations).toBe(true);
     expect(result.data.weekStart).toBe(1);
   });
 
@@ -29,6 +31,7 @@ describe("ProfileSettingsUpdatePayloadSchema", () => {
     }
 
     expect(result.data.colorMode).toBe("light");
+    expect(result.data.reduceAnimations).toBeUndefined();
     expect(result.data.weekStart).toBeUndefined();
   });
 
@@ -44,7 +47,26 @@ describe("ProfileSettingsUpdatePayloadSchema", () => {
 
     expect(result.data.weekStart).toBe(3);
     expect(result.data.colorMode).toBeUndefined();
+    expect(result.data.reduceAnimations).toBeUndefined();
   });
+
+  it.each([true, false])(
+    "accepts reduceAnimations alone: %s",
+    (reduceAnimations) => {
+      const result = ProfileSettingsUpdatePayloadSchema.safeParse({
+        reduceAnimations,
+      });
+
+      expect(result.success).toBe(true);
+      if (!result.success) {
+        return;
+      }
+
+      expect(result.data.reduceAnimations).toBe(reduceAnimations);
+      expect(result.data.colorMode).toBeUndefined();
+      expect(result.data.weekStart).toBeUndefined();
+    },
+  );
 
   it("accepts system color mode", () => {
     const result = ProfileSettingsUpdatePayloadSchema.safeParse({

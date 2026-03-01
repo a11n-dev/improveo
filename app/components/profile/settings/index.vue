@@ -1,31 +1,46 @@
 <script setup lang="ts">
-const { profile } = defineProps<{ profile: Profile }>();
+import { markRaw } from "vue";
+import type { SingleVewPayload } from "~/types/singleview";
 
-const { settings, updateWeekStart } = useSettings();
+import AccountView from "./account/view/index.vue";
+import AppearanceView from "./appearance/view/index.vue";
+import WeekStartView from "./week-start/View.vue";
 
-const handleWeekStartChange = async (value: number): Promise<void> => {
-  await updateWeekStart(value);
+const emit = defineEmits<{
+  "open-view": [view: SingleVewPayload];
+}>();
+
+type SettingsViewKey = "account" | "appearance" | "weekStart";
+
+/** Registry of settings subviews that can be opened from the main list. */
+const SETTINGS_VIEWS: Record<SettingsViewKey, SingleVewPayload> = {
+  account: {
+    key: "account",
+    title: "Account",
+    component: markRaw(AccountView),
+  },
+  appearance: {
+    key: "appearance",
+    title: "Appearance",
+    component: markRaw(AppearanceView),
+  },
+  weekStart: {
+    key: "week-start",
+    title: "Start Week On",
+    component: markRaw(WeekStartView),
+  },
+};
+
+/** Opens a full-screen settings subview by key. */
+const openView = (viewKey: SettingsViewKey): void => {
+  emit("open-view", { ...SETTINGS_VIEWS[viewKey] });
 };
 </script>
 
 <template>
-  <div class="divide-y divide-default">
-    <!-- Account -->
-    <div class="pb-3">
-      <ProfileSettingsAccount :profile="profile" />
-    </div>
-
-    <!-- Appearance -->
-    <div class="py-3">
-      <ProfileSettingsAppearance />
-    </div>
-
-    <!-- Calendar Preferences -->
-    <div class="pt-3">
-      <ProfileSettingsWeekStart
-        :model-value="settings?.weekStart ?? 0"
-        @update:model-value="handleWeekStartChange"
-      />
-    </div>
-  </div>
+  <ProfileSettingsList>
+    <ProfileSettingsAccount @open="openView('account')" />
+    <ProfileSettingsAppearance @open="openView('appearance')" />
+    <ProfileSettingsWeekStart @open="openView('weekStart')" />
+  </ProfileSettingsList>
 </template>

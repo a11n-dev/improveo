@@ -1,27 +1,48 @@
 /**
  * GET /api/profile
- * Returns the authenticated user's profile.
+ * Returns combined profile/settings data for the authenticated user.
+ * Includes profile + settings in a single request.
  */
 
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 
-export default defineEventHandler(async (event): Promise<Profile> => {
-  const supabase = await serverSupabaseClient<Database>(event);
-  const user = await serverSupabaseUser(event);
+import type { ProfileSettingsSelectRow } from "~~/server/types/settings";
+import type { ProfileSelectRow } from "~~/server/types/user";
+import type { ProfileWithSettings } from "~~/shared/types/user";
 
-  if (!user?.sub) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
+type ProfileWithSettingsRow = ProfileSelectRow & {
+  settings: ProfileSettingsSelectRow;
+};
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, email, name, avatar_path, timezone, created_at")
-    .eq("id", user.sub)
-    .single();
+export default defineEventHandler(
+  async (event): Promise<ProfileWithSettings> => {
+    const supabase = await serverSupabaseClient<Database>(event);
+    const user = await serverSupabaseUser(event);
 
-  if (error) {
-    throw createError({ statusCode: 500, message: "Failed to fetch profile" });
-  }
+    if (!user?.sub) {
+      throw createError({ statusCode: 401, message: "Unauthorized" });
+    }
 
-  return mapProfileRowToDto(data);
-});
+    const { data, error } = await supabase
+      .from("profiles")
+      .select(
+        "id, username, avatar_path, timezone, created_at, settings:profile_settings!inner(id, color_mode, reduce_animations, week_start, updated_at)",
+      )
+      .eq("id", user.sub)
+      .single();
+
+    if (error || !data) {
+      throw createError({
+        statusCode: 500,
+        message: "Failed to fetch profile",
+      });
+    }
+
+    const row = data as unknown as ProfileWithSettingsRow;
+
+    return {
+      profile: mapProfileRowToDto(row, user.email ?? ""),
+      settings: mapSettingsRowToDto(row.settings),
+    };
+  },
+);

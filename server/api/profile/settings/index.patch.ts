@@ -22,6 +22,9 @@ export default defineEventHandler(async (event): Promise<ProfileSettings> => {
     ...(payload.colorMode !== undefined && {
       color_mode: payload.colorMode,
     }),
+    ...(payload.reduceAnimations !== undefined && {
+      reduce_animations: payload.reduceAnimations,
+    }),
     ...(payload.weekStart !== undefined && {
       week_start: payload.weekStart,
     }),
@@ -31,7 +34,7 @@ export default defineEventHandler(async (event): Promise<ProfileSettings> => {
     .from("profile_settings")
     .update(updatePayload)
     .eq("id", user.sub)
-    .select("id, color_mode, week_start, updated_at")
+    .select("id, color_mode, reduce_animations, week_start, updated_at")
     .single();
 
   if (error || !data) {

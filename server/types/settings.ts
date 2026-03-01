@@ -4,5 +4,5 @@
 
 export type ProfileSettingsSelectRow = Pick<
   Tables<"profile_settings">,
-  "id" | "color_mode" | "week_start" | "updated_at"
+  "id" | "color_mode" | "reduce_animations" | "week_start" | "updated_at"
 >;

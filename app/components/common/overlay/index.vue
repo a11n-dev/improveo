@@ -155,8 +155,7 @@ onBeforeUnmount(() => {
       v-bind="modalProps"
       :ui="{
         footer: [
-          'relative bottom-0 z-20',
-          `before:absolute before:-z-1 before:inset-x-0 before:bottom-0 before:backdrop-blur-sm before:top-0 before:mask-[linear-gradient(to_top,black_0%,black_70%,transparent_100%)] before:content-[''] [&:has([data-overlay-confirm])]:before:-top-full`,
+          'relative bottom-0 z-20 overlay-footer-blur-mask [&:has([data-overlay-confirm])]:before:-top-full',
         ],
       }"
       @after:leave="emit('after:leave')"
@@ -200,10 +199,7 @@ onBeforeUnmount(() => {
             : 'pb-8',
           '[&:has([data-overlay-confirm])]:overflow-hidden',
         ],
-        footer: [
-          'sticky bottom-0 z-20 -mx-4 px-4',
-          `before:absolute before:-z-1 before:inset-x-0 before:bottom-0 before:backdrop-blur-sm before:top-0 before:mask-[linear-gradient(to_top,black_0%,black_70%,transparent_100%)] before:content-['']`,
-        ],
+        footer: ['sticky bottom-0 z-20 -mx-4 px-4 overlay-footer-blur-mask'],
       }"
       :scroll-lock-timeout="250"
       @after:leave="emit('after:leave')"

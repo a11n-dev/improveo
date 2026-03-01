@@ -1,6 +1,6 @@
 /**
  * PATCH /api/profile
- * Updates the authenticated user's profile fields (name, avatar, timezone).
+ * Updates the authenticated user's profile fields (username, avatar, timezone).
  */
 
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event): Promise<Profile> => {
   const payload = await parseBody(event, ProfileUpdatePayloadSchema);
 
   const updatePayload: TablesUpdate<"profiles"> = {
-    ...(payload.name !== undefined && { name: payload.name }),
+    ...(payload.username !== undefined && { username: payload.username }),
     ...(payload.avatarPath !== undefined && {
       avatar_path: payload.avatarPath,
     }),
@@ -29,12 +29,12 @@ export default defineEventHandler(async (event): Promise<Profile> => {
     .from("profiles")
     .update(updatePayload)
     .eq("id", user.sub)
-    .select("id, email, name, avatar_path, timezone, created_at")
+    .select("id, username, avatar_path, timezone, created_at")
     .single();
 
   if (error) {
     throw createError({ statusCode: 500, message: "Failed to update profile" });
   }
 
-  return mapProfileRowToDto(data);
+  return mapProfileRowToDto(data, user.email ?? "");
 });

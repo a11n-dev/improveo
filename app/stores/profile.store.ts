@@ -7,9 +7,10 @@ export const useProfileStore = defineStore("profile", () => {
   const profile = ref<Profile | null>(null);
   const pending = ref(false);
   const error = ref<string | null>(null);
+  const settingsStore = useSettingsStore();
 
   /**
-   * Fetches the user's profile from the server and updates the store state.
+   * Fetches combined profile/settings data and hydrates stores.
    * @returns The fetched Profile object or null if an error occurred.
    */
   const fetchProfile = async (): Promise<Profile | null> => {
@@ -17,12 +18,16 @@ export const useProfileStore = defineStore("profile", () => {
     error.value = null;
 
     try {
-      const fetchedProfile = await $fetch<Profile>(PROFILE_API_PATH, {
-        headers: useRequestHeaders(["cookie"]),
-      });
+      const fetchedProfile = await $fetch<ProfileWithSettings>(
+        PROFILE_API_PATH,
+        {
+          headers: useRequestHeaders(["cookie"]),
+        },
+      );
 
-      profile.value = fetchedProfile;
-      return fetchedProfile;
+      profile.value = fetchedProfile.profile;
+      settingsStore.settings = fetchedProfile.settings;
+      return fetchedProfile.profile;
     } catch (caughtError) {
       error.value =
         caughtError instanceof Error
@@ -74,6 +79,7 @@ export const useProfileStore = defineStore("profile", () => {
       });
 
       profile.value = null;
+      settingsStore.settings = null;
       return true;
     } catch {
       return false;

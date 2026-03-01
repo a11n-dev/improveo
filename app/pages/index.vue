@@ -7,6 +7,7 @@ definePageMeta({
 
 const { habits, weekStart, pending, toggleCompletion, deleteHabit } =
   useHabits();
+const { motionReducedPolicy } = useMotionPreference();
 
 const {
   isOpen: infoOpen,
@@ -102,7 +103,7 @@ watch(
     </div>
 
     <MotionConfig
-      reduced-motion="user"
+      :reduced-motion="motionReducedPolicy"
       :transition="{ duration: 0.2, ease: 'easeOut' }"
     >
       <!-- Empty state -->

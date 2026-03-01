@@ -4,6 +4,18 @@ import { z } from "zod";
 
 import { EmailSchema } from "~~/shared/validation/auth";
 
+type EmailChangeStep = "form" | "otp";
+
+interface Props {
+  currentEmail: string;
+  pendingEmail: string;
+  step: EmailChangeStep;
+  canRequestEmailChange: boolean;
+  resendSeconds: number;
+  isRequesting: boolean;
+  isVerifying: boolean;
+}
+
 const {
   currentEmail,
   pendingEmail,
@@ -12,24 +24,19 @@ const {
   resendSeconds,
   isRequesting,
   isVerifying,
-} = defineProps<{
-  currentEmail: string;
-  pendingEmail: string;
-  step: "form" | "otp";
-  canRequestEmailChange: boolean;
-  resendSeconds: number;
-  isRequesting: boolean;
-  isVerifying: boolean;
-}>();
+} = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: "request", email: string): void;
-  (e: "back" | "verify" | "after:leave"): void;
+  request: [email: string];
+  back: [];
+  verify: [token: string];
+  "after:leave": [];
 }>();
-const open = defineModel<boolean>("open", { default: false });
-const otpValue = defineModel<number[]>("otpValue", { default: () => [] });
 
-const EmailChangeFormSchema = z
+const open = defineModel<boolean>("open", { default: false });
+const otpValue = ref<number[]>([]);
+
+const emailChangeFormSchema = z
   .object({
     nextEmail: EmailSchema,
     confirmEmail: EmailSchema,
@@ -52,7 +59,7 @@ const EmailChangeFormSchema = z
     }
   });
 
-type EmailChangeFormData = z.output<typeof EmailChangeFormSchema>;
+type EmailChangeFormData = z.output<typeof emailChangeFormSchema>;
 
 const formState = reactive<EmailChangeFormData>({
   nextEmail: "",
@@ -66,31 +73,25 @@ type FormInstance = {
 
 const form = ref<FormInstance | null>(null);
 
-/**
- * Enables verify action only when a full 6-digit OTP is entered.
- */
+/** Enables verify action only when a full 6-digit OTP is entered. */
 const canVerify = computed(
   () => otpValue.value.join("").trim().length === 6 && !isVerifying,
 );
 
-/**
- * Minimal client-side guard to prevent empty confirmation submits.
- */
-const hasEmailInput = computed(
+/** Minimal guard to prevent empty request submissions. */
+const canSendConfirmation = computed(
   () =>
+    canRequestEmailChange &&
+    !isRequesting &&
     formState.nextEmail.trim().length > 0 &&
     formState.confirmEmail.trim().length > 0,
 );
 
-const canSendConfirmation = computed(
-  () => hasEmailInput.value && canRequestEmailChange && !isRequesting,
-);
+const otpToken = computed(() => otpValue.value.join("").trim());
 
 const resendCountdown = computed(() => formatCountdown(resendSeconds));
 
-/**
- * Resets local form state whenever overlay re-opens.
- */
+/** Resets local email form state whenever overlay opens. */
 watch(open, (value) => {
   if (!value) {
     return;
@@ -103,21 +104,32 @@ watch(open, (value) => {
 });
 
 /**
- * Emits request only when local guard allows submit from current form state.
+ * Emits request only when form validation passes.
  */
 const handleRequest = (event: FormSubmitEvent<EmailChangeFormData>): void => {
-  if (!canSendConfirmation.value) {
+  if (!canRequestEmailChange || isRequesting) {
     return;
   }
 
   emit("request", event.data.nextEmail);
 };
 
-/**
- * Submits Nuxt UI form programmatically from footer button.
- */
+/** Submits the email change form programmatically from footer action. */
 const submitRequestForm = async (): Promise<void> => {
+  if (!canSendConfirmation.value) {
+    return;
+  }
+
   await form.value?.submit();
+};
+
+/** Emits OTP verification request when current token is complete. */
+const submitVerify = (): void => {
+  if (!canVerify.value) {
+    return;
+  }
+
+  emit("verify", otpToken.value);
 };
 </script>
 
@@ -139,55 +151,25 @@ const submitRequestForm = async (): Promise<void> => {
         v-if="step === 'form'"
         ref="form"
         :state="formState"
-        :schema="EmailChangeFormSchema"
+        :schema="emailChangeFormSchema"
         :validate-on="[]"
         class="space-y-4"
         @submit="handleRequest"
       >
-        <UFormField label="New email" name="nextEmail" required>
-          <UInput
-            v-model="formState.nextEmail"
-            class="w-full"
-            type="email"
-            placeholder="name@example.com"
-            :disabled="isRequesting"
-          />
-        </UFormField>
-
-        <UFormField label="Confirm new email" name="confirmEmail" required>
-          <UInput
-            v-model="formState.confirmEmail"
-            class="w-full"
-            type="email"
-            placeholder="Repeat email"
-            :disabled="isRequesting"
-          />
-        </UFormField>
-
-        <p class="text-sm text-muted break-all">
-          Current: {{ currentEmail }} <br />
-          Enter a new email address for your account.
-        </p>
+        <ProfileSettingsAccountViewEmailFormChange
+          v-model:state="formState"
+          :current-email="currentEmail"
+          :disabled="isRequesting"
+        />
       </UForm>
 
-      <div v-else class="space-y-4">
-        <p class="text-sm text-muted">
-          Enter the 6-digit code sent to
-          <span class="font-medium text-highlighted">{{ pendingEmail }}</span>
-        </p>
-
-        <UPinInput
-          v-model="otpValue"
-          :length="6"
-          otp
-          size="xl"
-          type="number"
-          placeholder="·"
-          class="w-full justify-between"
-          :disabled="isVerifying"
-          @complete="emit('verify')"
-        />
-      </div>
+      <ProfileSettingsAccountViewEmailFormVerify
+        v-else
+        v-model:otp-value="otpValue"
+        :pending-email="pendingEmail"
+        :disabled="isVerifying || isRequesting"
+        @complete="submitVerify"
+      />
     </template>
 
     <template #footer>
@@ -209,7 +191,7 @@ const submitRequestForm = async (): Promise<void> => {
                   color: 'primary',
                   loading: isVerifying,
                   disabled: !canVerify || isRequesting,
-                  onClick: () => emit('verify'),
+                  onClick: submitVerify,
                 },
                 {
                   label: 'Back',
@@ -226,6 +208,7 @@ const submitRequestForm = async (): Promise<void> => {
               You can request another code in {{ resendCountdown }}.
             </p>
           </template>
+
           <template v-else>
             <CommonCodeResendAction
               :seconds-left="resendSeconds"

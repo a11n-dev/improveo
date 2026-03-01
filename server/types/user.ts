@@ -4,5 +4,5 @@
 
 export type ProfileSelectRow = Pick<
   Tables<"profiles">,
-  "id" | "email" | "name" | "avatar_path" | "timezone" | "created_at"
+  "id" | "username" | "avatar_path" | "timezone" | "created_at"
 >;

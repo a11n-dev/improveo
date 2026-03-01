@@ -15,11 +15,9 @@ import {
 export const EmailSchema = z
   .email("Enter a valid email address.")
   .trim()
+  .min(1, "Email is required")
   .toLowerCase()
-  .max(
-    EMAIL_MAX_LENGTH,
-    `Email must be ${EMAIL_MAX_LENGTH} characters or less`,
-  );
+  .max(EMAIL_MAX_LENGTH, `Email must be ${EMAIL_MAX_LENGTH} characters or less`)
 
 /**
  * Reusable username validator for account creation and editing.
@@ -29,7 +27,6 @@ export const EmailSchema = z
 export const UsernameSchema = z
   .string()
   .trim()
-  .toLowerCase()
   .min(
     PROFILE_NAME_MIN_LENGTH,
     `Must be at least ${PROFILE_NAME_MIN_LENGTH} characters`,
@@ -38,4 +35,8 @@ export const UsernameSchema = z
     PROFILE_NAME_MAX_LENGTH,
     `Must be ${PROFILE_NAME_MAX_LENGTH} characters or less`,
   )
-  .regex(PROFILE_USERNAME_PATTERN, "Can contain only letters and numbers");
+  .toLowerCase()
+  .regex(
+    PROFILE_USERNAME_PATTERN,
+    "Can contain only lowercase letters and numbers",
+  );

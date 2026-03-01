@@ -142,12 +142,16 @@ watch(
 
 <template>
   <UContainer class="py-8">
-    <!-- Loading state -->
-    <div v-if="pending" class="fixed inset-0 flex items-center justify-center">
+    <!-- Initial loading state (no cached habits yet) -->
+    <div
+      v-if="pending && habits.length === 0"
+      class="fixed inset-0 flex items-center justify-center"
+    >
       <LoadingState />
     </div>
 
     <MotionConfig
+      v-else
       :reduced-motion="motionReducedPolicy"
       :transition="{ duration: 0.2, ease: 'easeOut' }"
     >
@@ -197,7 +201,7 @@ watch(
     </MotionConfig>
 
     <!-- Habit Info Overlay -->
-    <HabitsInfoOverlay
+    <LazyHabitsInfoOverlay
       v-if="selectedHabit"
       v-model:open="infoOpen"
       :habit="selectedHabit"

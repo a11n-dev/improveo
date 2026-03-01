@@ -6,13 +6,13 @@ export default defineAppConfig({
     modal: {
       slots: {
         header: "pb-0!",
-        overlay: "z-90",
+        overlay: "z-100",
         content: "z-100 divide-y-0",
       },
     },
     drawer: {
       slots: {
-        overlay: "z-90",
+        overlay: "z-100",
         container: "transform-gpu",
         content:
           "z-100 safe-drawer-content [--drawer-max-ratio:0.96] will-change-transform",

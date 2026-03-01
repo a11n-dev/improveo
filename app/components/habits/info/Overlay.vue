@@ -138,7 +138,7 @@ const handleClose = (): void => {
     </template>
 
     <!-- Nested edit overlay (default slot for drawer context) -->
-    <HabitsEditOverlay
+    <LazyHabitsEditOverlay
       v-if="isEditOverlayMounted"
       v-model:open="isEditOverlayOpen"
       :habit="habit"

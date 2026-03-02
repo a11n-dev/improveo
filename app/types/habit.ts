@@ -1,3 +1,4 @@
+/** Editable form state shared by habit create/edit overlays. */
 export interface HabitFormDraft {
   name: string;
   description: string;

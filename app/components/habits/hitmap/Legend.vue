@@ -1,12 +1,12 @@
 <script setup lang="ts">
 interface Props {
-  /** Current streak count (only shown if goal is set) */
+  /** Current streak count (only shown when goal tracking is enabled). */
   currentStreak?: number;
-  /** Best streak count */
+  /** Best streak count for the habit. */
   bestStreak?: number;
-  /** Whether goal tracking is enabled */
+  /** Indicates whether a goal is configured for the habit. */
   hasGoal?: boolean;
-  /** Goal label (e.g., "Daily", "3 / Week") */
+  /** Goal summary label, for example `Daily` or `3 / Week`. */
   goalLabel?: string;
 }
 
@@ -26,7 +26,6 @@ const badgeStyle = {
 
 <template>
   <div class="flex items-center justify-between text-xs text-muted">
-    <!-- Left: Streak info -->
     <div v-if="hasGoal" class="flex items-center gap-1" @click.stop>
       <UTooltip
         text="Current streak"
@@ -45,6 +44,7 @@ const badgeStyle = {
           {{ currentStreak }}
         </UBadge>
       </UTooltip>
+
       <UTooltip
         text="Best streak"
         :content="{ side: 'top', sideOffset: 6 }"
@@ -62,6 +62,7 @@ const badgeStyle = {
           {{ bestStreak }}
         </UBadge>
       </UTooltip>
+
       <UTooltip
         text="Goal"
         :content="{ side: 'top', sideOffset: 6 }"
@@ -78,6 +79,7 @@ const badgeStyle = {
         </UBadge>
       </UTooltip>
     </div>
+
     <div v-else @click.stop>
       <UTooltip
         text="Goal"
@@ -96,7 +98,6 @@ const badgeStyle = {
       </UTooltip>
     </div>
 
-    <!-- Right: Legend items -->
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-1">
         <div class="flex items-center gap-1">

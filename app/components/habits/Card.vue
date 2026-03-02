@@ -96,8 +96,8 @@ const handleCheckboxClick = (event: Event) => {
       </div>
     </template>
 
-    <!-- Body: Contribution graph -->
-    <HabitsGraph
+    <!-- Body: Habit hitmap -->
+    <HabitsHitmap
       :color="habit.color"
       :completions="habit.completions"
       :week-start="weekStart"

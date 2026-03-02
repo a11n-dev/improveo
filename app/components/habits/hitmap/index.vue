@@ -29,15 +29,19 @@ const {
   goalLabel = "",
 } = defineProps<Props>();
 
-/** Whether on desktop viewport (used to disable tooltips on mobile) */
+/** Whether viewport is desktop-sized (tooltips disabled on mobile). */
 const isDesktop = useIsDesktop();
 
-/** Today's date in ISO format for comparison */
-const todayStr = computed(() => formatDate(endDate));
+const tooltipOpen = ref(false);
+const tooltipAnchor = ref<HTMLElement>();
+const tooltipText = ref("");
 
-/** Build grid data */
+/** Today's date string used to hide future cells. */
+const todayStr = computed(() => formatHitmapDate(endDate));
+
+/** Weekly hitmap matrix generated from completion data. */
 const weeks = computed(() =>
-  buildContributionGrid({
+  buildHabitHitmap({
     endDate,
     daysCount,
     weekStart,
@@ -45,43 +49,22 @@ const weeks = computed(() =>
   }),
 );
 
-/** Month labels for header */
-const monthLabels = computed(() => getMonthLabels(weeks.value));
+/** Month labels rendered on top of each matching week column. */
+const monthLabels = computed(() => getHitmapMonthLabels(weeks.value));
 
-const monthLabelByWeekIndex = computed(() => {
+/** Fast lookup map for month labels by week index. */
+const monthLabelByWeekIndex = computed<Record<number, string>>(() => {
   const map: Record<number, string> = {};
+
   for (const label of monthLabels.value) {
     map[label.colIndex] = label.month;
   }
+
   return map;
 });
 
-const tooltipOpen = ref(false);
-const tooltipAnchor = ref<HTMLElement>();
-const tooltipText = ref("");
-
-const handleCellEnter = (event: MouseEvent, date: string) => {
-  if (!showTooltips || !isDesktop.value) {
-    return;
-  }
-  const formatted = formatDateWithWeekday(date);
-  if (tooltipOpen.value && tooltipText.value === formatted) {
-    tooltipAnchor.value = event.currentTarget as HTMLElement;
-    return;
-  }
-  tooltipAnchor.value = event.currentTarget as HTMLElement;
-  tooltipText.value = formatted;
-  tooltipOpen.value = true;
-};
-
-const handleCellLeave = () => {
-  tooltipOpen.value = false;
-};
-
-const handleGraphScroll = () => {
-  tooltipOpen.value = false;
-  tooltipAnchor.value = undefined;
-};
+/** Day labels rendered on the y-axis according to week start. */
+const dayLabels = computed(() => getDayLabelsForHitmap(weekStart));
 
 watch(
   () => showTooltips,
@@ -93,8 +76,34 @@ watch(
   },
 );
 
-/** Day labels based on week start */
-const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
+/** Opens tooltip for the hovered day cell when tooltips are enabled. */
+const handleCellEnter = (event: MouseEvent, date: string): void => {
+  if (!showTooltips || !isDesktop.value) {
+    return;
+  }
+
+  const formatted = formatDateWithWeekday(date);
+
+  if (tooltipOpen.value && tooltipText.value === formatted) {
+    tooltipAnchor.value = event.currentTarget as HTMLElement;
+    return;
+  }
+
+  tooltipAnchor.value = event.currentTarget as HTMLElement;
+  tooltipText.value = formatted;
+  tooltipOpen.value = true;
+};
+
+/** Closes tooltip when a cell loses hover state. */
+const handleCellLeave = (): void => {
+  tooltipOpen.value = false;
+};
+
+/** Closes tooltip while the horizontal hitmap region scrolls. */
+const handleHitmapScroll = (): void => {
+  tooltipOpen.value = false;
+  tooltipAnchor.value = undefined;
+};
 </script>
 
 <template>
@@ -111,13 +120,12 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
       <template #fallback />
     </ClientOnly>
 
-    <!-- Graph area -->
+    <!-- Hitmap area -->
     <div class="flex w-full" :class="showAxes ? 'gap-1' : ''">
       <!-- Fixed day labels column (pinned Y-axis) -->
       <div v-if="showAxes" class="flex w-7 shrink-0 flex-col gap-1">
-        <!-- Spacer for month labels row -->
         <div class="h-5.25" />
-        <!-- Day labels -->
+
         <div class="grid grid-rows-7 gap-0.75">
           <span
             v-for="(label, index) in dayLabels"
@@ -129,16 +137,15 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
         </div>
       </div>
 
-      <!-- Scrollable area (month labels + grid) -->
+      <!-- Scrollable area (month labels + cell grid) -->
       <div
         class="no-scrollbar min-w-0 flex-1 overflow-x-auto overflow-y-hidden [direction:rtl]"
-        @scroll="handleGraphScroll"
+        @scroll="handleHitmapScroll"
       >
         <div
           class="inline-flex flex-col [direction:ltr]"
           :class="showAxes ? 'gap-1' : ''"
         >
-          <!-- Month labels row -->
           <div v-if="showAxes" class="flex gap-0.75">
             <span
               v-for="(_, weekIndex) in weeks"
@@ -149,7 +156,6 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
             </span>
           </div>
 
-          <!-- Grid of cells -->
           <div class="grid grid-flow-col grid-rows-7 gap-0.75">
             <template v-for="(week, weekIndex) in weeks" :key="weekIndex">
               <div
@@ -167,7 +173,7 @@ const dayLabels = computed(() => getDayLabelsForGraph(weekStart));
       </div>
     </div>
 
-    <HabitsGraphLegend
+    <HabitsHitmapLegend
       v-if="showLegend"
       :current-streak="currentStreak"
       :best-streak="bestStreak"

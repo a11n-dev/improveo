@@ -90,7 +90,7 @@ const handleClose = (): void => {
           '--habit-color-light': `${habit.color}20`,
         }"
       >
-        <HabitsGraph
+        <HabitsHitmap
           :color="habit.color"
           :completions="habit.completions"
           :week-start="weekStart"

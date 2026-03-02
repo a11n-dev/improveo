@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AnimatePresence, MotionConfig, motion } from "motion-v";
-import type { SingleVewPayload } from "~/types/singleview";
+import type { SingleViewPayload } from "~/types/singleview";
 
 type PanelVariantState = {
   opacity: number;
@@ -35,13 +35,13 @@ const isLoading = computed(
   () => pending.value && !profile.value && !error.value,
 );
 
-const activeView = shallowRef<SingleVewPayload | null>(null);
+const activeView = shallowRef<SingleViewPayload | null>(null);
 const { motionReducedPolicy, reduceAnimationsEnabled } = useMotionPreference();
 
 const isDetailViewOpen = computed(() => activeView.value !== null);
 
 /** Opens a full-screen profile subview. */
-const openSettingsView = (view: SingleVewPayload): void => {
+const openSettingsView = (view: SingleViewPayload): void => {
   activeView.value = view;
 };
 

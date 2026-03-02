@@ -1,16 +1,10 @@
 <script setup lang="ts">
+import type { HabitFormDraft } from "~/types/habit";
+
 import {
   HABIT_DESCRIPTION_MAX_LENGTH,
   HABIT_TITLE_MAX_LENGTH,
 } from "~~/shared/constants/validation";
-
-type HabitFormDraft = {
-  name: string;
-  description: string;
-  icon: string | null;
-  color: HabitColor | null;
-  goal: Goal | null;
-};
 
 interface Props {
   /** Habit draft bound from the parent overlay. */

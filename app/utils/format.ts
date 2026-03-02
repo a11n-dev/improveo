@@ -9,15 +9,6 @@ export const formatCountdown = (seconds: number): string => {
   return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
 };
 
-/**
- * Format ISO date (YYYY-MM-DD) to display format (DD-MM-YYYY).
- */
-export const formatDateDisplay = (isoDate: string): string => {
-  const [year, month, day] = isoDate.split("-");
-  if (!year || !month || !day) return isoDate;
-  return `${day}-${month}-${year}`;
-};
-
 const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 /**

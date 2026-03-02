@@ -16,6 +16,43 @@ const {
   markInstallToastHandled,
 } = usePwaInstall();
 
+const createInstallToast = (primaryLabel: string) => {
+  return {
+    title: "Install Improveo",
+    description: "Add to your home screen for quick access",
+    color: "primary" as const,
+    duration: 0,
+    close: {
+      onClick: () => {
+        markInstallToastHandled();
+      },
+    },
+    actions: [
+      {
+        label: primaryLabel,
+        color: "primary" as const,
+        size: "lg" as const,
+        block: true,
+        onClick: () => {
+          markInstallToastHandled();
+          install();
+        },
+      },
+      {
+        label: "Later",
+        color: "neutral" as const,
+        variant: "ghost" as const,
+        size: "lg" as const,
+        block: true,
+        onClick: () => {
+          markInstallToastHandled();
+          cancel();
+        },
+      },
+    ],
+  };
+};
+
 /**
  * Show install prompt toast when native prompt is available.
  */
@@ -23,40 +60,7 @@ watch(
   () => $pwa?.showInstallPrompt,
   (showPrompt) => {
     if (showPrompt && showInstallButton.value && !hasOptedOut.value) {
-      toast.add({
-        title: "Install Improveo",
-        description: "Add to your home screen for quick access",
-        color: "primary",
-        duration: 0,
-        close: {
-          onClick: () => {
-            markInstallToastHandled();
-          },
-        },
-        actions: [
-          {
-            label: "Install",
-            color: "primary",
-            size: "lg",
-            block: true,
-            onClick: () => {
-              markInstallToastHandled();
-              install();
-            },
-          },
-          {
-            label: "Later",
-            color: "neutral",
-            variant: "ghost",
-            size: "lg",
-            block: true,
-            onClick: () => {
-              markInstallToastHandled();
-              cancel();
-            },
-          },
-        ],
-      });
+      toast.add(createInstallToast("Install"));
     }
   },
   { immediate: true },
@@ -83,40 +87,7 @@ const showGuideToastIfNeeded = () => {
     !hasShownGuideToast.value
   ) {
     hasShownGuideToast.value = true;
-    toast.add({
-      title: "Install Improveo",
-      description: "Add to your home screen for quick access",
-      color: "primary",
-      duration: 0,
-      close: {
-        onClick: () => {
-          markInstallToastHandled();
-        },
-      },
-      actions: [
-        {
-          label: "Show me how",
-          color: "primary",
-          size: "lg",
-          block: true,
-          onClick: () => {
-            markInstallToastHandled();
-            install();
-          },
-        },
-        {
-          label: "Later",
-          color: "neutral",
-          variant: "ghost",
-          size: "lg",
-          block: true,
-          onClick: () => {
-            markInstallToastHandled();
-            cancel();
-          },
-        },
-      ],
-    });
+    toast.add(createInstallToast("Show me how"));
   }
 };
 

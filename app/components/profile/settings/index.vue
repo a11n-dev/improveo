@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { markRaw } from "vue";
-import type { SingleVewPayload } from "~/types/singleview";
+import type { SingleViewPayload } from "~/types/singleview";
 
 import AccountView from "./account/view/index.vue";
 import AppearanceView from "./appearance/view/index.vue";
 import WeekStartView from "./week-start/View.vue";
 
 const emit = defineEmits<{
-  "open-view": [view: SingleVewPayload];
+  "open-view": [view: SingleViewPayload];
 }>();
 
 type SettingsViewKey = "account" | "appearance" | "weekStart";
 
 /** Registry of settings subviews that can be opened from the main list. */
-const SETTINGS_VIEWS: Record<SettingsViewKey, SingleVewPayload> = {
+const SETTINGS_VIEWS: Record<SettingsViewKey, SingleViewPayload> = {
   account: {
     key: "account",
     title: "Account",

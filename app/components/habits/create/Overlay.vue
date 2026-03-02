@@ -1,11 +1,5 @@
 <script setup lang="ts">
-type HabitCreateDraft = {
-  name: string;
-  description: string;
-  icon: string | null;
-  color: HabitColor | null;
-  goal: Goal | null;
-};
+import type { HabitFormDraft } from "~/types/habit";
 
 const { isOpen, closeOverlay } = useHabitCreateOverlay();
 const habitsStore = useHabitsStore();
@@ -18,42 +12,25 @@ const modalProps = {
   close: false,
 };
 
-/** Returns initial empty draft values for create form state. */
-const createDefaultDraft = (): HabitCreateDraft => ({
-  name: "",
-  description: "",
-  icon: null,
-  color: null,
-  goal: null,
-});
-
 /** Draft state for create habit form fields. */
-const draft = ref<HabitCreateDraft>(createDefaultDraft());
+const draft = ref<HabitFormDraft>(createHabitDraft());
 
 /** Tracks create request progress to prevent duplicate submissions. */
 const isCreating = ref(false);
 
 /** Returns formatted goal label for the create form button. */
 const goalLabel = computed<string>(() => {
-  const { goal } = draft.value;
-
-  if (!goal) {
-    return "None";
-  }
-
-  return formatGoalLabel(goal.periodType, goal.targetCount);
+  return getGoalLabel(draft.value.goal);
 });
 
 /** Validates required fields before enabling create action. */
 const isValid = computed<boolean>(() => {
-  const { name, icon, color } = draft.value;
-
-  return name.trim().length > 0 && icon !== null && color !== null;
+  return isHabitDraftValid(draft.value);
 });
 
 /** Resets create draft values when overlay closes or reopens. */
 const resetDraft = (): void => {
-  draft.value = createDefaultDraft();
+  draft.value = createHabitDraft();
 };
 
 /** Ensures each open starts from a clean create draft. */

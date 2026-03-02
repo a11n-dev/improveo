@@ -6,7 +6,7 @@ import type { Component } from "vue";
  * `TProps` allows each view to provide component-specific props while
  * preserving a shared navigation contract (`key`, `title`, `component`).
  */
-export type SingleVewPayload<
+export type SingleViewPayload<
   TProps extends Record<string, unknown> = Record<string, never>,
 > = {
   key: string;

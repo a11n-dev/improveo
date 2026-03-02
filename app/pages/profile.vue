@@ -25,7 +25,9 @@ definePageMeta({
 });
 
 const profileStore = useProfileStore();
+const settingsStore = useSettingsStore();
 const { error, pending, profile } = storeToRefs(profileStore);
+const { reduceAnimationsEnabled } = storeToRefs(settingsStore);
 const isProfileShellShifted = useState<boolean>(
   "profile-shell-shifted",
   () => false,
@@ -36,7 +38,9 @@ const isLoading = computed(
 );
 
 const activeView = shallowRef<SingleViewPayload | null>(null);
-const { motionReducedPolicy, reduceAnimationsEnabled } = useMotionPreference();
+const motionReducedPolicy = computed(() =>
+  reduceAnimationsEnabled.value ? "always" : "never",
+);
 
 const isDetailViewOpen = computed(() => activeView.value !== null);
 

@@ -8,7 +8,9 @@ definePageMeta({
 const HABITS_KEY = "habits";
 
 const habitsStore = useHabitsStore();
+const settingsStore = useSettingsStore();
 const { habits, weekStart } = storeToRefs(habitsStore);
+const { reduceAnimationsEnabled } = storeToRefs(settingsStore);
 const { data: cachedHabits } = useNuxtData<HabitsListResponse>(HABITS_KEY);
 
 const { pending } = useAsyncData<HabitsListResponse>(
@@ -24,7 +26,9 @@ const { pending } = useAsyncData<HabitsListResponse>(
   },
 );
 
-const { motionReducedPolicy } = useMotionPreference();
+const motionReducedPolicy = computed(() =>
+  reduceAnimationsEnabled.value ? "always" : "never",
+);
 
 const infoOpen = ref(false);
 const selectedHabitId = ref<string | null>(null);

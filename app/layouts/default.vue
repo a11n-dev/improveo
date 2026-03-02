@@ -7,7 +7,7 @@ const shouldScrollAfterHabitCreate = useState<boolean>(
   () => false,
 );
 
-const { shellTransition, shellVariant, shellVariants } = useShellShiftMotion();
+const { shellTransition, shellVariant, shellVariants } = useShiftMotion();
 
 /** Redirect to home after creation and request a post-navigation scroll. */
 const handleHabitCreated = async () => {

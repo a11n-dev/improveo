@@ -2,7 +2,7 @@
 import { motion } from "motion-v";
 
 const { openOverlay } = useHabitCreateOverlay();
-const { shellTransition, shellVariant, shellVariants } = useShellShiftMotion();
+const { shellTransition, shellVariant, shellVariants } = useShiftMotion();
 </script>
 
 <template>

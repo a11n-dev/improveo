@@ -17,7 +17,10 @@ export const EmailSchema = z
   .trim()
   .min(1, "Email is required")
   .toLowerCase()
-  .max(EMAIL_MAX_LENGTH, `Email must be ${EMAIL_MAX_LENGTH} characters or less`)
+  .max(
+    EMAIL_MAX_LENGTH,
+    `Email must be ${EMAIL_MAX_LENGTH} characters or less`,
+  );
 
 /**
  * Reusable username validator for account creation and editing.

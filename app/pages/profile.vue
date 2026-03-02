@@ -24,7 +24,8 @@ definePageMeta({
   keepalive: true,
 });
 
-const { error, pending, profile } = useProfile();
+const profileStore = useProfileStore();
+const { error, pending, profile } = storeToRefs(profileStore);
 const isProfileShellShifted = useState<boolean>(
   "profile-shell-shifted",
   () => false,

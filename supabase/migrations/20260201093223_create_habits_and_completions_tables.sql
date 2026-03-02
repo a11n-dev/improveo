@@ -1,5 +1,3 @@
-
--- Habits table
 CREATE TABLE habits (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -16,7 +14,6 @@ CREATE TABLE habits (
   updated_at timestamptz DEFAULT now()
 );
 
--- Completions table
 CREATE TABLE completions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   habit_id uuid NOT NULL REFERENCES habits(id) ON DELETE CASCADE,
@@ -25,16 +22,12 @@ CREATE TABLE completions (
   created_at timestamptz DEFAULT now()
 );
 
--- Unique index on completions (habit_id, completed_on) - one completion per day per habit
 CREATE UNIQUE INDEX idx_completions_habit_date ON completions(habit_id, completed_on);
 
--- Index on completions for efficient user queries by date range
 CREATE INDEX idx_completions_user_date ON completions(user_id, completed_on);
 
--- Add week_start column to profiles
-ALTER TABLE profiles ADD COLUMN week_start smallint NOT NULL DEFAULT 0 
+ALTER TABLE profiles ADD COLUMN week_start smallint NOT NULL DEFAULT 0
   CHECK (week_start BETWEEN 0 AND 6);
 
--- Comment: week_start mapping: 0 = Sunday, 1 = Monday, ..., 6 = Saturday
 COMMENT ON COLUMN profiles.week_start IS 'Week start day: 0 = Sunday, 1 = Monday, ..., 6 = Saturday';
 ;

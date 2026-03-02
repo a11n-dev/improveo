@@ -1,13 +1,3 @@
--- =============================================================
--- Migration: profile/settings refactor
--- - Rename profiles.name -> profiles.username
--- - Remove duplicated profiles.email (auth.users remains source of truth)
--- - Convert profile_settings.color_mode from text/check to enum
--- - Optimize RLS policies to use initplan-friendly auth.uid() pattern
--- - Harden set_updated_at search_path
--- =============================================================
-
--- 1) Enum for color mode preference
 do $$
 begin
   if not exists (
@@ -32,7 +22,6 @@ alter table public.profile_settings
     using color_mode::public.color_mode_preference,
   alter column color_mode set default 'system'::public.color_mode_preference;
 
--- 2) Rename profiles.name -> profiles.username
 do $$
 begin
   if exists (
@@ -47,7 +36,6 @@ begin
 end;
 $$;
 
--- Normalize legacy values into username-safe values.
 with normalized as (
   select
     profile.id,
@@ -81,7 +69,6 @@ alter table public.profiles
   add constraint profiles_username_length_check
     check (char_length(username) >= 3 and char_length(username) <= 30);
 
--- 3) Drop duplicated email plumbing from profiles
 drop trigger if exists on_auth_user_email_updated on auth.users;
 drop function if exists public.sync_profile_email_from_auth_user();
 
@@ -125,7 +112,6 @@ begin
 end;
 $$;
 
--- 4) Optimize RLS policy predicates for initplan usage
 drop policy if exists "Profiles are viewable by owner" on public.profiles;
 drop policy if exists "Profiles are insertable by owner" on public.profiles;
 drop policy if exists "Profiles are updatable by owner" on public.profiles;
@@ -156,7 +142,6 @@ create policy "settings_update_own" on public.profile_settings
   using ((select auth.uid()) = id)
   with check ((select auth.uid()) = id);
 
--- 5) Harden trigger helper function search_path (security advisor)
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql

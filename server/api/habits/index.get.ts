@@ -16,8 +16,6 @@ import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 type HabitsOverviewRow =
   Database["public"]["Functions"]["get_habits_overview"]["Returns"][number];
 
-const HABITS_OVERVIEW_RPC = "get_habits_overview";
-
 interface HabitAggregate {
   habit: Habit;
   completionRows: CompletionBitmapRow[];
@@ -47,7 +45,7 @@ export default defineEventHandler(
 
     const [settings, overviewResult] = await Promise.all([
       getUserSettings(event),
-      client.rpc(HABITS_OVERVIEW_RPC, {
+      client.rpc("get_habits_overview", {
         p_from: fromStr,
         p_to: toStr,
       }),

@@ -11,7 +11,7 @@ const habitsStore = useHabitsStore();
 const { habits, weekStart } = storeToRefs(habitsStore);
 const { data: cachedHabits } = useNuxtData<HabitsListResponse>(HABITS_KEY);
 
-const { status } = useAsyncData<HabitsListResponse>(
+const { pending } = useAsyncData<HabitsListResponse>(
   HABITS_KEY,
   (_nuxtApp, { signal }) =>
     $fetch<HabitsListResponse>("/api/habits", {
@@ -24,7 +24,6 @@ const { status } = useAsyncData<HabitsListResponse>(
   },
 );
 
-const pending = computed(() => status.value === "pending");
 const { motionReducedPolicy } = useMotionPreference();
 
 const infoOpen = ref(false);

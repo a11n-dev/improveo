@@ -18,8 +18,9 @@ const SHELL_SHIFT_VARIANTS = {
  *
  * Keeps page content, bottom navigation, and FAB movement synchronized.
  */
-export const useShellShiftMotion = () => {
-  const { reduceAnimationsEnabled } = useMotionPreference();
+export const useShiftMotion = () => {
+  const settingsStore = useSettingsStore();
+  const { reduceAnimationsEnabled } = storeToRefs(settingsStore);
   const isProfileShellShifted = useState<boolean>(
     "profile-shell-shifted",
     () => false,

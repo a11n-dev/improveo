@@ -7,6 +7,11 @@ const SETTINGS_API_PATH = "/api/profile/settings";
 export const useSettingsStore = defineStore("settings", () => {
   const settings = ref<ProfileSettings | null>(null);
 
+  /** True when animations should be reduced according to user preferences. */
+  const reduceAnimationsEnabled = computed<boolean>(
+    () => settings.value?.reduceAnimations ?? false,
+  );
+
   /**
    * Updates settings with optimistic state and server validation.
    * @returns The updated ProfileSettings or null on error.
@@ -92,6 +97,7 @@ export const useSettingsStore = defineStore("settings", () => {
   };
 
   return {
+    reduceAnimationsEnabled,
     settings,
     updateColorMode,
     updateReduceAnimations,

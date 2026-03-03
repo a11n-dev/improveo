@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { serverSupabaseClient } from "#supabase/server";
 
 import type {
   CompletionBitmapRow,
@@ -12,12 +12,14 @@ import { decodeBitmapToCompletionMap } from "~~/server/utils/completions";
 import { fetchActiveGoal } from "./queries";
 import { computeStreaks } from "./streaks";
 
+type DbClient = Awaited<ReturnType<typeof serverSupabaseClient<Database>>>;
+
 /**
  * Fetches completion bitmap rows for a habit.
  * When `years` is provided, rows are restricted to that list.
  */
 export const fetchCompletionRows = async (
-  client: SupabaseClient<Database>,
+  client: DbClient,
   habitId: string,
   years?: number[],
 ): Promise<CompletionBitmapRow[]> => {
@@ -86,7 +88,7 @@ export const computeHabitStreak = (
  * Persists a completion toggle via RPC and returns updated streak values.
  */
 export const toggleHabitCompletion = async (
-  client: SupabaseClient<Database>,
+  client: DbClient,
   options: CompletionToggleComputationOptions,
 ): Promise<CompletionToggleResponse> => {
   const { habitId, date, completed, weekStart } = options;

@@ -1,16 +1,18 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { serverSupabaseClient } from "#supabase/server";
 
 import type { GoalVersionRow, HabitMetadataRow } from "~~/server/types/habit";
 import type { Database } from "~~/shared/types/database.types";
 
 import { mapGoalVersionRowToDto } from "./mappers";
 
+type DbClient = Awaited<ReturnType<typeof serverSupabaseClient<Database>>>;
+
 /**
  * Validates that a habit exists and belongs to the authenticated user.
  * Throws 404 when ownership does not match.
  */
 export const assertHabitOwnership = async (
-  client: SupabaseClient<Database>,
+  client: DbClient,
   habitId: string,
   userId: string,
 ): Promise<void> => {
@@ -30,7 +32,7 @@ export const assertHabitOwnership = async (
  * Fetches a habit metadata row owned by the authenticated user.
  */
 export const fetchHabitMetadata = async (
-  client: SupabaseClient<Database>,
+  client: DbClient,
   habitId: string,
   userId: string,
 ): Promise<HabitMetadataRow> => {
@@ -53,7 +55,7 @@ export const fetchHabitMetadata = async (
  * Returns null when no active goal exists.
  */
 export const fetchActiveGoal = async (
-  client: SupabaseClient<Database>,
+  client: DbClient,
   habitId: string,
 ): Promise<HabitGoalVersion | null> => {
   const { data, error } = await client

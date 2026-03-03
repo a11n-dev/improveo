@@ -1,10 +1,16 @@
+/**
+ * Redirects authenticated users away from `/auth` and guests to `/auth`.
+ */
 export default defineNuxtRouteMiddleware(async (to) => {
   const supabase = useSupabaseClient();
   const { data } = await supabase.auth.getClaims();
+  const isAuthenticated = Boolean(data?.claims);
 
-  if (data?.claims && to.path === "/auth") {
+  if (isAuthenticated && to.path === "/auth") {
     return navigateTo("/", { replace: true });
-  } else if (!data?.claims && to.path !== "/auth") {
+  }
+
+  if (!isAuthenticated && to.path !== "/auth") {
     return navigateTo("/auth", { replace: true });
   }
 });

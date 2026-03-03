@@ -1,8 +1,6 @@
--- 1) Add timezone to profiles
 ALTER TABLE public.profiles
   ADD COLUMN timezone text NOT NULL DEFAULT 'UTC';
 
--- 2) Create habit_goal_versions table
 CREATE TABLE public.habit_goal_versions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   habit_id uuid NOT NULL REFERENCES public.habits(id) ON DELETE CASCADE,
@@ -16,10 +14,8 @@ CREATE TABLE public.habit_goal_versions (
 CREATE INDEX idx_habit_goal_versions_lookup
   ON public.habit_goal_versions (habit_id, effective_from DESC);
 
--- Enable RLS on habit_goal_versions
 ALTER TABLE public.habit_goal_versions ENABLE ROW LEVEL SECURITY;
 
--- RLS policies for habit_goal_versions (join-based via habits.user_id)
 CREATE POLICY "goal_versions_select_own" ON public.habit_goal_versions
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.habits WHERE habits.id = habit_goal_versions.habit_id AND habits.user_id = auth.uid())
@@ -44,7 +40,6 @@ CREATE POLICY "goal_versions_delete_own" ON public.habit_goal_versions
     EXISTS (SELECT 1 FROM public.habits WHERE habits.id = habit_goal_versions.habit_id AND habits.user_id = auth.uid())
   );
 
--- 3) Add packed counter columns to completions
 ALTER TABLE public.completions
   ADD COLUMN week_counts bytea NOT NULL DEFAULT decode(repeat('00', 53), 'hex'),
   ADD COLUMN month_counts bytea NOT NULL DEFAULT decode(repeat('00', 12), 'hex');

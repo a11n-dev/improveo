@@ -1,16 +1,21 @@
 export default defineAppConfig({
   ui: {
+    colors: {
+      neutral: "neutral",
+    },
     modal: {
       slots: {
         header: "pb-0!",
-        content: "divide-y-0",
+        overlay: "z-100",
+        content: "z-100 divide-y-0",
       },
     },
     drawer: {
       slots: {
+        overlay: "z-100",
         container: "transform-gpu",
         content:
-          "safe-drawer-content [--drawer-max-ratio:0.96] will-change-transform",
+          "z-100 safe-drawer-content [--drawer-max-ratio:0.96] will-change-transform",
         footer: "pb-10 pt-6",
       },
     },
@@ -25,6 +30,7 @@ export default defineAppConfig({
       defaultVariants: {
         size: "lg",
         variant: "subtle",
+        color: "neutral",
       },
       variants: {
         size: {
@@ -64,6 +70,12 @@ export default defineAppConfig({
             empty: "p-2.5",
           },
         },
+      },
+    },
+    switch: {
+      defaultVariants: {
+        size: "lg",
+        color: "neutral",
       },
     },
     empty: {

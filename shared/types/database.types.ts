@@ -51,7 +51,7 @@ export type Database = {
           effective_to: string | null;
           habit_id: string;
           id: string;
-          period_type: string;
+          period_type: Database["public"]["Enums"]["goal_period_type"];
           target_count: number;
         };
         Insert: {
@@ -60,7 +60,7 @@ export type Database = {
           effective_to?: string | null;
           habit_id: string;
           id?: string;
-          period_type: string;
+          period_type: Database["public"]["Enums"]["goal_period_type"];
           target_count: number;
         };
         Update: {
@@ -69,7 +69,7 @@ export type Database = {
           effective_to?: string | null;
           habit_id?: string;
           id?: string;
-          period_type?: string;
+          period_type?: Database["public"]["Enums"]["goal_period_type"];
           target_count?: number;
         };
         Relationships: [
@@ -117,23 +117,26 @@ export type Database = {
       };
       profile_settings: {
         Row: {
-          color_mode: string;
+          color_mode: Database["public"]["Enums"]["color_mode_preference"];
           created_at: string;
           id: string;
+          reduce_animations: boolean;
           updated_at: string;
           week_start: number;
         };
         Insert: {
-          color_mode?: string;
+          color_mode?: Database["public"]["Enums"]["color_mode_preference"];
           created_at?: string;
           id: string;
+          reduce_animations?: boolean;
           updated_at?: string;
           week_start?: number;
         };
         Update: {
-          color_mode?: string;
+          color_mode?: Database["public"]["Enums"]["color_mode_preference"];
           created_at?: string;
           id?: string;
+          reduce_animations?: boolean;
           updated_at?: string;
           week_start?: number;
         };
@@ -151,29 +154,26 @@ export type Database = {
         Row: {
           avatar_path: string | null;
           created_at: string;
-          email: string;
           id: string;
-          name: string | null;
           timezone: string;
           updated_at: string;
+          username: string;
         };
         Insert: {
           avatar_path?: string | null;
           created_at?: string;
-          email: string;
           id: string;
-          name?: string | null;
           timezone?: string;
           updated_at?: string;
+          username: string;
         };
         Update: {
           avatar_path?: string | null;
           created_at?: string;
-          email?: string;
           id?: string;
-          name?: string | null;
           timezone?: string;
           updated_at?: string;
+          username?: string;
         };
         Relationships: [];
       };
@@ -182,6 +182,26 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      get_habits_overview: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          color: string;
+          completion_bitmap: string;
+          completion_month_counts: string;
+          completion_week_counts: string;
+          completion_year: number;
+          created_at: string;
+          description: string;
+          goal_effective_from: string;
+          goal_effective_to: string;
+          goal_id: string;
+          goal_period_type: Database["public"]["Enums"]["goal_period_type"];
+          goal_target_count: number;
+          habit_id: string;
+          icon: string;
+          title: string;
+        }[];
+      };
       set_habit_completion: {
         Args: {
           p_date: string;
@@ -193,7 +213,8 @@ export type Database = {
       };
     };
     Enums: {
-      [_ in never]: never;
+      color_mode_preference: "light" | "dark" | "system";
+      goal_period_type: "day" | "week" | "month";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -323,6 +344,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      color_mode_preference: ["light", "dark", "system"],
+      goal_period_type: ["day", "week", "month"],
+    },
   },
 } as const;

@@ -1,51 +1,64 @@
+import { PROFILE_CACHE_KEY } from "~~/shared/constants/cache";
+
 const PROFILE_API_PATH = "/api/profile";
 
 /**
- * Pinia store for managing user profile state, including fetching, updating, and deleting the profile. Provides methods for updating specific profile fields and handles loading and error states.
+ * Pinia store for profile mutations backed by the shared profile async-data cache.
  */
 export const useProfileStore = defineStore("profile", () => {
-  const profile = ref<Profile | null>(null);
-  const pending = ref(false);
-  const error = ref<string | null>(null);
+  const { notifyMessage } = useNotify();
+  const { data: profileData } = useNuxtData<ProfileWithSettings | null>(
+    PROFILE_CACHE_KEY,
+  );
 
-  /**
-   * Fetches the user's profile from the server and updates the store state.
-   * @returns The fetched Profile object or null if an error occurred.
-   */
-  const fetchProfile = async (): Promise<Profile | null> => {
-    pending.value = true;
-    error.value = null;
+  /** Current profile from async-data cache. */
+  const profile = computed<Profile | null>(
+    () => profileData.value?.profile ?? null,
+  );
 
-    try {
-      const fetchedProfile = await $fetch<Profile>(PROFILE_API_PATH, {
-        headers: useRequestHeaders(["cookie"]),
-      });
-
-      profile.value = fetchedProfile;
-      return fetchedProfile;
-    } catch (caughtError) {
-      error.value =
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Failed to fetch profile";
-      return null;
-    } finally {
-      pending.value = false;
+  /** Applies immutable updates to the cached profile payload when available. */
+  const patchProfileCache = (
+    updater: (current: ProfileWithSettings) => ProfileWithSettings,
+  ): void => {
+    if (!profileData.value) {
+      return;
     }
+
+    profileData.value = updater(profileData.value);
   };
 
   /**
-   * Updates the user's profile with the provided payload. Only sends fields that are being updated.
-   * @param payload An object containing the profile fields to update.
-   * @returns The updated Profile object or null if an error occurred or if no profile exists.
+   * Fetches profile/settings payload and hydrates the shared profile cache.
+   */
+  const fetchProfile = async (): Promise<Profile | null> => {
+    try {
+      const fetchedProfile = await $fetch<ProfileWithSettings>(
+        PROFILE_API_PATH,
+        {
+          headers: import.meta.server
+            ? useRequestHeaders(["cookie"])
+            : undefined,
+        },
+      );
+
+      profileData.value = fetchedProfile;
+      return fetchedProfile.profile;
+    } catch {
+      return null;
+    }
+  };
+
+  /** Clears the shared profile/settings cache. */
+  const clearProfile = (): void => {
+    profileData.value = null;
+  };
+
+  /**
+   * Updates profile fields and patches the shared profile cache on success.
    */
   const updateProfile = async (
     payload: ProfileUpdatePayload,
   ): Promise<Profile | null> => {
-    if (!profile.value) {
-      return null;
-    }
-
     if (Object.keys(payload).length === 0) {
       return profile.value;
     }
@@ -56,16 +69,20 @@ export const useProfileStore = defineStore("profile", () => {
         body: payload,
       });
 
-      profile.value = updatedProfile;
+      patchProfileCache((current) => ({
+        ...current,
+        profile: updatedProfile,
+      }));
+
       return updatedProfile;
     } catch {
+      notifyMessage({ scope: "profile", code: "update_failed" });
       return null;
     }
   };
 
   /**
-   * Deletes the user's profile from the server and clears the profile state in the store.
-   * @returns True if the profile was successfully deleted, false if the delete request failed.
+   * Deletes the current account and clears profile cache.
    */
   const deleteProfile = async (): Promise<boolean> => {
     try {
@@ -73,18 +90,19 @@ export const useProfileStore = defineStore("profile", () => {
         method: "DELETE",
       });
 
-      profile.value = null;
+      clearProfile();
+      notifyMessage({ scope: "profile", code: "account_deleted" });
       return true;
     } catch {
+      notifyMessage({ scope: "profile", code: "delete_failed" });
       return false;
     }
   };
 
   return {
+    clearProfile,
     deleteProfile,
-    error,
     fetchProfile,
-    pending,
     profile,
     updateProfile,
   };

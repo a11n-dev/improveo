@@ -6,7 +6,7 @@ import type { Tables, TablesUpdate } from "./database.types";
  */
 
 /** Color mode preference persisted to DB */
-export type ColorModePreference = "light" | "dark" | "system";
+export type ColorModePreference = Tables<"profile_settings">["color_mode"];
 
 /**
  * Profile settings DTO.
@@ -14,6 +14,7 @@ export type ColorModePreference = "light" | "dark" | "system";
  */
 export interface ProfileSettings {
   colorMode: ColorModePreference;
+  reduceAnimations: Tables<"profile_settings">["reduce_animations"];
   weekStart: Tables<"profile_settings">["week_start"];
   updatedAt: Tables<"profile_settings">["updated_at"];
 }
@@ -24,5 +25,6 @@ export interface ProfileSettings {
  */
 export interface ProfileSettingsUpdatePayload {
   colorMode?: TablesUpdate<"profile_settings">["color_mode"];
+  reduceAnimations?: TablesUpdate<"profile_settings">["reduce_animations"];
   weekStart?: TablesUpdate<"profile_settings">["week_start"];
 }

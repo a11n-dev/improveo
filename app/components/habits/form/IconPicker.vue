@@ -1,5 +1,9 @@
 <script setup lang="ts">
-defineProps<{ selectedIcon: string | null }>();
+interface Props {
+  selectedIcon: string | null;
+}
+
+const { selectedIcon } = defineProps<Props>();
 
 const emit = defineEmits<{
   select: [icon: string];
@@ -14,46 +18,66 @@ const isLoadingIcons = ref(false);
 const loadError = ref<string | null>(null);
 const scrollArea = useTemplateRef("scrollArea");
 
-const loadIcons = async () => {
-  if (iconClasses.value.length > 0 || isLoadingIcons.value) return;
+/** Loads available Lucide icons once per component instance. */
+const loadIcons = async (): Promise<void> => {
+  if (iconClasses.value.length > 0 || isLoadingIcons.value) {
+    return;
+  }
 
   isLoadingIcons.value = true;
   loadError.value = null;
 
   try {
     iconClasses.value = await loadLucideIconClasses();
-  } catch (error) {
+  } catch (caughtError) {
     loadError.value = "Failed to load icons. Please try again.";
-    console.error("Failed to load icons:", error);
+    console.error("Failed to load icons:", caughtError);
   } finally {
     isLoadingIcons.value = false;
   }
 };
 
-const filteredIcons = computed(() => {
-  if (!iconSearch.value.trim()) return iconClasses.value;
+/** Filters icon list by current search query. */
+const filteredIcons = computed<string[]>(() => {
+  if (!iconSearch.value.trim()) {
+    return iconClasses.value;
+  }
+
   const search = iconSearch.value.toLowerCase();
+
   return iconClasses.value.filter((icon) =>
     icon.toLowerCase().includes(search),
   );
 });
 
-const scrollToTop = () => {
+/** Resets virtualized scroll to top after search input changes. */
+const scrollToTop = (): void => {
   scrollArea.value?.virtualizer?.scrollToIndex(0, { behavior: "smooth" });
 };
 
-watch(open, async (isOpen) => {
-  if (isOpen) {
-    await loadIcons();
-    iconSearch.value = "";
+/** Emits selected icon and closes the picker overlay. */
+const handleSelectIcon = (icon: string): void => {
+  emit("select", icon);
+  open.value = false;
+};
+
+/** Loads icons lazily and clears search each time the picker opens. */
+watch(open, async (isOpen): Promise<void> => {
+  if (!isOpen) {
+    return;
   }
+
+  await loadIcons();
+  iconSearch.value = "";
 });
 
-watch(iconSearch, () => {
+/** Keeps the first search result row visible when filtering. */
+watch(iconSearch, (): void => {
   scrollToTop();
 });
 
-const lanes = computed(() => (isDesktop.value ? 12 : 8));
+/** Adapts virtual grid columns for desktop and mobile layouts. */
+const lanes = computed<number>(() => (isDesktop.value ? 12 : 8));
 </script>
 
 <template>
@@ -117,10 +141,7 @@ const lanes = computed(() => (isDesktop.value ? 12 : 8));
               class="flex size-9 items-center justify-center rounded-md p-0"
               :class="{ 'ring-2 ring-primary': selectedIcon === icon }"
               :aria-label="icon.replace('i-lucide-', '')"
-              @click="
-                emit('select', icon);
-                open = false;
-              "
+              @click="handleSelectIcon(icon)"
             />
           </UScrollArea>
         </div>

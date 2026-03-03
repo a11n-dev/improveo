@@ -1,54 +1,44 @@
 <script setup lang="ts">
+import type { HabitFormDraft } from "~/types/habit";
+
 import {
   HABIT_DESCRIPTION_MAX_LENGTH,
   HABIT_TITLE_MAX_LENGTH,
 } from "~~/shared/constants/validation";
+
 interface Props {
-  /** The draft object to bind to */
-  draft: {
-    name: string;
-    description: string;
-    icon: string | null;
-    color: HabitColor | null;
-    goal: Goal | null;
-  };
-  /** Label for the goal button */
+  draft: HabitFormDraft;
   goalLabel: string;
 }
 
-const props = defineProps<Props>();
+const { draft, goalLabel } = defineProps<Props>();
 
 const emit = defineEmits<{
-  "update:draft": [
-    draft: {
-      name: string;
-      description: string;
-      icon: string | null;
-      color: HabitColor | null;
-      goal: Goal | null;
-    },
-  ];
+  "update:draft": [draft: HabitFormDraft];
 }>();
 
-/** Goal editor open state */
+/** Controls nested goal editor visibility. */
 const goalEditorOpen = ref(false);
-
-/** Icon picker open state */
+/** Controls nested icon picker visibility. */
 const iconPickerOpen = ref(false);
-
-/** Custom color popover state */
+/** Controls custom color popover visibility. */
 const colorPickerOpen = ref(false);
-
-/** Custom color value */
+/** Holds user-selected custom color before applying to draft. */
 const customColor = ref("#3B82F6");
 
-/** Local draft reference for v-model binding */
+/**
+ * Provides a writable draft bridge for child inputs.
+ * Writes are emitted to keep source of truth in the parent overlay.
+ */
 const localDraft = computed({
-  get: () => props.draft,
-  set: (value) => emit("update:draft", value),
+  get: (): HabitFormDraft => draft,
+  set: (value: HabitFormDraft): void => {
+    emit("update:draft", value);
+  },
 });
 
-const isCustomIconSelected = computed(() => {
+/** Detects whether the selected icon is outside predefined icon presets. */
+const isCustomIconSelected = computed<boolean>(() => {
   if (!localDraft.value.icon) {
     return false;
   }
@@ -58,18 +48,17 @@ const isCustomIconSelected = computed(() => {
   );
 });
 
-const displayedIconPresets = computed(() => {
+/** Includes selected custom icon in the visible presets grid. */
+const displayedIconPresets = computed<ReadonlyArray<string>>(() => {
   if (!isCustomIconSelected.value || !localDraft.value.icon) {
     return habitIconPresets;
   }
 
-  return [
-    ...habitIconPresets.slice(0, -1),
-    localDraft.value.icon,
-  ] as ReadonlyArray<string>;
+  return [...habitIconPresets.slice(0, -1), localDraft.value.icon];
 });
 
-const isCustomColorSelected = computed(() => {
+/** Detects whether the selected color is outside predefined color presets. */
+const isCustomColorSelected = computed<boolean>(() => {
   if (!localDraft.value.color) {
     return false;
   }
@@ -79,50 +68,47 @@ const isCustomColorSelected = computed(() => {
   );
 });
 
-const displayedColorPresets = computed(() => {
+/** Includes selected custom color in the visible preset palette. */
+const displayedColorPresets = computed<ReadonlyArray<string>>(() => {
   if (!isCustomColorSelected.value || !localDraft.value.color) {
     return habitColorPresets;
   }
 
-  return [
-    ...habitColorPresets.slice(0, -1),
-    localDraft.value.color,
-  ] as ReadonlyArray<string>;
+  return [...habitColorPresets.slice(0, -1), localDraft.value.color];
 });
 
-/** Update a specific field in the draft */
-const updateField = <K extends keyof typeof props.draft>(
-  field: K,
-  value: (typeof props.draft)[K],
-) => {
-  emit("update:draft", { ...props.draft, [field]: value });
+/** Updates a single draft field while preserving other values. */
+const updateField = <Key extends keyof HabitFormDraft>(
+  field: Key,
+  value: HabitFormDraft[Key],
+): void => {
+  emit("update:draft", { ...draft, [field]: value } as HabitFormDraft);
 };
 
-/** Select a preset color */
-const selectColor = (color: string) => {
-  updateField("color", color as HabitColor);
+/** Applies a preset color selection to the habit draft. */
+const selectColor = (color: string): void => {
+  updateField("color", color);
 };
 
-/** Apply custom color */
-const applyCustomColor = () => {
-  updateField("color", customColor.value as HabitColor);
+/** Applies current custom color value and closes the color picker. */
+const applyCustomColor = (): void => {
+  updateField("color", customColor.value);
   colorPickerOpen.value = false;
 };
 
-/** Select an icon */
-const selectIcon = (icon: string) => {
+/** Applies icon selection to the habit draft. */
+const selectIcon = (icon: string): void => {
   updateField("icon", icon);
 };
 
-/** Handle goal change from editor */
-const handleGoalChange = (goal: Goal | null) => {
+/** Syncs goal editor output back into the habit draft. */
+const handleGoalChange = (goal: Goal | null): void => {
   updateField("goal", goal);
 };
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <!-- Name -->
     <UFormField label="Name" name="name" required>
       <UInput
         :model-value="localDraft.name"
@@ -145,7 +131,6 @@ const handleGoalChange = (goal: Goal | null) => {
       </UInput>
     </UFormField>
 
-    <!-- Description -->
     <UFormField label="Description" name="description">
       <UInput
         :model-value="localDraft.description"
@@ -170,7 +155,6 @@ const handleGoalChange = (goal: Goal | null) => {
       </UInput>
     </UFormField>
 
-    <!-- Goal -->
     <UFormField label="Goal" name="goal">
       <UButton
         :label="goalLabel"
@@ -182,17 +166,14 @@ const handleGoalChange = (goal: Goal | null) => {
       />
     </UFormField>
 
-    <!-- Nested goal editor -->
     <HabitsFormGoalEditor
       v-model:open="goalEditorOpen"
       :goal="localDraft.goal"
       @update:goal="handleGoalChange"
     />
 
-    <!-- Icon -->
     <UFormField label="Icon" name="icon" required>
       <div class="flex flex-col gap-4">
-        <!-- Icon presets grid -->
         <div
           class="grid grid-cols-[repeat(auto-fill,minmax(36px,1fr))] gap-1.5 md:grid-cols-12"
         >
@@ -212,7 +193,6 @@ const handleGoalChange = (goal: Goal | null) => {
             @click="selectIcon(icon)"
           />
         </div>
-        <!-- Browse all icons button -->
         <UButton
           label="Browse all icons"
           icon="i-lucide-layout-grid"
@@ -224,14 +204,12 @@ const handleGoalChange = (goal: Goal | null) => {
       </div>
     </UFormField>
 
-    <!-- Nested icon picker -->
     <HabitsFormIconPicker
       v-model:open="iconPickerOpen"
       :selected-icon="localDraft.icon"
       @select="selectIcon"
     />
 
-    <!-- Color -->
     <UFormField label="Color" name="color" required>
       <div
         class="grid grid-cols-[repeat(auto-fill,minmax(36px,1fr))] gap-1.5 md:grid-cols-12"

@@ -1,4 +1,3 @@
--- 1) Migrate existing goal fields from habits into habit_goal_versions
 INSERT INTO public.habit_goal_versions (habit_id, period_type, target_count, effective_from, effective_to)
 SELECT
   h.id,
@@ -16,7 +15,6 @@ WHERE h.streak_interval IS NOT NULL
     SELECT 1 FROM public.habit_goal_versions gv WHERE gv.habit_id = h.id
   );
 
--- 2) Backfill week_counts and month_counts from existing bitmaps
 DO $$
 DECLARE
   rec RECORD;
@@ -30,9 +28,9 @@ DECLARE
   month_idx int;
   wc int[];
   mc int[];
-  ws int;  -- week_start for user (0=Mon ISO)
-  js_dow int;  -- JS-style day of week (0=Sun)
-  iso_dow int; -- 0=Mon based
+  ws int;
+  js_dow int;
+  iso_dow int;
   week_start_offset int;
   days_in_year int;
   yr int;
@@ -45,44 +43,32 @@ BEGIN
     bm := rec.bitmap;
     yr := rec.year;
 
-    -- Get week_start from user profile
     SELECT COALESCE(p.week_start, 0) INTO ws
     FROM public.profiles p
     JOIN public.habits h ON h.user_id = p.id
     WHERE h.id = rec.habit_id
     LIMIT 1;
 
-    -- Determine days in year
     IF (yr % 4 = 0 AND (yr % 100 != 0 OR yr % 400 = 0)) THEN
       days_in_year := 366;
     ELSE
       days_in_year := 365;
     END IF;
 
-    -- Initialize counters
     wc := array_fill(0, ARRAY[53]);
     mc := array_fill(0, ARRAY[12]);
 
-    -- Iterate each day of the year
     FOR day_of_year IN 1..days_in_year LOOP
-      -- Check if bit is set (bit index = day_of_year - 1)
+
       bit_val := get_bit(bm, day_of_year - 1);
       IF bit_val = 1 THEN
         cur_date := make_date(yr, 1, 1) + (day_of_year - 1);
 
-        -- Month index (0-based)
         month_idx := EXTRACT(MONTH FROM cur_date)::int - 1;
         mc[month_idx + 1] := mc[month_idx + 1] + 1;
 
-        -- Week index: compute based on user's week_start
-        -- ws is ISO 8601: 0=Mon, 1=Tue, ..., 6=Sun
-        -- PostgreSQL EXTRACT(DOW) returns 0=Sun, 1=Mon, ..., 6=Sat
-        -- Convert pg DOW to ISO-based (0=Mon): (DOW + 6) % 7
         iso_dow := (EXTRACT(DOW FROM cur_date)::int + 6) % 7;
-        -- Day index within user's week: (iso_dow - ws + 7) % 7
-        -- Day of year offset for week calculation
-        -- Compute week index as: floor((day_of_year - 1 + offset) / 7)
-        -- where offset accounts for what day Jan 1 falls on relative to week_start
+
         DECLARE
           jan1_iso_dow int;
           jan1_offset int;
@@ -96,7 +82,6 @@ BEGIN
       END IF;
     END LOOP;
 
-    -- Pack week_counts (53 bytes)
     DECLARE
       wc_bytes bytea := decode(repeat('00', 53), 'hex');
       mc_bytes bytea := decode(repeat('00', 12), 'hex');

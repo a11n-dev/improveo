@@ -1,26 +1,15 @@
 <script setup lang="ts">
-const supabaseClient = useSupabaseClient();
-const { notifyError } = useToastNotify();
 const { install, showInstallButton } = usePwaInstall();
+const { signOut } = useSignOut();
 
-/**
- * Handle logout action.
- */
+/** Signs the user out and redirects to the auth page. */
 const handleLogout = async (): Promise<void> => {
-  const { error } = await supabaseClient.auth.signOut({ scope: "global" });
-
-  if (error) {
-    notifyError("Logout failed", "Please try again.");
-    return;
-  }
-
-  await navigateTo("/auth", { replace: true });
+  await signOut();
 };
 </script>
 
 <template>
   <div class="flex flex-col gap-2">
-    <!-- Install PWA button (shown when not installed) -->
     <ClientOnly>
       <UButton
         v-if="showInstallButton"
@@ -33,7 +22,6 @@ const handleLogout = async (): Promise<void> => {
       </UButton>
     </ClientOnly>
 
-    <!-- Logout button -->
     <UButton color="error" icon="i-lucide-log-out" block @click="handleLogout">
       Log out
     </UButton>

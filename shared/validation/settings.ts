@@ -13,10 +13,7 @@ const WeekStartSchema = z
 export const ProfileSettingsUpdatePayloadSchema = z
   .object({
     colorMode: ColorModeSchema.optional(),
+    reduceAnimations: z.boolean().optional(),
     weekStart: WeekStartSchema.optional(),
   })
   .strict();
-
-export type ProfileSettingsUpdateInput = z.infer<
-  typeof ProfileSettingsUpdatePayloadSchema
->;

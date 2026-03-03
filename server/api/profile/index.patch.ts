@@ -1,24 +1,24 @@
 /**
  * PATCH /api/profile
- * Updates the authenticated user's profile fields (name, avatar, timezone).
+ * Updates the authenticated user's profile fields (username, avatar, timezone).
  */
 
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 
+import { requireUser } from "~~/server/utils/request";
 import { ProfileUpdatePayloadSchema } from "~~/shared/validation/profile";
 
 export default defineEventHandler(async (event): Promise<Profile> => {
   const client = await serverSupabaseClient<Database>(event);
-  const user = await serverSupabaseUser(event);
+  const { id: userId, email } = await requireUser(event);
 
-  if (!user?.sub) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
-
-  const payload = await parseBody(event, ProfileUpdatePayloadSchema);
+  const payload = await readValidatedBody(
+    event,
+    ProfileUpdatePayloadSchema.parse,
+  );
 
   const updatePayload: TablesUpdate<"profiles"> = {
-    ...(payload.name !== undefined && { name: payload.name }),
+    ...(payload.username !== undefined && { username: payload.username }),
     ...(payload.avatarPath !== undefined && {
       avatar_path: payload.avatarPath,
     }),
@@ -28,13 +28,13 @@ export default defineEventHandler(async (event): Promise<Profile> => {
   const { data, error } = await client
     .from("profiles")
     .update(updatePayload)
-    .eq("id", user.sub)
-    .select("id, email, name, avatar_path, timezone, created_at")
+    .eq("id", userId)
+    .select("id, username, avatar_path, timezone, created_at")
     .single();
 
   if (error) {
     throw createError({ statusCode: 500, message: "Failed to update profile" });
   }
 
-  return mapProfileRowToDto(data);
+  return mapProfileRowToDto(data, email);
 });

@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@vite-pwa/nuxt",
     "@nuxt/ui",
+    "motion-v/nuxt",
   ],
 
   app: {
@@ -62,12 +63,6 @@ export default defineNuxtConfig({
       redis: {
         driver: "redis",
         url: process.env.REDIS_URL,
-      },
-    },
-    devStorage: {
-      redis: {
-        driver: "fs",
-        base: "./.data/redis",
       },
     },
   },

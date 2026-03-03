@@ -12,7 +12,6 @@ interface Props {
   icon?: string;
   modalProps?: Record<string, unknown>;
   drawerProps?: Record<string, unknown>;
-  /** Declarative footer actions - renders CommonOverlayFooter automatically when provided */
   actions?: FooterAction[];
 }
 
@@ -34,115 +33,7 @@ const isDesktop = useIsDesktop();
 const drawerBodyRef = ref<HTMLElement | null>(null);
 const scrollGateEnabled = computed(() => !isDesktop.value && open.value);
 
-const SCROLL_GATE_DRAG_THRESHOLD = 4;
-
-const isElementVerticallyScrollable = (element: HTMLElement) => {
-  const { overflowY } = window.getComputedStyle(element);
-
-  return (
-    ["auto", "scroll", "overlay"].includes(overflowY) &&
-    element.scrollHeight > element.clientHeight
-  );
-};
-
-const getClosestScrollableWithinContainer = (
-  target: EventTarget | null,
-  container: HTMLElement,
-) => {
-  if (!(target instanceof Node)) {
-    return container;
-  }
-
-  let currentElement: HTMLElement | null =
-    target instanceof HTMLElement ? target : target.parentElement;
-
-  while (currentElement && currentElement !== container) {
-    if (isElementVerticallyScrollable(currentElement)) {
-      return currentElement;
-    }
-
-    currentElement = currentElement.parentElement;
-  }
-
-  return container;
-};
-
-const applyScrollGate = (container: HTMLElement) => {
-  let startY = 0;
-  let activeScrollable: HTMLElement = container;
-
-  const handleTouchStart = (event: TouchEvent) => {
-    if (event.touches.length === 0) {
-      return;
-    }
-
-    startY = event.touches[0]?.clientY ?? 0;
-    activeScrollable = getClosestScrollableWithinContainer(
-      event.target,
-      container,
-    );
-  };
-
-  const handleTouchMove = (event: TouchEvent) => {
-    if (event.touches.length === 0) {
-      return;
-    }
-
-    const currentY = event.touches[0]?.clientY ?? 0;
-    const deltaY = currentY - startY;
-
-    if (deltaY <= SCROLL_GATE_DRAG_THRESHOLD) {
-      return;
-    }
-
-    if (activeScrollable.scrollTop > 0) {
-      return;
-    }
-
-    if (event.cancelable) {
-      event.preventDefault();
-    }
-  };
-
-  container.addEventListener("touchstart", handleTouchStart, { passive: true });
-  container.addEventListener("touchmove", handleTouchMove, { passive: false });
-
-  return () => {
-    container.removeEventListener("touchstart", handleTouchStart);
-    container.removeEventListener("touchmove", handleTouchMove);
-  };
-};
-
-let cleanupScrollGate: (() => void) | null = null;
-
-const setupScrollGate = async () => {
-  if (!scrollGateEnabled.value) {
-    cleanupScrollGate?.();
-    cleanupScrollGate = null;
-    return;
-  }
-
-  await nextTick();
-  const container = drawerBodyRef.value?.closest('[data-slot="container"]');
-  if (!(container instanceof HTMLElement)) {
-    return;
-  }
-
-  cleanupScrollGate?.();
-  cleanupScrollGate = applyScrollGate(container);
-};
-
-watch(
-  [scrollGateEnabled, drawerBodyRef],
-  () => {
-    void setupScrollGate();
-  },
-  { immediate: true },
-);
-
-onBeforeUnmount(() => {
-  cleanupScrollGate?.();
-});
+useScrollGate(scrollGateEnabled, drawerBodyRef);
 </script>
 
 <template>
@@ -155,8 +46,7 @@ onBeforeUnmount(() => {
       v-bind="modalProps"
       :ui="{
         footer: [
-          'relative bottom-0 z-20',
-          `before:absolute before:-z-1 before:inset-x-0 before:bottom-0 before:backdrop-blur-sm before:top-0 before:mask-[linear-gradient(to_top,black_0%,black_70%,transparent_100%)] before:content-[''] [&:has([data-overlay-confirm])]:before:-top-full`,
+          'relative bottom-0 z-20 overlay-footer-blur-mask [&:has([data-overlay-confirm])]:before:-top-full',
         ],
       }"
       @after:leave="emit('after:leave')"
@@ -200,10 +90,7 @@ onBeforeUnmount(() => {
             : 'pb-8',
           '[&:has([data-overlay-confirm])]:overflow-hidden',
         ],
-        footer: [
-          'sticky bottom-0 z-20 -mx-4 px-4',
-          `before:absolute before:-z-1 before:inset-x-0 before:bottom-0 before:backdrop-blur-sm before:top-0 before:mask-[linear-gradient(to_top,black_0%,black_70%,transparent_100%)] before:content-['']`,
-        ],
+        footer: ['sticky bottom-0 z-20 -mx-4 px-4 overlay-footer-blur-mask'],
       }"
       :scroll-lock-timeout="250"
       @after:leave="emit('after:leave')"

@@ -1,136 +1,171 @@
-# AGENTS
+# AGENTS.md
 
-Purpose: quick operational guide for coding agents in this repo.
-Scope: Nuxt 4 app with Tailwind v4, Vitest, Playwright.
+This file provides guidance for AI coding agents working on the Improveo repository.
 
-## Repository layout
+## Project Overview
 
-- `app/` holds the Nuxt app entrypoint and assets.
-- `app/app.vue` is the root component.
-- `app/assets/css/main.css` is the Tailwind v4 entry (`@import "tailwindcss"`).
-- `test/unit` and `test/nuxt` are Vitest roots (see `vitest.config.ts`).
-- `tests/` is the Playwright test directory (see `playwright.config.ts`).
+Main stack:
 
-## Dev and build
+- Nuxt 4 (`ssr: true`)
+- TypeScript (strict)
+- Supabase
+- Pinia
+- Nuxt UI + Tailwind CSS
+- Motion (`motion-v`)
+- Vite PWA
+- Vitest (unit + Nuxt projects) and Playwright
+- Redis (optional local container)
+- ESLint + Prettier
 
-- Dev server: `pnpm dev`.
-- Build: `pnpm build`.
-- Preview build: `pnpm preview`.
-- Postinstall (runs automatically): `pnpm postinstall` (`nuxt prepare`).
+## Project Structure
 
-## Lint, format, and typecheck
+```text
+app/
+  assets/css/main.css          # Global styles
+  components/                  # UI components (auth, common, habits, profile)
+  composables/                 # Reusable composables (use*.ts)
+  layouts/                     # App layouts
+  middleware/                  # Route middleware
+  pages/                       # File-based routes
+  plugins/                     # Nuxt plugins
+  services/                    # App services (notifications, toast)
+  stores/                      # Pinia stores
+  types/                       # Client/UI-only types
+  utils/                       # Client utilities
 
-- Lint: `pnpm lint` (ESLint via `@nuxt/eslint`).
-- Format: `pnpm format` (Prettier defaults; no custom config).
-- Type check: `pnpm type-check` (Nuxt type checker).
-- After implementation, run `pnpm lint`, `pnpm type-check`, `pnpm format`, `pnpm test:unit`, `pnpm test:nuxt` and report results (or note if skipped).
+server/
+  api/                         # Nitro API endpoints
+  types/                       # Server-only types
+  utils/                       # Server utilities
 
-## Tests
+shared/
+  constants/                   # Shared constants
+  types/                       # Cross-runtime types
+  utils/                       # Shared utilities
+  validation/                  # Shared zod validation schemas
 
-- All unit + Nuxt tests: `pnpm test` (Vitest).
-- Watch: `pnpm test:watch`.
-- Coverage: `pnpm test:coverage`.
-- Unit project only: `pnpm test:unit`.
-- Nuxt project only: `pnpm test:nuxt`.
-- E2E: `pnpm test:e2e` (Playwright).
+supabase/
+  migrations/                  # SQL migrations
+  seeds/                       # Seed data
+  config.toml                  # Local Supabase config
 
-## Single-test recipes
+scripts/
+  supabase-env-sync.mjs        # Sync local Supabase values to .env/.env.test
 
-- Vitest single file (unit): `pnpm vitest --project unit test/unit/foo.test.ts`.
-- Vitest single file (nuxt): `pnpm vitest --project nuxt test/nuxt/foo.spec.ts`.
-- Vitest name filter: `pnpm vitest --project unit -t "case name"`.
-- Playwright single file: `pnpm playwright test tests/foo.spec.ts`.
-- Playwright name filter: `pnpm playwright test -g "case name"`.
+test/
+  unit/                        # Unit tests (*.test.ts)
+  nuxt/                        # Nuxt integration tests (*.test.ts)
 
-## DB types generation
+tests/                         # Playwright E2E tests
+```
 
-- Supabase types: `pnpm run supabase:gen:types`.
+## Commands
 
-## Code style guidelines
+### Development and Build
 
-- Follow Nuxt 4 conventions and auto-imports; prefer framework composables where available.
-- Format with Prettier; do not hand-format around it.
-- Prefer explicit, named exports except where Nuxt expects default exports (e.g., config files).
-- Use `import type` for TypeScript-only types to keep runtime bundles clean.
-- Keep imports grouped by source: built-in, third-party, then local (separate with blank lines if needed).
-- Order named imports alphabetically when touched; avoid mixing type and value imports in one statement.
-- Use descriptive, domain-specific names; avoid single-letter identifiers outside short loops.
-- File naming: components in PascalCase; composables in `useXxx.ts`; tests in `*.test.ts` or `*.spec.ts`.
-- Vue SFCs: use `<script setup>` when adding logic; keep template, script, and style sections clean.
-- Keep props, emits, and slots typed; prefer `defineProps` and `defineEmits` generics.
-- Avoid implicit `any`; tighten types in composables and utilities.
-- Favor `const` and immutable data; reassign only when necessary.
-- Document non-obvious or complex logic with JSDoc/TSDoc comments, focusing on intent, assumptions, edge cases, and side effects. Avoid comments that merely restate the code or types.
+```bash
+pnpm install                   # Install dependencies
+pnpm run dev                   # Start Nuxt dev server
+pnpm run dev:local             # Start Supabase + sync env + start Nuxt dev server
+pnpm run build                 # Build production bundle
+pnpm run preview               # Preview production build locally
+pnpm run generate              # Generate static output
+pnpm run postinstall           # Run nuxt prepare (refresh generated artifacts)
+```
 
-## Error handling and logging
+### Setup and Local Services
 
-- Use Nuxt helpers (`createError`, `showError`, `useError`) for user-visible errors.
-- For server routes, return proper HTTP status codes and structured error messages.
-- Avoid swallowing errors; log context once and rethrow or surface to the UI.
-- In tests, assert on error messages or codes rather than generic failures.
+```bash
+pnpm run setup                 # Start local Supabase and sync .env/.env.test
+pnpm run setup:reset           # setup + reset local DB and re-seed
 
-## Data and state
+pnpm run supabase:start        # Start local Supabase stack
+pnpm run supabase:stop         # Stop local Supabase stack
+pnpm run supabase:status       # Show local Supabase status
+pnpm run supabase:env:sync     # Sync Supabase credentials into .env/.env.test
+pnpm run supabase:reset        # Reset local DB and rerun migrations/seeds
+pnpm run supabase:gen:types    # Generate shared/types/database.types.ts
 
-- Use `useState` for shared client state; use `useAsyncData`/`useFetch` for data fetching.
-- Keep server-only logic in `server/` and client-only logic behind `process.client` checks.
-- Prefer composables for cross-component logic and keep components focused on UI.
-- Use optimistic updates by mutating the keyed async‑data cache via `useNuxtData` (from `useAsyncData`/`useFetch`) or local state, and roll back on failure.
+pnpm run redis:start           # Start local Redis container (create if missing)
+pnpm run redis:stop            # Stop local Redis container
+pnpm run redis:logs            # Tail Redis container logs
+pnpm run redis:cli             # Open redis-cli inside container
+```
 
-## Styling
+### Quality and Tests
 
-- Tailwind v4 is enabled via `@tailwindcss/vite`; keep global CSS in `app/assets/css/main.css`.
-- Prefer utility classes for layout/spacing; create components for repeated patterns.
-- Use CSS variables for theming when needed; avoid inline styles unless dynamic.
-- Prefer Nuxt UI semantic colors (`text-muted`, `text-highlighted`, `bg-default`, `text-error`) over hard-coded color classes.
+```bash
+pnpm run lint                  # Run ESLint
+pnpm run type-check            # Run Nuxt type checking
+pnpm run format                # Format repository with Prettier
 
-## Testing conventions
+pnpm run test                  # Run all Vitest projects
+pnpm run test:watch            # Run Vitest in watch mode
+pnpm run test:coverage         # Run Vitest with coverage
+pnpm run test:unit             # Run unit tests only
+pnpm run test:nuxt             # Run Nuxt tests only
 
-- Unit tests live in `test/unit`; Nuxt integration tests in `test/nuxt`.
-- Playwright tests live in `tests/` and run against Nuxt via `@nuxt/test-utils`.
-- Use `.test.ts` or `.spec.ts` suffixes to match Vitest include globs.
-- Prefer deterministic tests: avoid timers/network unless mocked.
+pnpm run test:e2e              # Run Playwright E2E suite
+pnpm run test:e2e:ui           # Run Playwright in UI mode
+```
 
-## Nuxt conventions
+Single-test recipes:
 
-- Use the `app/` directory layout (Nuxt 4) for `pages/`, `layouts/`, `components/`, and `composables/`.
-- Prefer file-based routing under `app/pages/` when building pages.
-- Use `app/layouts/` for shared chrome; keep layout logic minimal.
-- Use `app/middleware/` for route guards; keep middleware side-effect free.
-- Use `app/plugins/` for client/server plugins; suffix with `.client` or `.server` when needed.
-- Use `server/api/` for REST API endpoints.
-- Keep server handlers stateless and return JSON-serializable data.
+```bash
+pnpm vitest --project unit test/unit/foo.test.ts      # Single unit test file
+pnpm vitest --project nuxt test/nuxt/foo.test.ts      # Single Nuxt test file
+pnpm vitest --project unit -t "case name"             # Vitest name filter
 
-## Nuxt UI usage
+pnpm playwright test tests/foo.spec.ts                # Single Playwright spec
+pnpm playwright test -g "case name"                   # Playwright name filter
+```
 
-- Use Nuxt UI components as the primary UI primitives.
-- Keep component overrides minimal; prefer theming via Nuxt UI config and CSS variables.
+## Coding Guidelines
 
-## TypeScript guidance
+- Use TypeScript for all new code; avoid `any`.
+- Follow Nuxt 4 `app/` conventions and file-based routing.
+- Follow Vue 3, Nuxt 4, Pinia, Supabase and Tailwind best practices.
+- Use `<script setup>` for Vue SFC logic.
+- Keep components/composables small and focused.
+- Keep imports grouped by source (built-in, third-party, local).
+- Keep type and value imports separate (`import type { ... }`).
+- Use named local types for `defineProps`/`defineEmits`.
+- Use `import.meta.client` / `import.meta.server` guards when needed.
+- Prefer `runtimeConfig` for app runtime config.
+- Using `process.env` is acceptable in config/tooling files (`nuxt.config.ts`, test config, scripts).
+- Prefer Nuxt UI semantic color tokens over raw Tailwind palette classes.
+- Keep global styles in `app/assets/css/main.css`.
+- Reuse schemas from `shared/validation` at request/input boundaries.
 
-- Use `defineProps`/`defineEmits` types for Vue components.
-- Prefer type aliases for object shapes and interfaces for public contracts when needed.
-- Use `as const` to preserve literal types for config objects.
-- Avoid `any`; use `unknown` and narrow with type guards.
-- Keep runtime validation at boundaries (API responses, form input).
+## Types and Boundaries
 
-## Types Organization
+- Keep types grouped by domain (`habit`, `profile`, `settings`, etc.).
+- Do not edit `shared/types/database.types.ts` manually; regenerate with `pnpm run supabase:gen:types`.
 
-- Shared, cross-runtime types (DTOs, API contracts, domain models) live in `shared/types/` and are auto-imported in both client and server.
-- Server-only types (Nitro handlers/services, server context, server config) live in `server/types/` and are only available in server context. Should be imported manually.
-- UI/client-only types (component/view models, chart configs, browser-related types) live in `app/types/` and are only available in client context. Should be imported manually.
-- Prefer grouping by domain (e.g. `shared/types/user.ts`, `shared/types/trading.ts`) over dumping into a single `types.ts`.
+## Testing Guidelines
 
-## Naming conventions
+- Unit tests live in `test/unit/**/*.test.ts` and run in Node environment.
+- Nuxt tests live in `test/nuxt/**/*.test.ts` and run in Nuxt + Happy DOM.
+- Playwright tests live in `tests/**/*.spec.ts`.
+- Prefer deterministic tests (mock unstable network/timers when needed).
+- Assert specific status codes/messages for error paths.
+- When changing behavior, add or update tests in the closest relevant layer.
 
-- Components: `PascalCase.vue` and `<MyComponent />` in templates.
-- Composables: `useXxx` (file and function).
-- Stores/state: `useXxxStore` if a store pattern is added.
-- Boolean variables: `isX`, `hasX`, `shouldX`.
-- Event handlers: `onXxx`.
-- Constants: `SCREAMING_SNAKE_CASE` only for true constants.
+## CI Notes
 
-## Environment and config
+- CI workflow runs `lint`, `type-check`, and `build`.
+- Test workflow runs local Supabase setup/reset, then `test:unit` and `test:nuxt`.
+- CI and tests run on `main` and `release` branches.
 
-- Keep secrets in `.env` (not tracked); prefer `runtimeConfig` in `nuxt.config.ts`.
-- Avoid reading `process.env` directly in client code; use Nuxt runtime config.
-- Regenerate `.nuxt` artifacts with `pnpm postinstall` if types drift.
+## Before Submitting
+
+- [ ] `pnpm run lint`
+- [ ] `pnpm run type-check`
+- [ ] `pnpm run format`
+- [ ] `pnpm run test:unit`
+- [ ] `pnpm run test:nuxt`
+- [ ] `pnpm run test:e2e` (when E2E exists or critical UI flow changed)
+- [ ] Updated tests for changed behavior
+- [ ] If DB schema changed: migration added, local reset run, DB types regenerated
+- [ ] No secrets committed (`.env`, keys, tokens)
+- [ ] Mentioned any skipped checks and why

@@ -1,4 +1,5 @@
 import type { Tables, TablesUpdate } from "./database.types";
+import type { ProfileSettings } from "./settings";
 
 /**
  * Shared user/profile types used by both client and server.
@@ -11,11 +12,20 @@ import type { Tables, TablesUpdate } from "./database.types";
  */
 export interface Profile {
   id: Tables<"profiles">["id"];
-  email: Tables<"profiles">["email"];
-  name: Tables<"profiles">["name"];
+  email: string;
+  username: Tables<"profiles">["username"];
   avatarPath: Tables<"profiles">["avatar_path"];
   timezone: Tables<"profiles">["timezone"];
   createdAt: Tables<"profiles">["created_at"];
+}
+
+/**
+ * Combined payload returned by GET /api/profile.
+ * Includes profile + settings in one response.
+ */
+export interface ProfileWithSettings {
+  profile: Profile;
+  settings: ProfileSettings;
 }
 
 /**
@@ -23,7 +33,7 @@ export interface Profile {
  * Fields that can be updated by the client.
  */
 export interface ProfileUpdatePayload {
-  name?: TablesUpdate<"profiles">["name"];
+  username?: TablesUpdate<"profiles">["username"];
   avatarPath?: TablesUpdate<"profiles">["avatar_path"];
   timezone?: TablesUpdate<"profiles">["timezone"];
 }

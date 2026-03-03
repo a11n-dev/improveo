@@ -9,6 +9,10 @@
     "dev:local": "pnpm run supabase:start && pnpm run supabase:env:sync && pnpm run dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "redis:start": "docker start improveo-redis || docker run -d --name improveo-redis -p 6379:6379 redis:latest",
+    "redis:stop": "docker stop improveo-redis",
+    "redis:logs": "docker logs -f improveo-redis",
+    "redis:cli": "docker exec -it improveo-redis redis-cli",
     "setup": "pnpm run supabase:start && pnpm run supabase:env:sync",
     "setup:reset": "pnpm run setup && pnpm run supabase:reset",
     "postinstall": "nuxt prepare",
@@ -30,7 +34,6 @@
     "supabase:gen:types": "supabase gen types typescript --local --schema public > shared/types/database.types.ts"
   },
   "dependencies": {
-    "@formkit/auto-animate": "^0.9.0",
     "@iconify-json/lucide": "^1.2.90",
     "@internationalized/date": "^3.11.0",
     "@nuxt/eslint": "^1.15.1",
@@ -42,6 +45,7 @@
     "@vite-pwa/nuxt": "1.1.1",
     "@vueuse/core": "^14.2.1",
     "eslint": "^9.39.2",
+    "motion-v": "2.0.0-beta.4",
     "nuxt": "^4.3.1",
     "pinia": "^3.0.4",
     "tailwindcss": "^4.1.18",

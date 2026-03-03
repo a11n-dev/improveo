@@ -17,8 +17,8 @@ declare
   member2_id uuid;
   v_week_start int := 0; -- Monday (ISO 8601)
 begin
-  select id into member1_id from public.profiles where email = 'member1@example.test';
-  select id into member2_id from public.profiles where email = 'member2@example.test';
+  select id into member1_id from auth.users where email = 'member1@example.test';
+  select id into member2_id from auth.users where email = 'member2@example.test';
 
   if member1_id is null or member2_id is null then
     raise notice 'Skipping completion bitmap seed because test users do not exist';

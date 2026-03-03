@@ -67,8 +67,6 @@ export const useHaptics = () => {
 
   /**
    * Triggers haptic feedback with the requested named pattern.
-   *
-   * @param pattern - Named haptic profile to play. Defaults to `base`.
    */
   const tap = (pattern: HapticPatternName = "base"): void => {
     if (!import.meta.client) {

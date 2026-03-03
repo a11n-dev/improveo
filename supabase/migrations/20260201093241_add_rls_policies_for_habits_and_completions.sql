@@ -1,8 +1,5 @@
-
--- Enable RLS on habits table
 ALTER TABLE habits ENABLE ROW LEVEL SECURITY;
 
--- Habits policies: users can only access their own habits
 CREATE POLICY "Users can view their own habits"
   ON habits FOR SELECT
   TO authenticated
@@ -24,10 +21,8 @@ CREATE POLICY "Users can delete their own habits"
   TO authenticated
   USING (user_id = auth.uid());
 
--- Enable RLS on completions table
 ALTER TABLE completions ENABLE ROW LEVEL SECURITY;
 
--- Completions policies: users can only access their own completions
 CREATE POLICY "Users can view their own completions"
   ON completions FOR SELECT
   TO authenticated

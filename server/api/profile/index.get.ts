@@ -1,27 +1,45 @@
 /**
  * GET /api/profile
- * Returns the authenticated user's profile.
+ * Returns combined profile/settings data for the authenticated user.
+ * Includes profile + settings in a single request.
  */
 
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 
-export default defineEventHandler(async (event): Promise<Profile> => {
-  const supabase = await serverSupabaseClient<Database>(event);
-  const user = await serverSupabaseUser(event);
+import type { ProfileSettingsRow } from "~~/server/types/settings";
+import type { ProfileRow } from "~~/server/types/user";
+import { requireUser } from "~~/server/utils/request";
+import type { ProfileWithSettings } from "~~/shared/types/user";
 
-  if (!user?.sub) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
+type ProfileWithSettingsRow = ProfileRow & {
+  settings: ProfileSettingsRow;
+};
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, email, name, avatar_path, timezone, created_at")
-    .eq("id", user.sub)
-    .single();
+export default defineEventHandler(
+  async (event): Promise<ProfileWithSettings> => {
+    const supabase = await serverSupabaseClient<Database>(event);
+    const { id: userId, email } = await requireUser(event);
 
-  if (error) {
-    throw createError({ statusCode: 500, message: "Failed to fetch profile" });
-  }
+    const { data, error } = await supabase
+      .from("profiles")
+      .select(
+        "id, username, avatar_path, timezone, created_at, settings:profile_settings!inner(id, color_mode, reduce_animations, week_start, updated_at)",
+      )
+      .eq("id", userId)
+      .single();
 
-  return mapProfileRowToDto(data);
-});
+    if (error || !data) {
+      throw createError({
+        statusCode: 500,
+        message: "Failed to fetch profile",
+      });
+    }
+
+    const row = data as unknown as ProfileWithSettingsRow;
+
+    return {
+      profile: mapProfileRowToDto(row, email),
+      settings: mapSettingsRowToDto(row.settings),
+    };
+  },
+);

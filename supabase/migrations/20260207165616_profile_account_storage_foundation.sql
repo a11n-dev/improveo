@@ -37,15 +37,12 @@ DROP TRIGGER IF EXISTS on_auth_user_email_updated ON auth.users;
 
 CREATE TRIGGER on_auth_user_email_updated AFTER UPDATE OF email ON auth.users FOR EACH ROW EXECUTE FUNCTION public.sync_profile_email_from_auth_user();
 
-
   create policy "Owner can delete in own folder"
   on "storage"."objects"
   as permissive
   for delete
   to authenticated
 using (((bucket_id = 'avatars'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text)));
-
-
 
   create policy "Owner can insert in own folder"
   on "storage"."objects"
@@ -54,13 +51,9 @@ using (((bucket_id = 'avatars'::text) AND ((storage.foldername(name))[1] = (auth
   to authenticated
 with check (((bucket_id = 'avatars'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text)));
 
-
-
   create policy "Owner can select in own folder"
   on "storage"."objects"
   as permissive
   for select
   to authenticated
 using (((bucket_id = 'avatars'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text)));
-
-

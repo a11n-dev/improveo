@@ -7,6 +7,21 @@ import {
   today as getToday,
 } from "@internationalized/date";
 
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
+
 interface Props {
   habit: Habit;
   weekStart?: WeekStartDay;
@@ -130,22 +145,26 @@ const isNextDisabled = computed(() => {
 
 /** Format month/year for display */
 const monthYearLabel = computed(() => {
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  return `${monthNames[placeholder.value.month - 1]} ${placeholder.value.year}`;
+  return `${MONTH_NAMES[placeholder.value.month - 1]} ${placeholder.value.year}`;
 });
+
+/** Handles date selection updates coming from the calendar model. */
+const handleDateUpdate = (value: unknown): void => {
+  tapHaptic("base");
+
+  if (Array.isArray(value)) {
+    localSelectedDates.value = value.map(
+      (dateValue: DateValue) =>
+        new CalendarDate(dateValue.year, dateValue.month, dateValue.day),
+    );
+    return;
+  }
+
+  if (value === undefined || value === null) {
+    // Handle unchecking the last date - calendar may return undefined/null.
+    localSelectedDates.value = [];
+  }
+};
 </script>
 
 <template>
@@ -176,20 +195,7 @@ const monthYearLabel = computed(() => {
         ].join(' '),
       }"
       class="w-full"
-      @update:model-value="
-        (v: unknown) => {
-          tapHaptic('base');
-
-          if (Array.isArray(v)) {
-            localSelectedDates = v.map(
-              (d: DateValue) => new CalendarDate(d.year, d.month, d.day),
-            );
-          } else if (v === undefined || v === null) {
-            // Handle unchecking the last date - calendar may return undefined/null
-            localSelectedDates = [];
-          }
-        }
-      "
+      @update:model-value="handleDateUpdate"
     />
 
     <HabitsInfoCalendarControls

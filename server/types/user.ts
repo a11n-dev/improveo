@@ -2,7 +2,10 @@
  * This file contains types related to the "profiles" table in the database.
  */
 
-export type ProfileSelectRow = Pick<
+import type { Tables } from "~~/shared/types/database.types";
+
+/** Server row projection for `public.profiles`. */
+export type ProfileRow = Pick<
   Tables<"profiles">,
-  "id" | "email" | "name" | "avatar_path" | "timezone" | "created_at"
+  "id" | "username" | "avatar_path" | "timezone" | "created_at"
 >;

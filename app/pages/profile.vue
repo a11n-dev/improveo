@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
           <motion.section
             v-if="activeView"
             :key="activeView.key"
-            class="fixed inset-0 z-70 bg-default"
+            class="fixed inset-0 z-70 bg-default transform-gpu will-change-transform"
             :variants="panelVariants"
             initial="hidden"
             animate="visible"

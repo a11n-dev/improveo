@@ -16,7 +16,10 @@ const handleBack = (): void => {
 </script>
 
 <template>
-  <UContainer class="py-8">
+  <UContainer
+    class="py-8"
+    :style="{ paddingTop: 'calc(env(safe-area-inset-top) + 2rem)' }"
+  >
     <div class="space-y-6">
       <CommonSingleViewHeader :title="title" @back="handleBack">
         <template #trailing>

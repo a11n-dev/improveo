@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import {
+  buildHabitHitmap,
+  getDayLabelsForHitmap,
+  getHitmapMonthLabels,
+} from "~/utils/habits";
+
 interface Props {
   color: string;
   completions: Record<string, boolean>;
@@ -37,7 +43,7 @@ const tooltipAnchor = ref<HTMLElement>();
 const tooltipText = ref("");
 
 /** Today's date string used to hide future cells. */
-const todayStr = computed(() => formatHitmapDate(endDate));
+const todayStr = computed(() => toISODateString(endDate));
 
 /** Weekly hitmap matrix generated from completion data. */
 const weeks = computed(() =>

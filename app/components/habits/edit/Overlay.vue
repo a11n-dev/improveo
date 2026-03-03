@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import type { HabitFormDraft } from "~/types/habit";
 
+import {
+  cloneHabitDraft,
+  createHabitDraft,
+  getGoalLabel,
+  isGoalEqual,
+  isHabitDraftValid,
+  mapDraftToUpdatePayload,
+  mapHabitToDraft,
+} from "~/utils/habits";
+
 interface Props {
   habit: Habit;
 }
@@ -92,13 +102,7 @@ const handleSave = async (): Promise<void> => {
   isSaving.value = true;
 
   try {
-    const payload: HabitUpdatePayload = {
-      title: draft.value.name,
-      description: draft.value.description || null,
-      icon: draft.value.icon!,
-      color: draft.value.color!,
-      goal: draft.value.goal,
-    };
+    const payload = mapDraftToUpdatePayload(draft.value);
 
     const updated = await habitsStore.updateHabit(habit.id, payload);
 

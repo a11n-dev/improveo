@@ -87,7 +87,7 @@ const handleClose = (): void => {
         :style="{
           '--habit-color': habit.color,
           '--habit-color-hover': `color-mix(in srgb, ${habit.color} 70%, white)`,
-          '--habit-color-light': `${habit.color}20`,
+          '--habit-color-light': dimColor(habit.color),
         }"
       >
         <HabitsHitmap

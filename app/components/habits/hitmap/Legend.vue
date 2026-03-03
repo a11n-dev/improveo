@@ -1,12 +1,8 @@
 <script setup lang="ts">
 interface Props {
-  /** Current streak count (only shown when goal tracking is enabled). */
   currentStreak?: number;
-  /** Best streak count for the habit. */
   bestStreak?: number;
-  /** Indicates whether a goal is configured for the habit. */
   hasGoal?: boolean;
-  /** Goal summary label, for example `Daily` or `3 / Week`. */
   goalLabel?: string;
 }
 

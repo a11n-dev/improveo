@@ -1,11 +1,20 @@
+import { HABITS_CACHE_KEY, PROFILE_CACHE_KEY } from "~~/shared/constants/cache";
+
 const SETTINGS_API_PATH = "/api/profile/settings";
 
 /**
- * Pinia store for managing user profile settings.
- * Populated during SSR by the profile plugin; updated via PATCH on client.
+ * Pinia store for settings mutations backed by the shared profile async-data cache.
  */
 export const useSettingsStore = defineStore("settings", () => {
-  const settings = ref<ProfileSettings | null>(null);
+  const { notifyMessage } = useNotify();
+  const { data: profileData } = useNuxtData<ProfileWithSettings | null>(
+    PROFILE_CACHE_KEY,
+  );
+
+  /** Current settings from async-data cache. */
+  const settings = computed<ProfileSettings | null>(
+    () => profileData.value?.settings ?? null,
+  );
 
   /** True when animations should be reduced according to user preferences. */
   const reduceAnimationsEnabled = computed<boolean>(
@@ -13,34 +22,43 @@ export const useSettingsStore = defineStore("settings", () => {
   );
 
   /**
-   * Updates settings with optimistic state and server validation.
-   * @returns The updated ProfileSettings or null on error.
+   * Updates settings with optimistic cache state and server validation.
+   *
+   * @param payload Partial settings payload.
+   * @returns Updated settings on success, null on failure.
    */
   const updateSettings = async (
     payload: ProfileSettingsUpdatePayload,
   ): Promise<ProfileSettings | null> => {
-    if (!settings.value) {
+    const currentSettings = settings.value;
+
+    if (!currentSettings) {
       return null;
     }
 
     if (Object.keys(payload).length === 0) {
-      return settings.value;
+      return currentSettings;
     }
 
-    // Optimistic update
-    const previous = { ...settings.value };
-    settings.value = {
-      ...settings.value,
-      ...(payload.colorMode !== undefined && {
-        colorMode: payload.colorMode as ColorModePreference,
-      }),
-      ...(payload.reduceAnimations !== undefined && {
-        reduceAnimations: payload.reduceAnimations,
-      }),
-      ...(payload.weekStart !== undefined && {
-        weekStart: payload.weekStart,
-      }),
-    };
+    const previousSettings = { ...currentSettings };
+
+    if (profileData.value) {
+      profileData.value = {
+        ...profileData.value,
+        settings: {
+          ...profileData.value.settings,
+          ...(payload.colorMode !== undefined && {
+            colorMode: payload.colorMode as ColorModePreference,
+          }),
+          ...(payload.reduceAnimations !== undefined && {
+            reduceAnimations: payload.reduceAnimations,
+          }),
+          ...(payload.weekStart !== undefined && {
+            weekStart: payload.weekStart,
+          }),
+        },
+      };
+    }
 
     try {
       const updated = await $fetch<ProfileSettings>(SETTINGS_API_PATH, {
@@ -48,21 +66,36 @@ export const useSettingsStore = defineStore("settings", () => {
         body: payload,
       });
 
-      settings.value = updated;
+      if (profileData.value) {
+        profileData.value = {
+          ...profileData.value,
+          settings: updated,
+        };
+      }
+
       return updated;
     } catch {
-      // Revert optimistic update
-      settings.value = previous;
+      if (profileData.value) {
+        profileData.value = {
+          ...profileData.value,
+          settings: previousSettings,
+        };
+      }
+
+      notifyMessage({ scope: "settings", code: "update_failed" });
       return null;
     }
   };
 
   /**
    * Convenience: update week start day.
-   * @returns true on success, false on failure.
+   *
+   * @param value Week start index (0..6).
+   * @returns True on success, false on failure.
    */
   const updateWeekStart = async (value: number): Promise<boolean> => {
     if (value < 0 || value > 6) {
+      notifyMessage({ scope: "settings", code: "invalid_value" });
       return false;
     }
 
@@ -72,13 +105,15 @@ export const useSettingsStore = defineStore("settings", () => {
       return false;
     }
 
-    await refreshNuxtData("habits");
+    await refreshNuxtData(HABITS_CACHE_KEY);
     return true;
   };
 
   /**
    * Convenience: update color mode preference.
-   * @returns true on success, false on failure.
+   *
+   * @param value Target color mode preference.
+   * @returns True on success.
    */
   const updateColorMode = async (
     value: ColorModePreference,
@@ -89,7 +124,9 @@ export const useSettingsStore = defineStore("settings", () => {
 
   /**
    * Convenience: update motion reduction preference.
-   * @returns true on success, false on failure.
+   *
+   * @param value Motion reduction preference.
+   * @returns True on success.
    */
   const updateReduceAnimations = async (value: boolean): Promise<boolean> => {
     const result = await updateSettings({ reduceAnimations: value });

@@ -15,3 +15,19 @@ export const requireUserId = async (event: H3Event): Promise<string> => {
 
   return user.sub;
 };
+
+/**
+ * Returns the authenticated user id and email for the current request.
+ * @throws 401 when no authenticated session is present.
+ */
+export const requireUser = async (
+  event: H3Event,
+): Promise<{ id: string; email: string }> => {
+  const user = await serverSupabaseUser(event);
+
+  if (!user?.sub || !user.email) {
+    throw createError({ statusCode: 401, message: "Unauthorized" });
+  }
+
+  return { id: user.sub, email: user.email };
+};

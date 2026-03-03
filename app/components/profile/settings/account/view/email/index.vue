@@ -1,5 +1,7 @@
 <script setup lang="ts">
-type EmailChangeStep = "form" | "otp";
+import type { EmailChangeStep } from "~/types/email";
+
+import { PROFILE_CACHE_KEY } from "~~/shared/constants/cache";
 
 const profileStore = useProfileStore();
 const { notifyMessage } = useNotify();
@@ -68,7 +70,7 @@ const handleConfirmedEmail = async (): Promise<void> => {
     notifyMessage({ scope: "profile", code: "email_updated" });
     stopResendCooldown();
     closeOverlay();
-    await profileStore.fetchProfile();
+    await refreshNuxtData(PROFILE_CACHE_KEY);
   } finally {
     isFinalizingConfirmation.value = false;
   }

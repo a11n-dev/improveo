@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import { motion } from "motion-v";
 
+import { HABITS_CACHE_KEY } from "~~/shared/constants/cache";
+
 definePageMeta({
   keepalive: true,
 });
-
-const HABITS_KEY = "habits";
 
 const habitsStore = useHabitsStore();
 const settingsStore = useSettingsStore();
 const { habits, weekStart } = storeToRefs(habitsStore);
 const { reduceAnimationsEnabled } = storeToRefs(settingsStore);
-const { data: cachedHabits } = useNuxtData<HabitsListResponse>(HABITS_KEY);
+const { data: cachedHabits } =
+  useNuxtData<HabitsListResponse>(HABITS_CACHE_KEY);
 
 const { pending } = useAsyncData<HabitsListResponse>(
-  HABITS_KEY,
+  HABITS_CACHE_KEY,
   (_nuxtApp, { signal }) =>
     $fetch<HabitsListResponse>("/api/habits", {
       headers: useRequestHeaders(["cookie"]),

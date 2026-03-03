@@ -1,4 +1,15 @@
 /**
+ * Creates a color with appended alpha channel.
+ *
+ * @param hexColor Base hex color string.
+ * @param opacity Alpha channel value in decimal (0-255).
+ * @returns Hex color string with alpha channel suffix.
+ */
+export const dimColor = (hexColor: string, opacity: number = 0x20): string => {
+  return `${hexColor}${opacity.toString(16).padStart(2, "0")}`;
+};
+
+/**
  * Preset habit colors for the color picker swatches.
  * Users can also choose a custom color via UColorPicker.
  * 23 balanced hues covering the spectrum.

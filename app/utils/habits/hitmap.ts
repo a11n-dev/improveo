@@ -22,11 +22,6 @@ export interface HabitHitmapOptions {
   completions: Record<string, boolean>;
 }
 
-/** Formats a date to ISO date string (YYYY-MM-DD). */
-export function formatHitmapDate(date: Date): string {
-  return toISODateString(date);
-}
-
 /** Returns a new date shifted by `days` from `date`. */
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -55,14 +50,14 @@ export function buildHabitHitmap(options: HabitHitmapOptions): HitmapDay[][] {
   const endDayIndex = getDayIndexForWeekStart(rangeEnd, weekStart);
   const gridEnd = addDays(rangeEnd, 6 - endDayIndex);
 
-  const rangeStartStr = formatHitmapDate(rangeStart);
-  const rangeEndStr = formatHitmapDate(rangeEnd);
+  const rangeStartStr = toISODateString(rangeStart);
+  const rangeEndStr = toISODateString(rangeEnd);
 
   const days: HitmapDay[] = [];
   let current = gridStart;
 
   while (current <= gridEnd) {
-    const dateStr = formatHitmapDate(current);
+    const dateStr = toISODateString(current);
 
     days.push({
       date: dateStr,
@@ -81,6 +76,21 @@ export function buildHabitHitmap(options: HabitHitmapOptions): HitmapDay[][] {
   return weeks;
 }
 
+const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
+
 /**
  * Returns abbreviated month labels with their corresponding week column index.
  * Labels are hidden for months represented by fewer than two in-range weeks.
@@ -88,21 +98,6 @@ export function buildHabitHitmap(options: HabitHitmapOptions): HitmapDay[][] {
 export function getHitmapMonthLabels(
   weeks: HitmapDay[][],
 ): { month: string; colIndex: number }[] {
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-
   const monthKeys = weeks.map((week) => {
     const inRangeDay = week.find((day) => day.inRange);
 
@@ -135,7 +130,7 @@ export function getHitmapMonthLabels(
 
     const monthStr = monthKey.split("-")[1];
     if (monthStr && (monthCounts[monthKey] ?? 0) >= 2) {
-      const monthName = monthNames[parseInt(monthStr, 10) - 1];
+      const monthName = MONTH_NAMES[parseInt(monthStr, 10) - 1];
 
       if (monthName) {
         labels.push({ month: monthName, colIndex });

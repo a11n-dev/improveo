@@ -23,10 +23,9 @@ export default defineNuxtPlugin(async () => {
     applySettingsColorMode();
   };
 
-  /** Clears profile-related client stores after sign-out. */
+  /** Clears profile-related store state after sign-out. */
   const resetProfileState = (): void => {
-    profileStore.profile = null;
-    settingsStore.settings = null;
+    profileStore.clearProfile();
   };
 
   /** Resolves whether the current request/session is authenticated. */
@@ -63,6 +62,10 @@ export default defineNuxtPlugin(async () => {
   }
 
   if (import.meta.server) {
+    return;
+  }
+
+  if (typeof supabase.auth.onAuthStateChange !== "function") {
     return;
   }
 

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { joinOtpDigits } from "~/utils/auth/otp";
+
 interface Props {
   email: string;
   isSending?: boolean;
@@ -14,11 +16,7 @@ const emit = defineEmits<{
   verify: [];
 }>();
 
-const otpToken = computed(() =>
-  otpValue.value
-    .map((digit) => (typeof digit === "number" ? String(digit) : ""))
-    .join(""),
-);
+const otpToken = computed(() => joinOtpDigits(otpValue.value));
 
 /** Enables verify action only when email exists and 6 digits are entered. */
 const canVerify = computed(

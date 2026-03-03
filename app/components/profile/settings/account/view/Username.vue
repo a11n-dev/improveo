@@ -3,7 +3,6 @@ import { PROFILE_NAME_MAX_LENGTH } from "~~/shared/constants/validation";
 import { UsernameSchema } from "~~/shared/validation/auth";
 
 const profileStore = useProfileStore();
-const { notifyMessage } = useNotify();
 const { profile } = storeToRefs(profileStore);
 
 const draftUsername = ref(profile.value?.username ?? "");
@@ -56,7 +55,6 @@ const saveUsername = async (): Promise<boolean> => {
     });
 
     if (!updatedProfile) {
-      notifyMessage({ scope: "profile", code: "update_failed" });
       return false;
     }
 

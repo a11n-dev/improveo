@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const profileStore = useProfileStore();
-const { notifyMessage } = useNotify();
-const supabaseClient = useSupabaseClient();
+const { signOut } = useSignOut();
 const { profile } = storeToRefs(profileStore);
 
 const isConfirmOpen = ref(false);
@@ -27,15 +26,12 @@ const handleDeleteAccount = async (): Promise<void> => {
     const isDeleted = await profileStore.deleteProfile();
 
     if (!isDeleted) {
-      notifyMessage({ scope: "profile", code: "delete_failed" });
       return;
     }
 
-    notifyMessage({ scope: "profile", code: "account_deleted" });
     isConfirmOpen.value = false;
 
-    await supabaseClient.auth.signOut({ scope: "global" });
-    await navigateTo("/auth", { replace: true });
+    await signOut();
   } finally {
     isDeleting.value = false;
   }

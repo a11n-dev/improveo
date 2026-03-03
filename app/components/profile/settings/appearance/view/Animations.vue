@@ -1,19 +1,14 @@
 <script setup lang="ts">
-const { notifyMessage } = useNotify();
 const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
 
-/** Persists a new animations preference and emits a failure notification. */
+/** Persists a new animations preference when it differs from current state. */
 const handleReduceAnimationsChange = async (value: boolean): Promise<void> => {
   if (settings.value === null || value === settings.value.reduceAnimations) {
     return;
   }
 
-  const updated = await settingsStore.updateReduceAnimations(value);
-
-  if (!updated) {
-    notifyMessage({ scope: "settings", code: "update_failed" });
-  }
+  await settingsStore.updateReduceAnimations(value);
 };
 
 /** Two-way model bound directly to persisted settings state. */

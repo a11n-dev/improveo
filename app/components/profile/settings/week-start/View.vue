@@ -1,35 +1,22 @@
 <script setup lang="ts">
-interface WeekStartOption {
-  label: string;
-  value: WeekStartDay;
-}
+import { WEEKDAY_LABELS } from "~~/shared/constants/weekdays";
 
 /** Ordered weekday options used by the week-start selector. */
-const WEEK_START_OPTIONS: WeekStartOption[] = [
-  { label: "Monday", value: 0 },
-  { label: "Tuesday", value: 1 },
-  { label: "Wednesday", value: 2 },
-  { label: "Thursday", value: 3 },
-  { label: "Friday", value: 4 },
-  { label: "Saturday", value: 5 },
-  { label: "Sunday", value: 6 },
-];
+const WEEK_START_OPTIONS = WEEKDAY_LABELS.map((label, value) => ({
+  label,
+  value: value as WeekStartDay,
+}));
 
-const { notifyMessage } = useNotify();
 const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
 
-/** Persists a new week-start value and emits a failure notification. */
+/** Persists a new week-start value when it differs from current state. */
 const handleWeekStartChange = async (value: WeekStartDay): Promise<void> => {
   if (settings.value === null || value === settings.value.weekStart) {
     return;
   }
 
-  const updated = await settingsStore.updateWeekStart(value);
-
-  if (!updated) {
-    notifyMessage({ scope: "settings", code: "update_failed" });
-  }
+  await settingsStore.updateWeekStart(value);
 };
 
 /** Two-way model bound directly to persisted settings state. */

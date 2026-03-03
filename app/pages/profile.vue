@@ -2,6 +2,8 @@
 import { AnimatePresence, MotionConfig, motion } from "motion-v";
 import type { SingleViewPayload } from "~/types/singleview";
 
+import { PROFILE_CACHE_KEY } from "~~/shared/constants/cache";
+
 type PanelVariantState = {
   opacity: number;
   x?: string;
@@ -26,16 +28,18 @@ definePageMeta({
 
 const profileStore = useProfileStore();
 const settingsStore = useSettingsStore();
-const { error, pending, profile } = storeToRefs(profileStore);
+const { profile } = storeToRefs(profileStore);
 const { reduceAnimationsEnabled } = storeToRefs(settingsStore);
+const { data: profileCache } = useNuxtData<ProfileWithSettings | null>(
+  PROFILE_CACHE_KEY,
+);
 const isProfileShellShifted = useState<boolean>(
   "profile-shell-shifted",
   () => false,
 );
 
-const isLoading = computed(
-  () => pending.value && !profile.value && !error.value,
-);
+const isLoading = computed(() => profileCache.value === undefined);
+const hasError = computed(() => profileCache.value === null);
 
 const activeView = shallowRef<SingleViewPayload | null>(null);
 const motionReducedPolicy = computed(() =>
@@ -108,7 +112,7 @@ onBeforeUnmount(() => {
       </div>
 
       <div
-        v-else-if="error"
+        v-else-if="hasError"
         class="fixed inset-0 flex items-center justify-center px-6"
       >
         <UEmpty

@@ -4,10 +4,11 @@
  * Includes profile + settings in a single request.
  */
 
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 
 import type { ProfileSettingsRow } from "~~/server/types/settings";
 import type { ProfileRow } from "~~/server/types/user";
+import { requireUser } from "~~/server/utils/request";
 import type { ProfileWithSettings } from "~~/shared/types/user";
 
 type ProfileWithSettingsRow = ProfileRow & {
@@ -17,18 +18,14 @@ type ProfileWithSettingsRow = ProfileRow & {
 export default defineEventHandler(
   async (event): Promise<ProfileWithSettings> => {
     const supabase = await serverSupabaseClient<Database>(event);
-    const user = await serverSupabaseUser(event);
-
-    if (!user?.sub) {
-      throw createError({ statusCode: 401, message: "Unauthorized" });
-    }
+    const { id: userId, email } = await requireUser(event);
 
     const { data, error } = await supabase
       .from("profiles")
       .select(
         "id, username, avatar_path, timezone, created_at, settings:profile_settings!inner(id, color_mode, reduce_animations, week_start, updated_at)",
       )
-      .eq("id", user.sub)
+      .eq("id", userId)
       .single();
 
     if (error || !data) {
@@ -41,7 +38,7 @@ export default defineEventHandler(
     const row = data as unknown as ProfileWithSettingsRow;
 
     return {
-      profile: mapProfileRowToDto(row, user.email ?? ""),
+      profile: mapProfileRowToDto(row, email),
       settings: mapSettingsRowToDto(row.settings),
     };
   },

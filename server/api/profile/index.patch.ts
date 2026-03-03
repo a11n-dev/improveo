@@ -3,17 +3,14 @@
  * Updates the authenticated user's profile fields (username, avatar, timezone).
  */
 
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 
+import { requireUser } from "~~/server/utils/request";
 import { ProfileUpdatePayloadSchema } from "~~/shared/validation/profile";
 
 export default defineEventHandler(async (event): Promise<Profile> => {
   const client = await serverSupabaseClient<Database>(event);
-  const user = await serverSupabaseUser(event);
-
-  if (!user?.sub) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
+  const { id: userId, email } = await requireUser(event);
 
   const payload = await readValidatedBody(
     event,
@@ -31,7 +28,7 @@ export default defineEventHandler(async (event): Promise<Profile> => {
   const { data, error } = await client
     .from("profiles")
     .update(updatePayload)
-    .eq("id", user.sub)
+    .eq("id", userId)
     .select("id, username, avatar_path, timezone, created_at")
     .single();
 
@@ -39,5 +36,5 @@ export default defineEventHandler(async (event): Promise<Profile> => {
     throw createError({ statusCode: 500, message: "Failed to update profile" });
   }
 
-  return mapProfileRowToDto(data, user.email ?? "");
+  return mapProfileRowToDto(data, email);
 });

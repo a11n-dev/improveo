@@ -1,7 +1,9 @@
-const HABITS_KEY = "habits";
+import { HABITS_CACHE_KEY } from "~~/shared/constants/cache";
 
+/** Immutable cache updater for habits payload. */
 type HabitsCacheUpdater = (current: HabitsListResponse) => HabitsListResponse;
 
+/** Updates a single habit in an array while preserving order. */
 const updateHabitById = (
   habits: Habit[],
   habitId: string,
@@ -10,6 +12,7 @@ const updateHabitById = (
   return habits.map((habit) => (habit.id === habitId ? updater(habit) : habit));
 };
 
+/** Returns habit copy with completion state toggled for a given date. */
 const withCompletionState = (
   habit: Habit,
   date: string,
@@ -30,49 +33,16 @@ const withCompletionState = (
   };
 };
 
-const withStreakState = (
-  habit: Habit,
-  response: CompletionToggleResponse,
-): Habit => {
-  return {
-    ...habit,
-    currentStreak: response.currentStreak,
-    bestStreak: response.bestStreak,
-  };
-};
-
-const requestCompletionToggle = async (
-  habitId: string,
-  date: string,
-  completed: boolean,
-): Promise<CompletionToggleResponse> => {
-  if (completed) {
-    return $fetch<CompletionToggleResponse>(
-      `/api/habits/${habitId}/completions`,
-      {
-        method: "POST",
-        body: { date },
-      },
-    );
-  }
-
-  return $fetch<CompletionToggleResponse>(
-    `/api/habits/${habitId}/completions?date=${date}`,
-    {
-      method: "DELETE",
-    },
-  );
-};
-
 /**
  * Pinia store for habit mutations and cache selectors.
  *
- * Data fetching remains in the page layer via `useAsyncData("habits", ...)`.
+ * Data fetching remains in the page layer via `useAsyncData(HABITS_CACHE_KEY, ...)`.
  * This store reads and mutates the keyed async-data cache through `useNuxtData`.
  */
 export const useHabitsStore = defineStore("habits", () => {
   const { notifyMessage } = useNotify();
-  const { data: habitsData } = useNuxtData<HabitsListResponse>(HABITS_KEY);
+  const { data: habitsData } =
+    useNuxtData<HabitsListResponse>(HABITS_CACHE_KEY);
 
   /** Current habits list from async-data cache. */
   const habits = computed<Habit[]>(() => habitsData.value?.habits ?? []);
@@ -91,6 +61,7 @@ export const useHabitsStore = defineStore("habits", () => {
     habitsData.value = updater(habitsData.value);
   };
 
+  /** Applies a focused immutable update to one habit in cached payload. */
   const patchHabitInCache = (
     habitId: string,
     updater: (habit: Habit) => Habit,
@@ -184,25 +155,37 @@ export const useHabitsStore = defineStore("habits", () => {
     const wasCompleted = habit.completions[date] ?? false;
     const newCompleted = !wasCompleted;
 
-    const patchCompletionState = (completed: boolean): void => {
-      patchHabitInCache(habitId, (entry) =>
-        withCompletionState(entry, date, completed),
-      );
-    };
-
-    patchCompletionState(newCompleted);
+    patchHabitInCache(habitId, (entry) =>
+      withCompletionState(entry, date, newCompleted),
+    );
 
     try {
-      const response = await requestCompletionToggle(
-        habitId,
-        date,
-        newCompleted,
-      );
-      patchHabitInCache(habitId, (entry) => withStreakState(entry, response));
+      const response = newCompleted
+        ? await $fetch<CompletionToggleResponse>(
+            `/api/habits/${habitId}/completions`,
+            {
+              method: "POST",
+              body: { date },
+            },
+          )
+        : await $fetch<CompletionToggleResponse>(
+            `/api/habits/${habitId}/completions?date=${date}`,
+            {
+              method: "DELETE",
+            },
+          );
+
+      patchHabitInCache(habitId, (entry) => ({
+        ...entry,
+        currentStreak: response.currentStreak,
+        bestStreak: response.bestStreak,
+      }));
 
       return true;
     } catch {
-      patchCompletionState(wasCompleted);
+      patchHabitInCache(habitId, (entry) =>
+        withCompletionState(entry, date, wasCompleted),
+      );
 
       notifyMessage({ scope: "habits", code: "completion_update_failed" });
       return false;

@@ -15,7 +15,7 @@ const emit = defineEmits<{
     <div class="flex flex-1 items-start gap-3">
       <div
         class="flex size-11 shrink-0 items-center justify-center rounded-md"
-        :style="{ backgroundColor: `${habit.color}20` }"
+        :style="{ backgroundColor: dimColor(habit.color) }"
       >
         <UIcon
           :name="habit.icon"

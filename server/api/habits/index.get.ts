@@ -14,15 +14,7 @@
 import { serverSupabaseClient } from "#supabase/server";
 
 import type { CompletionBitmapRow } from "~~/server/types/habit";
-import {
-  computeHabitStreak,
-  getHabitRangeFromQuery,
-  mapGoalVersionRowToDto,
-  mapHabitRowToDto,
-} from "~~/server/utils/habits";
-import { requireUserId } from "~~/server/utils/request";
 import { HabitsRangeQuerySchema } from "~~/server/validation/habits";
-import { getUserSettings } from "~~/server/utils/settings";
 
 type HabitsOverviewRow =
   Database["public"]["Functions"]["get_habits_overview"]["Returns"][number];

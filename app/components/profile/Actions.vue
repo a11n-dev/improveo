@@ -1,18 +1,10 @@
 <script setup lang="ts">
-const supabaseClient = useSupabaseClient();
-const { notifyMessage } = useNotify();
 const { install, showInstallButton } = usePwaInstall();
+const { signOut } = useSignOut();
 
 /** Signs the user out and redirects to the auth page. */
 const handleLogout = async (): Promise<void> => {
-  const { error } = await supabaseClient.auth.signOut({ scope: "global" });
-
-  if (error) {
-    notifyMessage({ scope: "auth", code: "logout_failed" });
-    return;
-  }
-
-  await navigateTo("/auth", { replace: true });
+  await signOut();
 };
 </script>
 

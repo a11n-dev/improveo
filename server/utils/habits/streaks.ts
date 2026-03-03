@@ -1,4 +1,9 @@
 import type { CompletionBitmapRow, HabitStreak } from "~~/server/types/habit";
+import {
+  decodeBitmapToCompletionDates,
+  parsePackedCounts,
+} from "~~/server/utils/completions";
+import { parseISODateString, toISODateString } from "~~/shared/utils/weekStart";
 
 /**
  * Server-side streak calculation logic.

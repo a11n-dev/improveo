@@ -8,17 +8,17 @@ export const useCodeResend = (initialSeconds = 0) => {
 
   const isActive = computed(() => secondsLeft.value > 0);
 
-  /* Starts the countdown with the specified number of seconds. */
+  /** Starts the countdown with the specified number of seconds. */
   const start = (seconds = OTP_RESEND_COOLDOWN_SECONDS): void => {
     secondsLeft.value = Math.max(0, Math.floor(seconds));
   };
 
-  /* Stops the countdown and resets the seconds left to 0. */
+  /** Stops the countdown and resets the seconds left to 0. */
   const stop = (): void => {
     secondsLeft.value = 0;
   };
 
-  /* Countdown logic: Decrease secondsLeft every second until it reaches 0. */
+  /** Countdown logic: decreases secondsLeft every second until it reaches 0. */
   watch(secondsLeft, (value, _, onCleanup) => {
     if (value <= 0) {
       return;

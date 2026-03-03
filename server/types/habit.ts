@@ -1,11 +1,4 @@
-import type { serverSupabaseClient } from "#supabase/server";
-
 import type { Tables } from "~~/shared/types/database.types";
-
-/** Supabase client instance type used by habit server utilities. */
-export type DbClient = Awaited<
-  ReturnType<typeof serverSupabaseClient<Database>>
->;
 
 /** Minimal habit metadata row fetched from `public.habits`. */
 export type HabitMetadataRow = Pick<

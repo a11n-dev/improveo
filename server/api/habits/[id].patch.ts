@@ -5,20 +5,7 @@
  */
 import { serverSupabaseClient } from "#supabase/server";
 
-import {
-  computeHabitStreak,
-  decodeCompletionsFromRows,
-  fetchActiveGoalVersion,
-  fetchCompletionRows,
-  fetchHabitMetadata,
-  getDefaultHabitRange,
-  getYearsInRange,
-  mapGoalVersionRowToDto,
-  mapHabitRowToDto,
-} from "~~/server/utils/habits";
-import { requireUserId } from "~~/server/utils/request";
 import { HabitIdParamsSchema } from "~~/server/validation/habits";
-import { getUserSettings } from "~~/server/utils/settings";
 import { HabitUpdatePayloadSchema } from "~~/shared/validation/habit";
 
 export default defineEventHandler(async (event): Promise<Habit> => {

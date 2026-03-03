@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import type { HabitFormDraft } from "~/types/habit";
 
+import {
+  createHabitDraft,
+  getGoalLabel,
+  isHabitDraftValid,
+  mapDraftToCreatePayload,
+} from "~/utils/habits";
+
 const { isOpen, closeOverlay } = useHabitCreateOverlay();
 const habitsStore = useHabitsStore();
 
@@ -51,13 +58,7 @@ const handleCreate = async (): Promise<void> => {
   isCreating.value = true;
 
   try {
-    const payload: HabitCreatePayload = {
-      title: draft.value.name,
-      description: draft.value.description || undefined,
-      icon: draft.value.icon!,
-      color: draft.value.color!,
-      goal: draft.value.goal,
-    };
+    const payload = mapDraftToCreatePayload(draft.value);
 
     const created = await habitsStore.createHabit(payload);
 

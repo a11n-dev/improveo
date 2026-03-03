@@ -7,15 +7,9 @@
 import { serverSupabaseClient } from "#supabase/server";
 
 import {
-  assertHabitOwnership,
-  setHabitCompletionAndComputeStreak,
-} from "~~/server/utils/habits";
-import { requireUserId } from "~~/server/utils/request";
-import {
   CompletionDateBodySchema,
   HabitIdParamsSchema,
 } from "~~/server/validation/habits";
-import { getUserSettings } from "~~/server/utils/settings";
 
 export default defineEventHandler(
   async (event): Promise<CompletionToggleResponse> => {

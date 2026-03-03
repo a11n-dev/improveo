@@ -11,11 +11,10 @@ const THEME_OPTIONS: AppearanceOption[] = [
   { label: "System", value: "system" },
 ];
 
-const { notifyMessage } = useNotify();
 const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
 
-/** Persists a new color mode value and emits a single failure notification. */
+/** Persists a new color mode value when it differs from current state. */
 const handleColorModeChange = async (
   value: ColorModePreference,
 ): Promise<void> => {
@@ -23,11 +22,7 @@ const handleColorModeChange = async (
     return;
   }
 
-  const updated = await settingsStore.updateColorMode(value);
-
-  if (!updated) {
-    notifyMessage({ scope: "settings", code: "update_failed" });
-  }
+  await settingsStore.updateColorMode(value);
 };
 
 /** Two-way model bound directly to persisted settings state. */

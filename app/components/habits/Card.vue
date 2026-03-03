@@ -49,7 +49,7 @@ const handleCheckboxClick = (event: Event) => {
           <!-- Icon circle with habit color -->
           <div
             class="flex size-11 shrink-0 items-center justify-center rounded-md"
-            :style="{ backgroundColor: `${habit.color}20` }"
+            :style="{ backgroundColor: dimColor(habit.color) }"
           >
             <UIcon
               :name="habit.icon"
@@ -76,7 +76,7 @@ const handleCheckboxClick = (event: Event) => {
             <UCheckbox
               v-model="isChecked"
               :style="{
-                '--habit-color-dimmed': `${habit.color}20`,
+                '--habit-color-dimmed': dimColor(habit.color),
                 '--habit-color': habit.color,
               }"
               :color="isChecked ? 'success' : 'neutral'"

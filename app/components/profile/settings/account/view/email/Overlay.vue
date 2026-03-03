@@ -2,9 +2,10 @@
 import type { FormSubmitEvent } from "@nuxt/ui";
 import { z } from "zod";
 
-import { EmailSchema } from "~~/shared/validation/auth";
+import type { EmailChangeStep } from "~/types/email";
+import { joinOtpDigits } from "~/utils/auth/otp";
 
-type EmailChangeStep = "form" | "otp";
+import { EmailSchema } from "~~/shared/validation/auth";
 
 interface Props {
   currentEmail: string;
@@ -75,7 +76,7 @@ const form = ref<FormInstance | null>(null);
 
 /** Enables verify action only when a full 6-digit OTP is entered. */
 const canVerify = computed(
-  () => otpValue.value.join("").trim().length === 6 && !isVerifying,
+  () => joinOtpDigits(otpValue.value).length === 6 && !isVerifying,
 );
 
 /** Minimal guard to prevent empty request submissions. */
@@ -87,7 +88,7 @@ const canSendConfirmation = computed(
     formState.confirmEmail.trim().length > 0,
 );
 
-const otpToken = computed(() => otpValue.value.join("").trim());
+const otpToken = computed(() => joinOtpDigits(otpValue.value));
 
 const resendCountdown = computed(() => formatCountdown(resendSeconds));
 

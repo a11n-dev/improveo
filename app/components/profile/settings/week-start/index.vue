@@ -1,13 +1,5 @@
 <script setup lang="ts">
-const WEEKDAY_LABELS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-] as const;
+import { WEEKDAY_LABELS } from "~~/shared/constants/weekdays";
 
 const emit = defineEmits<{
   open: [];

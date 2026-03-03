@@ -4,8 +4,6 @@
  */
 import { serverSupabaseClient } from "#supabase/server";
 
-import { assertHabitOwnership } from "~~/server/utils/habits";
-import { requireUserId } from "~~/server/utils/request";
 import { HabitIdParamsSchema } from "~~/server/validation/habits";
 
 export default defineEventHandler(

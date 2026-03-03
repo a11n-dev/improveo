@@ -5,11 +5,6 @@
  */
 import { serverSupabaseClient } from "#supabase/server";
 
-import {
-  mapGoalVersionRowToDto,
-  mapHabitRowToDto,
-} from "~~/server/utils/habits";
-import { requireUserId } from "~~/server/utils/request";
 import { HabitCreatePayloadSchema } from "~~/shared/validation/habit";
 
 export default defineEventHandler(async (event): Promise<Habit> => {

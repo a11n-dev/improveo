@@ -13,5 +13,3 @@ export const ProfileUpdatePayloadSchema = z
     timezone: TimezoneSchema.optional(),
   })
   .strict();
-
-export type ProfileUpdateInput = z.infer<typeof ProfileUpdatePayloadSchema>;

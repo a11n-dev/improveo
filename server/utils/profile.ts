@@ -1,4 +1,4 @@
-import type { ProfileSelectRow } from "~~/server/types/user";
+import type { ProfileRow } from "~~/server/types/user";
 
 /**
  * Maps a database row from the profiles table to a Profile DTO.
@@ -7,10 +7,7 @@ import type { ProfileSelectRow } from "~~/server/types/user";
  * @param email The authenticated user's email.
  * @returns The mapped Profile DTO.
  */
-export const mapProfileRowToDto = (
-  row: ProfileSelectRow,
-  email: string,
-): Profile => {
+export const mapProfileRowToDto = (row: ProfileRow, email: string): Profile => {
   return {
     id: row.id,
     email,

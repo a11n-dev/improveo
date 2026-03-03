@@ -89,12 +89,12 @@ const updateField = <Key extends keyof HabitFormDraft>(
 
 /** Applies a preset color selection to the habit draft. */
 const selectColor = (color: string): void => {
-  updateField("color", color as HabitColor);
+  updateField("color", color);
 };
 
 /** Applies current custom color value and closes the color picker. */
 const applyCustomColor = (): void => {
-  updateField("color", customColor.value as HabitColor);
+  updateField("color", customColor.value);
   colorPickerOpen.value = false;
 };
 

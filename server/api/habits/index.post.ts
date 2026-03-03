@@ -3,27 +3,26 @@
  * Create a new habit for the authenticated user.
  * If a goal is provided, also creates a habit_goal_version row.
  */
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 
-import { parseBody } from "~~/server/utils/validate";
+import {
+  mapGoalVersionRowToDto,
+  mapHabitRowToDto,
+} from "~~/server/utils/habits";
+import { requireUserId } from "~~/server/utils/request";
 import { HabitCreatePayloadSchema } from "~~/shared/validation/habit";
 
 export default defineEventHandler(async (event): Promise<Habit> => {
   const client = await serverSupabaseClient<Database>(event);
-  const user = await serverSupabaseUser(event);
+  const userId = await requireUserId(event);
 
-  if (!user?.sub) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
-
-  // Parse and validate body
-  const body = await parseBody(event, HabitCreatePayloadSchema);
+  const body = await readValidatedBody(event, HabitCreatePayloadSchema.parse);
 
   // Insert the habit (metadata only — no streak columns)
   const { data: habit, error } = await client
     .from("habits")
     .insert({
-      user_id: user.sub,
+      user_id: userId,
       title: body.title,
       description: body.description?.trim() || null,
       icon: body.icon,
@@ -62,26 +61,26 @@ export default defineEventHandler(async (event): Promise<Habit> => {
       });
     }
 
-    goal = {
+    goal = mapGoalVersionRowToDto({
       id: goalRow.id,
-      periodType: goalRow.period_type as PeriodType,
-      targetCount: goalRow.target_count,
-      effectiveFrom: goalRow.effective_from,
-      effectiveTo: goalRow.effective_to,
-    };
+      period_type: goalRow.period_type,
+      target_count: goalRow.target_count,
+      effective_from: goalRow.effective_from,
+      effective_to: goalRow.effective_to,
+    });
   }
 
-  // Return DTO with empty completions and zero streaks
-  return {
-    id: habit.id,
-    title: habit.title,
-    description: habit.description,
-    icon: habit.icon,
-    color: habit.color,
+  return mapHabitRowToDto(
+    {
+      id: habit.id,
+      title: habit.title,
+      description: habit.description,
+      icon: habit.icon,
+      color: habit.color,
+      created_at: habit.created_at,
+    },
     goal,
-    currentStreak: 0,
-    bestStreak: 0,
-    completions: {},
-    createdAt: habit.created_at || new Date().toISOString(),
-  };
+    {},
+    { currentStreak: 0, bestStreak: 0 },
+  );
 });

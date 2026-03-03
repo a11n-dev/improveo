@@ -1,13 +1,10 @@
+import type { CompletionBitmapRow, HabitStreak } from "~~/server/types/habit";
+
 /**
  * Server-side streak calculation logic.
  * Computes streak information from packed counters (week_counts / month_counts)
  * or bitmap (for daily goals).
  */
-
-interface StreakResult {
-  currentStreak: number;
-  bestStreak: number;
-}
 
 interface GoalConfig {
   periodType: PeriodType;
@@ -27,7 +24,7 @@ export function computeStreaks(
   rows: CompletionBitmapRow[],
   config: GoalConfig,
   weekStart: WeekStartDay,
-): StreakResult {
+): HabitStreak {
   if (rows.length === 0) {
     return { currentStreak: 0, bestStreak: 0 };
   }
@@ -63,7 +60,7 @@ export function computeStreaks(
  * Compute daily streaks by scanning bitmaps.
  * A daily goal always has targetCount=1, so any completed day counts.
  */
-function computeDailyStreaks(rows: CompletionBitmapRow[]): StreakResult {
+function computeDailyStreaks(rows: CompletionBitmapRow[]): HabitStreak {
   // Build a flat array of all completed dates across all years
   const allDates: string[] = [];
   for (const row of rows) {
@@ -131,7 +128,7 @@ function computePeriodicStreaks(
   countField: "week_counts" | "month_counts",
   periodsPerYear: number,
   _weekStart: WeekStartDay,
-): StreakResult {
+): HabitStreak {
   // Build a flat list of (year, periodIndex, met) tuples
   const allPeriods: { year: number; index: number; met: boolean }[] = [];
 

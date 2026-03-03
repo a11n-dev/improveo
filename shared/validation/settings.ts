@@ -17,7 +17,3 @@ export const ProfileSettingsUpdatePayloadSchema = z
     weekStart: WeekStartSchema.optional(),
   })
   .strict();
-
-export type ProfileSettingsUpdateInput = z.infer<
-  typeof ProfileSettingsUpdatePayloadSchema
->;

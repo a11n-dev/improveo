@@ -1,20 +1,3 @@
-/**
- * Completion bitmap row shape stored in the DB.
- */
-export interface CompletionBitmapRow {
-  year: number;
-  bitmap: string;
-  week_counts: string;
-  month_counts: string;
-}
-
-/**
- * Completion bitmap row including the habit id for grouping.
- */
-export interface HabitCompletionBitmapRow extends CompletionBitmapRow {
-  habit_id: string;
-}
-
 const isLeapYear = (year: number): boolean => {
   return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
 };

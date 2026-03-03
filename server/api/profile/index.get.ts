@@ -6,12 +6,12 @@
 
 import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 
-import type { ProfileSettingsSelectRow } from "~~/server/types/settings";
-import type { ProfileSelectRow } from "~~/server/types/user";
+import type { ProfileSettingsRow } from "~~/server/types/settings";
+import type { ProfileRow } from "~~/server/types/user";
 import type { ProfileWithSettings } from "~~/shared/types/user";
 
-type ProfileWithSettingsRow = ProfileSelectRow & {
-  settings: ProfileSettingsSelectRow;
+type ProfileWithSettingsRow = ProfileRow & {
+  settings: ProfileSettingsRow;
 };
 
 export default defineEventHandler(

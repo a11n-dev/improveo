@@ -2,6 +2,68 @@ const HABITS_KEY = "habits";
 
 type HabitsCacheUpdater = (current: HabitsListResponse) => HabitsListResponse;
 
+const updateHabitById = (
+  habits: Habit[],
+  habitId: string,
+  updater: (habit: Habit) => Habit,
+): Habit[] => {
+  return habits.map((habit) => (habit.id === habitId ? updater(habit) : habit));
+};
+
+const withCompletionState = (
+  habit: Habit,
+  date: string,
+  completed: boolean,
+): Habit => {
+  if (completed) {
+    return {
+      ...habit,
+      completions: { ...habit.completions, [date]: true },
+    };
+  }
+
+  const { [date]: _removed, ...rest } = habit.completions;
+
+  return {
+    ...habit,
+    completions: rest,
+  };
+};
+
+const withStreakState = (
+  habit: Habit,
+  response: CompletionToggleResponse,
+): Habit => {
+  return {
+    ...habit,
+    currentStreak: response.currentStreak,
+    bestStreak: response.bestStreak,
+  };
+};
+
+const requestCompletionToggle = async (
+  habitId: string,
+  date: string,
+  completed: boolean,
+): Promise<CompletionToggleResponse> => {
+  if (completed) {
+    return $fetch<CompletionToggleResponse>(
+      `/api/habits/${habitId}/completions`,
+      {
+        method: "POST",
+        body: { date },
+      },
+    );
+  }
+
+  return $fetch<CompletionToggleResponse>(
+    `/api/habits/${habitId}/completions?date=${date}`,
+    {
+      method: "DELETE",
+    },
+  );
+};
+
 /**
  * Pinia store for habit mutations and cache selectors.
  *
@@ -27,6 +89,16 @@ export const useHabitsStore = defineStore("habits", () => {
     }
 
     habitsData.value = updater(habitsData.value);
+  };
+
+  const patchHabitInCache = (
+    habitId: string,
+    updater: (habit: Habit) => Habit,
+  ): void => {
+    patchHabitsCache((current) => ({
+      ...current,
+      habits: updateHabitById(current.habits, habitId, updater),
+    }));
   };
 
   /** Creates a habit and appends it to cached list when present. */
@@ -83,9 +155,7 @@ export const useHabitsStore = defineStore("habits", () => {
 
       patchHabitsCache((current) => ({
         ...current,
-        habits: current.habits.map((habit) =>
-          habit.id === habitId ? updated : habit,
-        ),
+        habits: updateHabitById(current.habits, habitId, () => updated),
       }));
 
       return updated;
@@ -114,86 +184,25 @@ export const useHabitsStore = defineStore("habits", () => {
     const wasCompleted = habit.completions[date] ?? false;
     const newCompleted = !wasCompleted;
 
-    patchHabitsCache((current) => ({
-      ...current,
-      habits: current.habits.map((entry) => {
-        if (entry.id !== habitId) {
-          return entry;
-        }
+    const patchCompletionState = (completed: boolean): void => {
+      patchHabitInCache(habitId, (entry) =>
+        withCompletionState(entry, date, completed),
+      );
+    };
 
-        if (newCompleted) {
-          return {
-            ...entry,
-            completions: { ...entry.completions, [date]: true },
-          };
-        }
-
-        const { [date]: _removed, ...rest } = entry.completions;
-
-        return {
-          ...entry,
-          completions: rest,
-        };
-      }),
-    }));
+    patchCompletionState(newCompleted);
 
     try {
-      let response: CompletionToggleResponse;
-
-      if (newCompleted) {
-        response = await $fetch<CompletionToggleResponse>(
-          `/api/habits/${habitId}/completions`,
-          {
-            method: "POST",
-            body: { date },
-          },
-        );
-      } else {
-        response = await $fetch<CompletionToggleResponse>(
-          `/api/habits/${habitId}/completions?date=${date}`,
-          {
-            method: "DELETE",
-          },
-        );
-      }
-
-      patchHabitsCache((current) => ({
-        ...current,
-        habits: current.habits.map((entry) =>
-          entry.id === habitId
-            ? {
-                ...entry,
-                currentStreak: response.currentStreak,
-                bestStreak: response.bestStreak,
-              }
-            : entry,
-        ),
-      }));
+      const response = await requestCompletionToggle(
+        habitId,
+        date,
+        newCompleted,
+      );
+      patchHabitInCache(habitId, (entry) => withStreakState(entry, response));
 
       return true;
     } catch {
-      patchHabitsCache((current) => ({
-        ...current,
-        habits: current.habits.map((entry) => {
-          if (entry.id !== habitId) {
-            return entry;
-          }
-
-          if (wasCompleted) {
-            return {
-              ...entry,
-              completions: { ...entry.completions, [date]: true },
-            };
-          }
-
-          const { [date]: _removed, ...rest } = entry.completions;
-
-          return {
-            ...entry,
-            completions: rest,
-          };
-        }),
-      }));
+      patchCompletionState(wasCompleted);
 
       notifyMessage({ scope: "habits", code: "completion_update_failed" });
       return false;

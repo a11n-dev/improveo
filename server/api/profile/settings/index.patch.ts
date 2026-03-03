@@ -4,19 +4,19 @@
  * Invalidates the server-side cache after update.
  */
 
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 
+import { requireUserId } from "~~/server/utils/request";
 import { ProfileSettingsUpdatePayloadSchema } from "~~/shared/validation/settings";
 
 export default defineEventHandler(async (event): Promise<ProfileSettings> => {
   const client = await serverSupabaseClient<Database>(event);
-  const user = await serverSupabaseUser(event);
+  const userId = await requireUserId(event);
 
-  if (!user?.sub) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
-
-  const payload = await parseBody(event, ProfileSettingsUpdatePayloadSchema);
+  const payload = await readValidatedBody(
+    event,
+    ProfileSettingsUpdatePayloadSchema.parse,
+  );
 
   const updatePayload: TablesUpdate<"profile_settings"> = {
     ...(payload.colorMode !== undefined && {
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event): Promise<ProfileSettings> => {
   const { data, error } = await client
     .from("profile_settings")
     .update(updatePayload)
-    .eq("id", user.sub)
+    .eq("id", userId)
     .select("id, color_mode, reduce_animations, week_start, updated_at")
     .single();
 
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event): Promise<ProfileSettings> => {
 
   // Update cache with fresh data so next read avoids a DB query
   const settings = mapSettingsRowToDto(data);
-  await cacheUserSettings(user.sub, settings);
+  await cacheUserSettings(userId, settings);
 
   return settings;
 });

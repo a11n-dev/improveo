@@ -11,9 +11,11 @@ import {
   GOAL_COUNT_LIMITS,
 } from "../constants/validation";
 
-const PeriodTypeSchema = z.enum(["day", "week", "month"]);
+/** Allowed period values for habit goals. */
+export const PeriodTypeSchema = z.enum(["day", "week", "month"]);
 
-const HabitTitleSchema = z
+/** Reusable habit title validation used by create and update payloads. */
+export const HabitTitleSchema = z
   .string()
   .trim()
   .min(
@@ -27,7 +29,8 @@ const HabitTitleSchema = z
     `Title must be ${HABIT_TITLE_MAX_LENGTH} characters or less`,
   );
 
-const HabitDescriptionSchema = z
+/** Reusable habit description validation used by create and update payloads. */
+export const HabitDescriptionSchema = z
   .string()
   .trim()
   .max(
@@ -35,7 +38,8 @@ const HabitDescriptionSchema = z
     `Description must be ${HABIT_DESCRIPTION_MAX_LENGTH} characters or less`,
   );
 
-const HabitIconSchema = z
+/** Reusable icon token validation (Iconify lucide token format). */
+export const HabitIconSchema = z
   .string()
   .trim()
   .min(1, "Icon is required")
@@ -45,7 +49,8 @@ const HabitIconSchema = z
   )
   .regex(HABIT_ICON_PATTERN, "Icon format is invalid");
 
-const HabitColorSchema = z
+/** Reusable color validation for canonical hex colors (`#RRGGBB`). */
+export const HabitColorSchema = z
   .string()
   .trim()
   .min(1, "Color is required")
@@ -55,59 +60,47 @@ const HabitColorSchema = z
   )
   .regex(HABIT_COLOR_PATTERN, "Color format is invalid");
 
-const applyGoalRules = (
-  value: {
-    periodType: z.infer<typeof PeriodTypeSchema>;
-    targetCount: number;
-  },
-  ctx: z.RefinementCtx,
-) => {
-  if (value.targetCount < 1) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Target count must be a positive integer",
-      path: ["targetCount"],
-    });
-    return;
-  }
-
-  const maxCount = GOAL_COUNT_LIMITS[value.periodType];
-  if (value.targetCount > maxCount) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Target count must be ${maxCount} or less for ${value.periodType}`,
-      path: ["targetCount"],
-    });
-  }
-};
-
 export const HabitGoalSchema = z
-  .object({
+  .strictObject({
     periodType: PeriodTypeSchema,
     targetCount: z.number().int(),
   })
-  .superRefine(applyGoalRules);
+  .check((ctx) => {
+    const { periodType, targetCount } = ctx.value;
 
-export const HabitCreatePayloadSchema = z
-  .object({
-    title: HabitTitleSchema,
-    description: HabitDescriptionSchema.optional(),
-    icon: HabitIconSchema,
-    color: HabitColorSchema,
-    goal: HabitGoalSchema.nullable(),
-  })
-  .strict();
+    if (targetCount < 1) {
+      ctx.issues.push({
+        code: "custom",
+        message: "Target count must be a positive integer",
+        path: ["targetCount"],
+        input: targetCount,
+      });
+      return;
+    }
 
-export const HabitUpdatePayloadSchema = z
-  .object({
-    title: HabitTitleSchema.optional(),
+    const maxCount = GOAL_COUNT_LIMITS[periodType];
+    if (targetCount > maxCount) {
+      ctx.issues.push({
+        code: "custom",
+        message: `Target count must be ${maxCount} or less for ${periodType}`,
+        path: ["targetCount"],
+        input: targetCount,
+      });
+    }
+  });
+
+const HabitCreatePayloadShape = {
+  title: HabitTitleSchema,
+  description: HabitDescriptionSchema.optional(),
+  icon: HabitIconSchema,
+  color: HabitColorSchema,
+  goal: HabitGoalSchema.nullable(),
+};
+
+export const HabitCreatePayloadSchema = z.strictObject(HabitCreatePayloadShape);
+
+export const HabitUpdatePayloadSchema = HabitCreatePayloadSchema.partial()
+  .extend({
     description: HabitDescriptionSchema.nullable().optional(),
-    icon: HabitIconSchema.optional(),
-    color: HabitColorSchema.optional(),
-    goal: HabitGoalSchema.nullable().optional(),
   })
   .strict();
-
-export type HabitCreateInput = z.infer<typeof HabitCreatePayloadSchema>;
-export type HabitUpdateInput = z.infer<typeof HabitUpdatePayloadSchema>;
-export type HabitGoalInput = z.infer<typeof HabitGoalSchema>;

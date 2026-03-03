@@ -1,8 +1,9 @@
 import type { H3Event } from "h3";
 
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
 
-import type { ProfileSettingsSelectRow } from "~~/server/types/settings";
+import type { ProfileSettingsRow } from "~~/server/types/settings";
+import { requireUserId } from "~~/server/utils/request";
 
 /**
  * Cache key prefix for profile settings in Nitro storage.
@@ -14,7 +15,7 @@ const CACHE_PREFIX = "profile-settings";
  * Maps a profile_settings DB row to the shared ProfileSettings DTO.
  */
 export const mapSettingsRowToDto = (
-  row: ProfileSettingsSelectRow,
+  row: ProfileSettingsRow,
 ): ProfileSettings => {
   return {
     colorMode: row.color_mode as ColorModePreference,
@@ -44,15 +45,12 @@ const DEFAULT_SETTINGS: ProfileSettings = {
  */
 export const getUserSettings = async (
   event: H3Event,
+  userId?: string,
 ): Promise<ProfileSettings> => {
-  const user = await serverSupabaseUser(event);
-
-  if (!user?.sub) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
+  const resolvedUserId = userId ?? (await requireUserId(event));
 
   const storage = useStorage("redis");
-  const cacheKey = `${CACHE_PREFIX}:${user.sub}`;
+  const cacheKey = `${CACHE_PREFIX}:${resolvedUserId}`;
 
   // Try cache first
   const cached = await storage.getItem<ProfileSettings>(cacheKey);
@@ -65,7 +63,7 @@ export const getUserSettings = async (
   const { data, error } = await client
     .from("profile_settings")
     .select("id, color_mode, reduce_animations, week_start, updated_at")
-    .eq("id", user.sub)
+    .eq("id", resolvedUserId)
     .single();
 
   if (error || !data) {

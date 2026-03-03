@@ -15,7 +15,10 @@ export default defineEventHandler(async (event): Promise<Profile> => {
     throw createError({ statusCode: 401, message: "Unauthorized" });
   }
 
-  const payload = await parseBody(event, ProfileUpdatePayloadSchema);
+  const payload = await readValidatedBody(
+    event,
+    ProfileUpdatePayloadSchema.parse,
+  );
 
   const updatePayload: TablesUpdate<"profiles"> = {
     ...(payload.username !== undefined && { username: payload.username }),

@@ -20,7 +20,7 @@ export const mapHabitToDraft = (source: Habit): HabitFormDraft => ({
   name: source.title,
   description: source.description ?? "",
   icon: source.icon,
-  color: source.color as HabitColor,
+  color: source.color,
   goal: source.goal
     ? {
         periodType: source.goal.periodType,

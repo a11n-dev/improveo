@@ -11,7 +11,18 @@
  *   - to: End date (YYYY-MM-DD), defaults to today
  */
 
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseClient } from "#supabase/server";
+
+import type { CompletionBitmapRow } from "~~/server/types/habit";
+import {
+  computeHabitStreak,
+  getHabitRangeFromQuery,
+  mapGoalVersionRowToDto,
+  mapHabitRowToDto,
+} from "~~/server/utils/habits";
+import { requireUserId } from "~~/server/utils/request";
+import { HabitsRangeQuerySchema } from "~~/server/validation/habits";
+import { getUserSettings } from "~~/server/utils/settings";
 
 type HabitsOverviewRow =
   Database["public"]["Functions"]["get_habits_overview"]["Returns"][number];
@@ -24,27 +35,13 @@ interface HabitAggregate {
 export default defineEventHandler(
   async (event): Promise<HabitsListResponse> => {
     const client = await serverSupabaseClient<Database>(event);
-    const user = await serverSupabaseUser(event);
+    const userId = await requireUserId(event);
 
-    if (!user?.sub) {
-      throw createError({ statusCode: 401, message: "Unauthorized" });
-    }
-
-    // Parse query params with defaults
-    const query = getQuery(event);
-    const today = new Date();
-    const defaultFrom = new Date(today);
-    defaultFrom.setDate(defaultFrom.getDate() - 364); // 365 days including today
-
-    const fromStr =
-      typeof query.from === "string"
-        ? query.from
-        : toISODateString(defaultFrom);
-    const toStr =
-      typeof query.to === "string" ? query.to : toISODateString(today);
+    const query = await getValidatedQuery(event, HabitsRangeQuerySchema.parse);
+    const { fromStr, toStr } = getHabitRangeFromQuery(query);
 
     const [settings, overviewResult] = await Promise.all([
-      getUserSettings(event),
+      getUserSettings(event, userId),
       client.rpc("get_habits_overview", {
         p_from: fromStr,
         p_to: toStr,
@@ -71,28 +68,31 @@ export default defineEventHandler(
       const aggregate = habitsById.get(row.habit_id);
 
       if (!aggregate) {
+        const goal =
+          row.goal_id && row.goal_period_type && row.goal_target_count
+            ? mapGoalVersionRowToDto({
+                id: row.goal_id,
+                period_type: row.goal_period_type,
+                target_count: row.goal_target_count,
+                effective_from: row.goal_effective_from ?? fromStr,
+                effective_to: row.goal_effective_to,
+              })
+            : null;
+
         habitsById.set(row.habit_id, {
-          habit: {
-            id: row.habit_id,
-            title: row.title,
-            description: row.description,
-            icon: row.icon,
-            color: row.color,
-            goal:
-              row.goal_id && row.goal_period_type && row.goal_target_count
-                ? {
-                    id: row.goal_id,
-                    periodType: row.goal_period_type as PeriodType,
-                    targetCount: row.goal_target_count,
-                    effectiveFrom: row.goal_effective_from ?? fromStr,
-                    effectiveTo: row.goal_effective_to,
-                  }
-                : null,
-            currentStreak: 0,
-            bestStreak: 0,
-            completions: {},
-            createdAt: row.created_at || new Date().toISOString(),
-          },
+          habit: mapHabitRowToDto(
+            {
+              id: row.habit_id,
+              title: row.title,
+              description: row.description,
+              icon: row.icon,
+              color: row.color,
+              created_at: row.created_at,
+            },
+            goal,
+            {},
+            { currentStreak: 0, bestStreak: 0 },
+          ),
           completionRows: [],
         });
       }
@@ -128,16 +128,9 @@ export default defineEventHandler(
 
     const habits: Habit[] = Array.from(habitsById.values()).map(
       ({ habit, completionRows }) => {
-        if (!habit.goal) {
-          return habit;
-        }
-
-        const { currentStreak, bestStreak } = computeStreaks(
+        const { currentStreak, bestStreak } = computeHabitStreak(
+          habit.goal,
           completionRows,
-          {
-            periodType: habit.goal.periodType,
-            targetCount: habit.goal.targetCount,
-          },
           weekStart,
         );
 

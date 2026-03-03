@@ -11,57 +11,32 @@ const THEME_OPTIONS: AppearanceOption[] = [
   { label: "System", value: "system" },
 ];
 
-const settingsStore = useSettingsStore();
 const { notifyMessage } = useNotify();
+const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
-const colorMode = useColorMode();
 
-const isUpdating = ref(false);
-const selectedColorMode = ref<ColorModePreference>(
-  settings.value?.colorMode ?? "system",
-);
-
-/** Keeps local selection aligned with optimistic store updates/reverts. */
-watch(
-  () => settings.value?.colorMode,
-  (value) => {
-    selectedColorMode.value = value ?? "system";
-  },
-  { immediate: true },
-);
-
-/** Applies color mode changes immediately after option selection. */
+/** Persists a new color mode value and emits a single failure notification. */
 const handleColorModeChange = async (
   value: ColorModePreference,
 ): Promise<void> => {
-  if (settings.value === null || isUpdating.value) {
+  if (settings.value === null || value === settings.value.colorMode) {
     return;
   }
 
-  if (value === settings.value?.colorMode) {
-    return;
-  }
+  const updated = await settingsStore.updateColorMode(value);
 
-  const previousPreference = settings.value?.colorMode ?? "system";
-
-  selectedColorMode.value = value;
-  colorMode.preference = value;
-  isUpdating.value = true;
-
-  try {
-    const isUpdated = await settingsStore.updateColorMode(value);
-
-    if (isUpdated) {
-      return;
-    }
-
-    selectedColorMode.value = previousPreference;
-    colorMode.preference = previousPreference;
+  if (!updated) {
     notifyMessage({ scope: "settings", code: "update_failed" });
-  } finally {
-    isUpdating.value = false;
   }
 };
+
+/** Two-way model bound directly to persisted settings state. */
+const selectedColorMode = computed<ColorModePreference>({
+  get: () => settings.value?.colorMode ?? "system",
+  set: (value) => {
+    void handleColorModeChange(value);
+  },
+});
 </script>
 
 <template>
@@ -72,7 +47,6 @@ const handleColorModeChange = async (
       value-key="value"
       variant="card"
       color="neutral"
-      @update:model-value="handleColorModeChange"
     />
   </CommonSingleViewItem>
 </template>

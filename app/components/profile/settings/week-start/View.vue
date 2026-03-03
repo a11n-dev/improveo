@@ -1,7 +1,7 @@
 <script setup lang="ts">
 interface WeekStartOption {
   label: string;
-  value: number;
+  value: WeekStartDay;
 }
 
 /** Ordered weekday options used by the week-start selector. */
@@ -15,36 +15,30 @@ const WEEK_START_OPTIONS: WeekStartOption[] = [
   { label: "Sunday", value: 6 },
 ];
 
-const settingsStore = useSettingsStore();
 const { notifyMessage } = useNotify();
+const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
 
-const selectedWeekStart = ref<number>(settings.value?.weekStart ?? 0);
-
-/** Keeps local selection aligned with optimistic store updates/reverts. */
-watch(
-  () => settings.value?.weekStart,
-  (value) => {
-    selectedWeekStart.value = value ?? 0;
-  },
-  { immediate: true },
-);
-
-/** Applies week-start changes immediately after option selection. */
-const handleWeekStartChange = async (value: number): Promise<void> => {
-  if (value === settings.value?.weekStart) {
+/** Persists a new week-start value and emits a failure notification. */
+const handleWeekStartChange = async (value: WeekStartDay): Promise<void> => {
+  if (settings.value === null || value === settings.value.weekStart) {
     return;
   }
 
-  const isUpdated = await settingsStore.updateWeekStart(value);
+  const updated = await settingsStore.updateWeekStart(value);
 
-  if (isUpdated) {
-    return;
+  if (!updated) {
+    notifyMessage({ scope: "settings", code: "update_failed" });
   }
-
-  selectedWeekStart.value = settings.value?.weekStart ?? 0;
-  notifyMessage({ scope: "settings", code: "update_failed" });
 };
+
+/** Two-way model bound directly to persisted settings state. */
+const selectedWeekStart = computed<WeekStartDay>({
+  get: () => (settings.value?.weekStart ?? 0) as WeekStartDay,
+  set: (value) => {
+    void handleWeekStartChange(value);
+  },
+});
 </script>
 
 <template>
@@ -55,7 +49,6 @@ const handleWeekStartChange = async (value: number): Promise<void> => {
       value-key="value"
       variant="card"
       color="neutral"
-      @update:model-value="handleWeekStartChange"
     />
   </CommonSingleViewItem>
 </template>

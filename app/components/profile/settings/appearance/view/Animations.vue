@@ -1,57 +1,35 @@
 <script setup lang="ts">
-const settingsStore = useSettingsStore();
 const { notifyMessage } = useNotify();
+const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
 
-const isUpdating = ref(false);
-const reduceAnimationsEnabled = ref<boolean>(
-  settings.value?.reduceAnimations ?? false,
-);
-
-/** Keeps local switch value aligned with optimistic store updates/reverts. */
-watch(
-  () => settings.value?.reduceAnimations,
-  (value) => {
-    reduceAnimationsEnabled.value = value ?? false;
-  },
-  { immediate: true },
-);
-
-/** Applies animation preference changes immediately after switch toggle. */
+/** Persists a new animations preference and emits a failure notification. */
 const handleReduceAnimationsChange = async (value: boolean): Promise<void> => {
-  if (settings.value === null || isUpdating.value) {
+  if (settings.value === null || value === settings.value.reduceAnimations) {
     return;
   }
 
-  if (value === settings.value?.reduceAnimations) {
-    return;
-  }
+  const updated = await settingsStore.updateReduceAnimations(value);
 
-  isUpdating.value = true;
-
-  try {
-    const isUpdated = await settingsStore.updateReduceAnimations(value);
-
-    if (isUpdated) {
-      return;
-    }
-
-    reduceAnimationsEnabled.value = settings.value?.reduceAnimations ?? false;
+  if (!updated) {
     notifyMessage({ scope: "settings", code: "update_failed" });
-  } finally {
-    isUpdating.value = false;
   }
 };
+
+/** Two-way model bound directly to persisted settings state. */
+const reduceAnimationsEnabled = computed<boolean>({
+  get: () => settings.value?.reduceAnimations ?? false,
+  set: (value) => {
+    void handleReduceAnimationsChange(value);
+  },
+});
 </script>
 
 <template>
   <CommonSingleViewItem label="Animations">
     <ProfileSettingsField title="Reduce animation effects">
       <template #trailing>
-        <USwitch
-          v-model="reduceAnimationsEnabled"
-          @update:model-value="handleReduceAnimationsChange"
-        />
+        <USwitch v-model="reduceAnimationsEnabled" />
       </template>
     </ProfileSettingsField>
   </CommonSingleViewItem>

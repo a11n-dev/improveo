@@ -29,8 +29,6 @@ export const useProfileStore = defineStore("profile", () => {
 
   /**
    * Fetches profile/settings payload and hydrates the shared profile cache.
-   *
-   * @returns The fetched profile or null when loading fails.
    */
   const fetchProfile = async (): Promise<Profile | null> => {
     try {
@@ -57,9 +55,6 @@ export const useProfileStore = defineStore("profile", () => {
 
   /**
    * Updates profile fields and patches the shared profile cache on success.
-   *
-   * @param payload Partial profile fields to persist.
-   * @returns Updated profile DTO or null when the operation fails.
    */
   const updateProfile = async (
     payload: ProfileUpdatePayload,
@@ -88,8 +83,6 @@ export const useProfileStore = defineStore("profile", () => {
 
   /**
    * Deletes the current account and clears profile cache.
-   *
-   * @returns True when deletion succeeds.
    */
   const deleteProfile = async (): Promise<boolean> => {
     try {

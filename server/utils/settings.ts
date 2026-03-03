@@ -39,9 +39,6 @@ const DEFAULT_SETTINGS: ProfileSettings = {
 /**
  * Retrieves user settings, checking the Nitro storage cache first,
  * then falling back to a DB query. Caches the result on miss.
- *
- * @param event - H3 event (provides auth context)
- * @returns The user's ProfileSettings DTO
  */
 export const getUserSettings = async (
   event: H3Event,
@@ -82,9 +79,6 @@ export const getUserSettings = async (
 /**
  * Writes fresh settings into the cache for a specific user.
  * Call this after any settings update to keep the cache warm.
- *
- * @param userId - The user UUID
- * @param settings - The updated ProfileSettings to cache
  */
 export const cacheUserSettings = async (
   userId: string,

@@ -23,9 +23,6 @@ export const useSettingsStore = defineStore("settings", () => {
 
   /**
    * Updates settings with optimistic cache state and server validation.
-   *
-   * @param payload Partial settings payload.
-   * @returns Updated settings on success, null on failure.
    */
   const updateSettings = async (
     payload: ProfileSettingsUpdatePayload,
@@ -89,9 +86,6 @@ export const useSettingsStore = defineStore("settings", () => {
 
   /**
    * Convenience: update week start day.
-   *
-   * @param value Week start index (0..6).
-   * @returns True on success, false on failure.
    */
   const updateWeekStart = async (value: number): Promise<boolean> => {
     if (value < 0 || value > 6) {
@@ -111,9 +105,6 @@ export const useSettingsStore = defineStore("settings", () => {
 
   /**
    * Convenience: update color mode preference.
-   *
-   * @param value Target color mode preference.
-   * @returns True on success.
    */
   const updateColorMode = async (
     value: ColorModePreference,
@@ -124,9 +115,6 @@ export const useSettingsStore = defineStore("settings", () => {
 
   /**
    * Convenience: update motion reduction preference.
-   *
-   * @param value Motion reduction preference.
-   * @returns True on success.
    */
   const updateReduceAnimations = async (value: boolean): Promise<boolean> => {
     const result = await updateSettings({ reduceAnimations: value });

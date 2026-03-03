@@ -7,9 +7,7 @@ import {
 } from "~~/shared/constants/validation";
 
 interface Props {
-  /** Habit draft bound from the parent overlay. */
   draft: HabitFormDraft;
-  /** Label shown on the goal button. */
   goalLabel: string;
 }
 

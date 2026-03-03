@@ -6,11 +6,8 @@ import {
 
 /** Single cell data used by the habits hitmap UI. */
 export interface HitmapDay {
-  /** ISO date string (YYYY-MM-DD). */
   date: string;
-  /** Indicates whether the day belongs to the visible range window. */
   inRange: boolean;
-  /** Indicates whether the habit is completed on this date. */
   completed: boolean;
 }
 

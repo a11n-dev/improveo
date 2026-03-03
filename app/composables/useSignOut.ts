@@ -1,7 +1,5 @@
 /**
  * Provides a shared sign-out action used across profile surfaces.
- *
- * @returns A signOut action that returns true on success.
  */
 export const useSignOut = () => {
   const supabaseClient = useSupabaseClient();
@@ -9,8 +7,6 @@ export const useSignOut = () => {
 
   /**
    * Signs the current user out and navigates to the auth page.
-   *
-   * @returns True when sign-out and redirect succeed.
    */
   const signOut = async (): Promise<boolean> => {
     const { error } = await supabaseClient.auth.signOut({ scope: "global" });

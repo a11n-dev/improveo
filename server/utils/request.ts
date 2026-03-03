@@ -18,7 +18,6 @@ export const requireUserId = async (event: H3Event): Promise<string> => {
 
 /**
  * Returns the authenticated user id and email for the current request.
- * @throws 401 when no authenticated session is present.
  */
 export const requireUser = async (
   event: H3Event,

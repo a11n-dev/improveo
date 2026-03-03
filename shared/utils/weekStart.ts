@@ -17,10 +17,6 @@ export function toJsWeekStart(
 /**
  * Get the day of week index (0-6) based on week start preference.
  * Returns position within the week (0 = first day of week, 6 = last day).
- *
- * @param date - The date to get the day index for
- * @param weekStart - Week start day (0 = Monday, 1 = Tuesday, ..., 6 = Sunday) - ISO 8601
- * @returns Day index within the week (0-6)
  */
 export function getDayIndexForWeekStart(
   date: Date,
@@ -34,9 +30,6 @@ export function getDayIndexForWeekStart(
 
 /**
  * Format date to ISO date string (YYYY-MM-DD).
- *
- * @param date - The date to format
- * @returns ISO date string
  */
 export function toISODateString(date: Date): string {
   const year = date.getFullYear();
@@ -47,9 +40,6 @@ export function toISODateString(date: Date): string {
 
 /**
  * Parse an ISO date string (YYYY-MM-DD) to a Date object.
- *
- * @param dateStr - ISO date string
- * @returns Date object (at 00:00:00 local time)
  */
 export function parseISODateString(dateStr: string): Date {
   const [year, month, day] = dateStr.split("-").map(Number);
@@ -59,9 +49,6 @@ export function parseISODateString(dateStr: string): Date {
 /**
  * Get day labels for the contribution graph based on week start.
  * Returns labels for positions 2, 4, 6 (Tue, Thu, Sat or relative equivalents).
- *
- * @param weekStart - Week start day (0 = Monday, 1 = Tuesday, ..., 6 = Sunday) - ISO 8601
- * @returns Array of 7 labels (empty strings for unlabeled positions)
  */
 export function getDayLabels(weekStart: WeekStartDay): string[] {
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -83,9 +70,6 @@ export function getDayLabels(weekStart: WeekStartDay): string[] {
 /**
  * Convert ISO week start to the format used by date-fns and calendar components.
  * They use 0=Sunday convention.
- *
- * @param weekStart - Week start day from DB/DTO
- * @returns Week start for calendar components
  */
 export function toCalendarWeekStart(
   weekStart: WeekStartDay,

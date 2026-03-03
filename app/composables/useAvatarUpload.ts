@@ -6,8 +6,6 @@ import { AVATAR_BUCKET } from "~~/shared/constants/storage";
 
 /**
  * Provides avatar upload/removal orchestration for profile settings.
- *
- * @returns Avatar file state and upload/remove actions.
  */
 export const useAvatarUpload = () => {
   const profileStore = useProfileStore();
@@ -91,8 +89,6 @@ export const useAvatarUpload = () => {
    * Uploads a new avatar immediately and persists profile changes.
    *
    * If profile update fails after upload, the new storage object is rolled back.
-   *
-   * @param file Selected avatar file.
    */
   const saveSelectedAvatar = async (file: File): Promise<void> => {
     if (!profile.value || isUploading.value) {
@@ -164,8 +160,6 @@ export const useAvatarUpload = () => {
 
   /**
    * Clears persisted avatar and removes storage object best-effort.
-   *
-   * @returns True when profile update succeeds.
    */
   const handleRemoveAvatar = async (): Promise<boolean> => {
     if (!profile.value?.avatarPath || isUploading.value || isRemoving.value) {

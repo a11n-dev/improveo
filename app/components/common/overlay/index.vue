@@ -12,7 +12,6 @@ interface Props {
   icon?: string;
   modalProps?: Record<string, unknown>;
   drawerProps?: Record<string, unknown>;
-  /** Declarative footer actions - renders CommonOverlayFooter automatically when provided */
   actions?: FooterAction[];
 }
 

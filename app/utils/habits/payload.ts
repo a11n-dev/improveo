@@ -2,9 +2,6 @@ import type { HabitFormDraft } from "~/types/habit";
 
 /**
  * Maps create-form draft state to API create payload.
- *
- * @param draft Habit draft from create overlay.
- * @returns Habit create payload.
  */
 export const mapDraftToCreatePayload = (
   draft: HabitFormDraft,
@@ -20,9 +17,6 @@ export const mapDraftToCreatePayload = (
 
 /**
  * Maps edit-form draft state to API update payload.
- *
- * @param draft Habit draft from edit overlay.
- * @returns Habit update payload.
  */
 export const mapDraftToUpdatePayload = (
   draft: HabitFormDraft,

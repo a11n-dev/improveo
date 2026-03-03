@@ -7,7 +7,7 @@ const { shellTransition, shellVariant, shellVariants } = useShiftMotion();
 
 <template>
   <motion.div
-    class="pointer-events-none fixed inset-x-0 bottom-8 z-50"
+    class="pointer-events-none fixed inset-x-0 bottom-8 z-50 transform-gpu will-change-transform"
     :initial="false"
     :variants="shellVariants"
     :animate="shellVariant"

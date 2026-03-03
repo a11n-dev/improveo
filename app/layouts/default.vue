@@ -22,7 +22,7 @@ const handleHabitCreated = async () => {
 <template>
   <div class="overflow-x-hidden">
     <motion.div
-      class="min-h-(--app-vh) will-change-transform pb-22"
+      class="min-h-(--app-vh) transform-gpu will-change-transform pb-22"
       :initial="false"
       :variants="shellVariants"
       :animate="shellVariant"

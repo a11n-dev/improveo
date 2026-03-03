@@ -65,12 +65,6 @@ export default defineNuxtConfig({
         url: process.env.REDIS_URL,
       },
     },
-    devStorage: {
-      redis: {
-        driver: "fs",
-        base: "./.data/redis",
-      },
-    },
   },
 
   pwa: {

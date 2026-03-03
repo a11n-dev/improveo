@@ -8,6 +8,9 @@ const supabaseClient = useSupabaseClient();
 
 /** Username fallback used when account username is not set. */
 const displayName = computed(() => profile.username ?? "User");
+const displayHandle = computed(() =>
+  profile.username ? `@${profile.username}` : displayName.value,
+);
 /** Human-friendly account creation date. */
 const joinedLabel = computed(() => formatMemberSince(profile.createdAt));
 /** Public URL for the user avatar image. */
@@ -29,7 +32,7 @@ const avatarUrl = computed(() =>
 
     <div>
       <p class="font-semibold text-highlighted">
-        {{ displayName }}
+        {{ displayHandle }}
       </p>
       <p class="text-sm text-muted">{{ joinedLabel }}</p>
     </div>

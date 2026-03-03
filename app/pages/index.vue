@@ -33,8 +33,9 @@ const motionReducedPolicy = computed(() =>
 
 const infoOpen = ref(false);
 const selectedHabitId = ref<string | null>(null);
+const overlayHabit = shallowRef<Habit | null>(null);
 
-const selectedHabit = computed<Habit | null>(() => {
+const selectedHabitFromStore = computed<Habit | null>(() => {
   if (!selectedHabitId.value) {
     return null;
   }
@@ -71,21 +72,26 @@ const handleTodayToggle = async (
 
 /** Opens habit info overlay for the selected habit id. */
 const handleInfo = (habitId: string): void => {
-  if (!habitsStore.getHabitById(habitId)) {
+  const habit = habitsStore.getHabitById(habitId);
+
+  if (!habit) {
     return;
   }
 
   selectedHabitId.value = habitId;
+  overlayHabit.value = habit;
   infoOpen.value = true;
 };
 
 /** Toggles completion for a date selected from the info calendar. */
 const handleToggleDate = async (date: string): Promise<void> => {
-  if (!selectedHabit.value) {
+  const habitId = selectedHabitId.value ?? overlayHabit.value?.id;
+
+  if (!habitId) {
     return;
   }
 
-  await habitsStore.toggleCompletion(selectedHabit.value.id, date);
+  await habitsStore.toggleCompletion(habitId, date);
 };
 
 /** Closes the info overlay. */
@@ -95,14 +101,16 @@ const closeInfo = (): void => {
 
 /** Deletes currently selected habit and closes overlay on success. */
 const handleDelete = async (): Promise<void> => {
-  if (!selectedHabit.value) {
+  const habitId = selectedHabitId.value ?? overlayHabit.value?.id;
+
+  if (!habitId) {
     return;
   }
 
   isDeleting.value = true;
 
   try {
-    const success = await habitsStore.deleteHabit(selectedHabit.value.id);
+    const success = await habitsStore.deleteHabit(habitId);
 
     if (success) {
       closeInfo();
@@ -110,6 +118,16 @@ const handleDelete = async (): Promise<void> => {
   } finally {
     isDeleting.value = false;
   }
+};
+
+/** Clears overlay selection only after close animation finishes. */
+const handleInfoOverlayAfterLeave = (): void => {
+  if (infoOpen.value) {
+    return;
+  }
+
+  selectedHabitId.value = null;
+  overlayHabit.value = null;
 };
 
 /** Scrolls to the bottom of the page after creating a new habit. */
@@ -120,9 +138,9 @@ const scrollToBottom = (): void => {
   });
 };
 
-watch(infoOpen, (isOpen): void => {
-  if (!isOpen) {
-    selectedHabitId.value = null;
+watch(selectedHabitFromStore, (habit): void => {
+  if (habit) {
+    overlayHabit.value = habit;
   }
 });
 
@@ -206,13 +224,14 @@ watch(
 
     <!-- Habit Info Overlay -->
     <LazyHabitsInfoOverlay
-      v-if="selectedHabit"
+      v-if="overlayHabit"
       v-model:open="infoOpen"
-      :habit="selectedHabit"
+      :habit="overlayHabit"
       :week-start="weekStart"
       :is-deleting="isDeleting"
       @toggle-date="handleToggleDate"
       @delete="handleDelete"
+      @after:leave="handleInfoOverlayAfterLeave"
     />
   </UContainer>
 </template>

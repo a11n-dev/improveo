@@ -10,6 +10,7 @@ const { habit, weekStart = 0, isDeleting = false } = defineProps<Props>();
 const emit = defineEmits<{
   "toggle-date": [date: string];
   delete: [];
+  "after:leave": [];
 }>();
 
 const open = defineModel<boolean>("open", { default: false });
@@ -36,9 +37,16 @@ watch(open, (isOpen): void => {
   if (!isOpen) {
     showDeleteConfirm.value = false;
     isEditOverlayOpen.value = false;
-    isEditOverlayMounted.value = false;
   }
 });
+
+/** Cleans up local state only after the close animation has finished. */
+const handleAfterLeave = (): void => {
+  showDeleteConfirm.value = false;
+  isEditOverlayOpen.value = false;
+  isEditOverlayMounted.value = false;
+  emit("after:leave");
+};
 
 /** Handle edit button click - opens nested edit overlay */
 const handleEdit = async (): Promise<void> => {
@@ -76,7 +84,11 @@ const handleClose = (): void => {
 </script>
 
 <template>
-  <CommonOverlay v-model:open="open" :modal-props="modalProps">
+  <CommonOverlay
+    v-model:open="open"
+    :modal-props="modalProps"
+    @after:leave="handleAfterLeave"
+  >
     <template #header>
       <HabitsInfoHeader :habit="habit" @close="handleClose" />
     </template>

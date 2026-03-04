@@ -33,6 +33,13 @@ export default defineEventHandler(async (event): Promise<Profile> => {
     .single();
 
   if (error) {
+    if (error.code === "23505" && payload.username !== undefined) {
+      throw createError({
+        statusCode: 409,
+        message: "Username is already taken",
+      });
+    }
+
     throw createError({ statusCode: 500, message: "Failed to update profile" });
   }
 

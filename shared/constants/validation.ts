@@ -6,6 +6,8 @@ export const PROFILE_NAME_MIN_LENGTH = 3;
 export const PROFILE_NAME_MAX_LENGTH = 30;
 /** Allowed username characters. */
 export const PROFILE_USERNAME_PATTERN = /^[a-z0-9]+$/;
+/** Debounce delay before checking username availability (ms). */
+export const USERNAME_CHECK_DEBOUNCE_MS = 500;
 
 /** Minimum habit title length. */
 export const HABIT_TITLE_MIN_LENGTH = 1;

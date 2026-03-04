@@ -32,3 +32,6 @@ coverage/
 # Playwright
 playwright-report/
 test-results/
+
+# OpenCode plans
+.opencode/plans/

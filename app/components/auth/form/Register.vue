@@ -35,12 +35,41 @@ const username = computed({
   },
 });
 
+const {
+  availabilityError,
+  isAvailable: isUsernameAvailable,
+  isChecking: isCheckingUsername,
+} = useUsernameCheck(username);
+
+const usernameHint = computed(() => {
+  if (isUsernameAvailable.value === true) {
+    return "Username is available";
+  }
+
+  if (isUsernameAvailable.value === false) {
+    return availabilityError.value ?? "Username is already taken";
+  }
+
+  return undefined;
+});
+
+const isSubmitDisabled = computed(
+  () =>
+    isSending ||
+    isCheckingUsername.value ||
+    isUsernameAvailable.value === false,
+);
+
 const emit = defineEmits<{
   submit: [payload: Schema];
 }>();
 
 /** Forwards successful Nuxt UI form submit to parent flow controller. */
 const handleSubmit = (event: FormSubmitEvent<Schema>): void => {
+  if (isCheckingUsername.value || isUsernameAvailable.value === false) {
+    return;
+  }
+
   emit("submit", event.data);
 };
 </script>
@@ -54,6 +83,21 @@ const handleSubmit = (event: FormSubmitEvent<Schema>): void => {
     @submit="handleSubmit"
   >
     <UFormField label="Username" name="username" required>
+      <template #hint>
+        <span
+          v-if="usernameHint"
+          :class="
+            isUsernameAvailable === false
+              ? 'text-error'
+              : isUsernameAvailable === true
+                ? 'text-success'
+                : 'text-muted'
+          "
+        >
+          {{ usernameHint }}
+        </span>
+      </template>
+
       <UInput
         v-model="username"
         class="w-full"
@@ -61,6 +105,9 @@ const handleSubmit = (event: FormSubmitEvent<Schema>): void => {
         autocomplete="username"
         :minlength="PROFILE_NAME_MIN_LENGTH"
         :maxlength="PROFILE_NAME_MAX_LENGTH"
+        :loading="isCheckingUsername"
+        trailing
+        :leading="false"
       />
     </UFormField>
 
@@ -78,7 +125,7 @@ const handleSubmit = (event: FormSubmitEvent<Schema>): void => {
     <UButton
       type="submit"
       :loading="isSending"
-      :disabled="isSending"
+      :disabled="isSubmitDisabled"
       label="Sign up"
       variant="solid"
       block

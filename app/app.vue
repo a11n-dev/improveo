@@ -3,7 +3,7 @@ const isDesktop = useIsDesktop();
 const colorMode = useColorMode();
 
 const themeColor = computed(() =>
-  colorMode.value === "dark" ? "#0f172a" : "#ffffff",
+  colorMode.value === "dark" ? "#171717" : "#ffffff",
 );
 
 useHead({

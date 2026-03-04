@@ -11,6 +11,8 @@ const habitsStore = useHabitsStore();
 const settingsStore = useSettingsStore();
 const { habits, weekStart } = storeToRefs(habitsStore);
 const { reduceAnimationsEnabled } = storeToRefs(settingsStore);
+const route = useRoute();
+
 const { data: cachedHabits } =
   useNuxtData<HabitsListResponse>(HABITS_CACHE_KEY);
 
@@ -44,7 +46,6 @@ const selectedHabitFromStore = computed<Habit | null>(() => {
 });
 
 const { openOverlay: openCreate } = useHabitCreateOverlay();
-const route = useRoute();
 const shouldScrollAfterHabitCreate = useState<boolean>(
   "habit-created-pending-scroll",
   () => false,
@@ -206,9 +207,9 @@ watch(
             v-for="habit in habits"
             :key="habit.id"
             layout
-            :initial="{ opacity: 0, y: 8, scale: 0.9 }"
+            :initial="{ y: 8, scale: 0.98 }"
             :animate="{ opacity: 1, y: 0, scale: 1 }"
-            :exit="{ opacity: 0, y: -8, scale: 0.9 }"
+            :exit="{ y: -8, scale: 0.98 }"
           >
             <HabitsCard
               :habit="habit"

@@ -3,15 +3,29 @@ type SingleViewItemVariant = "card" | "plain";
 
 interface Props {
   label?: string;
+  hint?: string;
   variant?: SingleViewItemVariant;
 }
 
-const { label = undefined, variant = "card" } = defineProps<Props>();
+const {
+  label = undefined,
+  hint = undefined,
+  variant = "card",
+} = defineProps<Props>();
 </script>
 
 <template>
   <div class="space-y-2">
-    <p v-if="label" class="pl-2 text-sm text-muted">{{ label }}</p>
+    <div
+      v-if="label || hint || !!$slots.hint"
+      class="flex content-center items-center justify-between gap-1 pl-2 text-sm"
+    >
+      <p v-if="label" class="text-muted">{{ label }}</p>
+
+      <slot name="hint">
+        <p v-if="hint" class="text-muted">{{ hint }}</p>
+      </slot>
+    </div>
 
     <UCard v-if="variant === 'card'" variant="subtle">
       <slot />

@@ -9,8 +9,8 @@ const SPRING_TRANSITION = {
 };
 
 const SHELL_SHIFT_VARIANTS = {
-  base: { x: "0vw" },
-  shifted: { x: "-24vw" },
+  base: { transform: "translateX(0vw)" },
+  shifted: { transform: "translateX(-24vw)" },
 } as const;
 
 /**

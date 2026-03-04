@@ -6,7 +6,7 @@ import { PROFILE_CACHE_KEY } from "~~/shared/constants/cache";
 
 type PanelVariantState = {
   opacity: number;
-  x?: string;
+  transform?: string;
 };
 
 type PanelVariants = {
@@ -67,14 +67,14 @@ const activeViewProps = computed<Record<string, unknown>>(
 const panelVariants = computed<PanelVariants>(() => {
   if (reduceAnimationsEnabled.value) {
     return {
-      hidden: { opacity: 1, x: "0%" },
-      visible: { opacity: 1, x: "0%" },
+      hidden: { opacity: 1, transform: "translateX(0%)" },
+      visible: { opacity: 1, transform: "translateX(0%)" },
     };
   }
 
   return {
-    hidden: { opacity: 1, x: "100%" },
-    visible: { opacity: 1, x: "0%" },
+    hidden: { opacity: 1, transform: "translateX(100%)" },
+    visible: { opacity: 1, transform: "translateX(0%)" },
   };
 });
 

@@ -21,10 +21,6 @@ const emit = defineEmits<{
 const goalEditorOpen = ref(false);
 /** Controls nested icon picker visibility. */
 const iconPickerOpen = ref(false);
-/** Controls custom color popover visibility. */
-const colorPickerOpen = ref(false);
-/** Holds user-selected custom color before applying to draft. */
-const customColor = ref("#3B82F6");
 
 /**
  * Provides a writable draft bridge for child inputs.
@@ -88,12 +84,6 @@ const updateField = <Key extends keyof HabitFormDraft>(
 /** Applies a preset color selection to the habit draft. */
 const selectColor = (color: string): void => {
   updateField("color", color);
-};
-
-/** Applies current custom color value and closes the color picker. */
-const applyCustomColor = (): void => {
-  updateField("color", customColor.value);
-  colorPickerOpen.value = false;
 };
 
 /** Applies icon selection to the habit draft. */
@@ -229,29 +219,6 @@ const handleGoalChange = (goal: Goal | null): void => {
           :aria-label="`Select color ${color}`"
           @click="selectColor(color)"
         />
-        <UPopover v-model:open="colorPickerOpen">
-          <UButton
-            icon="i-lucide-palette"
-            square
-            size="md"
-            color="neutral"
-            variant="soft"
-            class="flex size-9.5 items-center justify-center rounded-md p-0 md:size-8.5"
-            aria-label="Custom color"
-          />
-          <template #content>
-            <div class="flex flex-col gap-2 p-2">
-              <UColorPicker v-model="customColor" />
-              <UButton
-                label="Apply"
-                size="sm"
-                color="neutral"
-                variant="solid"
-                @click="applyCustomColor"
-              />
-            </div>
-          </template>
-        </UPopover>
       </div>
     </UFormField>
   </div>

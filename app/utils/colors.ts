@@ -7,8 +7,7 @@ export const dimColor = (hexColor: string, opacity: number = 0x20): string => {
 
 /**
  * Preset habit colors for the color picker swatches.
- * Users can also choose a custom color via UColorPicker.
- * 23 balanced hues covering the spectrum.
+ * 24 balanced hues covering the spectrum.
  */
 export const habitColorPresets = [
   // Reds & Pinks
@@ -38,6 +37,7 @@ export const habitColorPresets = [
   "#F97316", // orange-500
   // Neutrals & Browns
   "#78716C", // stone-500
+  "#57534E", // stone-600
   "#64748B", // slate-500
   "#475569", // slate-600
 ] as const;

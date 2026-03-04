@@ -29,33 +29,6 @@ const normalizedUsername = computed(() => {
   return parsedUsername.value.data;
 });
 
-const {
-  availabilityError,
-  isAvailable: isUsernameAvailable,
-  isChecking: isCheckingUsername,
-} = useUsernameCheck(
-  draftUsername,
-  computed(() => profile.value?.username),
-);
-const hint = defineModel<string | undefined>("hint", {
-  default: undefined,
-});
-
-watch(
-  [isUsernameAvailable, availabilityError],
-  ([nextIsUsernameAvailable, nextAvailabilityError]) => {
-    hint.value =
-      nextIsUsernameAvailable === false
-        ? (nextAvailabilityError ?? "Username is already taken")
-        : undefined;
-  },
-  { immediate: true },
-);
-
-onBeforeUnmount(() => {
-  hint.value = undefined;
-});
-
 /** Whether the current username draft differs from persisted profile state. */
 const hasUsernameChanged = computed(
   () => normalizedUsername.value !== (profile.value?.username ?? ""),
@@ -68,8 +41,6 @@ const saveUsername = async (): Promise<boolean> => {
   if (
     profile.value === null ||
     isSavingUsername.value ||
-    isCheckingUsername.value ||
-    isUsernameAvailable.value === false ||
     !hasUsernameChanged.value ||
     !result.success
   ) {
@@ -148,25 +119,19 @@ watch(
 
 <template>
   <ProfileSettingsField variant="content">
-    <div class="space-y-1">
-      <UInput
-        v-model="username"
-        class="w-full"
-        variant="none"
-        :ui="{
-          base: 'p-0! pr-7! text-sm/5 font-medium text-highlighted hover:bg-transparent focus:bg-transparent overflow-visible rounded-none',
-          trailing: 'pr-0 pointer-events-none',
-        }"
-        placeholder="e.g. johndoe"
-        :disabled="!profile"
-        :maxlength="PROFILE_NAME_MAX_LENGTH"
-        :loading="isCheckingUsername"
-        trailing
-        :leading="false"
-        @focus="handleUsernameFocus"
-        @blur="handleUsernameBlur"
-        @keydown.esc.prevent="handleUsernameEscape"
-      />
-    </div>
+    <UInput
+      v-model="username"
+      class="w-full"
+      variant="none"
+      :ui="{
+        base: 'p-0! text-sm/5 font-medium text-highlighted hover:bg-transparent focus:bg-transparent overflow-visible rounded-none',
+      }"
+      placeholder="e.g. johndoe"
+      :disabled="!profile"
+      :maxlength="PROFILE_NAME_MAX_LENGTH"
+      @focus="handleUsernameFocus"
+      @blur="handleUsernameBlur"
+      @keydown.esc.prevent="handleUsernameEscape"
+    />
   </ProfileSettingsField>
 </template>

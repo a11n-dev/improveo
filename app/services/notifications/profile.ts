@@ -64,13 +64,6 @@ export const notifications = {
       description: "Please try again.",
     }),
   }),
-  username_taken: defineNotification({
-    defaultVariant: "error",
-    build: () => ({
-      title: "Username taken",
-      description: "That username is already in use. Please choose another.",
-    }),
-  }),
   update_failed_with_message: defineNotification<{ message: string }>({
     defaultVariant: "error",
     build: ({ message }) => ({

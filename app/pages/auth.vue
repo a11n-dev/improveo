@@ -106,15 +106,6 @@ const handleVerify = async (): Promise<void> => {
   isVerifying.value = false;
 
   if (error) {
-    const normalizedErrorMessage = error.message.toLowerCase();
-
-    if (normalizedErrorMessage.includes("username is already taken")) {
-      notifyMessage({ scope: "profile", code: "username_taken" });
-      step.value = "request";
-      otpValue.value = [];
-      return;
-    }
-
     if (typeof error.code === "string") {
       notifyMessage({ scope: "supabase", code: error.code });
     }

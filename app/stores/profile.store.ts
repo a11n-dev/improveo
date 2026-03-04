@@ -1,5 +1,3 @@
-import { FetchError } from "ofetch";
-
 import { PROFILE_CACHE_KEY } from "~~/shared/constants/cache";
 
 const PROFILE_API_PATH = "/api/profile";
@@ -77,15 +75,7 @@ export const useProfileStore = defineStore("profile", () => {
       }));
 
       return updatedProfile;
-    } catch (error) {
-      if (
-        error instanceof FetchError &&
-        error.status === 409
-      ) {
-        notifyMessage({ scope: "profile", code: "username_taken" });
-        return null;
-      }
-
+    } catch {
       notifyMessage({ scope: "profile", code: "update_failed" });
       return null;
     }

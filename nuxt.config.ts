@@ -40,7 +40,7 @@ export default defineNuxtConfig({
         {
           rel: "apple-touch-icon",
           type: "image/png",
-          href: "/apple-touch-icon.png",
+          href: "/apple-touch-icon-v2.png",
         },
       ],
     },

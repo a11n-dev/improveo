@@ -19,7 +19,7 @@ const SPRING_TRANSITION = {
   type: "spring" as const,
   stiffness: 500,
   damping: 30,
-  mass: 0.1,
+  mass: 0.3,
 };
 
 definePageMeta({

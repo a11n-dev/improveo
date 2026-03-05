@@ -20,7 +20,7 @@ const { shellTransition, shellVariant, shellVariants } = useShiftMotion();
         size="xl"
         variant="solid"
         color="primary"
-        class="rounded-full p-4 shadow-md"
+        class="rounded-full p-4.5 shadow-md"
         aria-label="Create habit"
         @click="openOverlay"
       />

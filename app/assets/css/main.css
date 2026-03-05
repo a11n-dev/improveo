@@ -58,5 +58,5 @@
 
 /* Shared overlay footer backdrop blur mask utility. */
 @utility overlay-footer-blur-mask {
-  @apply before:absolute before:-z-1 before:inset-x-0 before:bottom-0 before:top-0 before:pointer-events-none before:backdrop-blur-sm before:[-webkit-mask-image:linear-gradient(to_top,black_0%,black_70%,transparent_100%)] before:[mask-image:linear-gradient(to_top,black_0%,black_70%,transparent_100%)] before:content-[''];
+  @apply before:absolute before:-z-1 before:inset-x-0 before:bottom-0 before:top-0 before:pointer-events-none before:backdrop-blur-sm before:[-webkit-mask-image:linear-gradient(to_top,black_0%,black_70%,transparent_100%)] before:mask-[linear-gradient(to_top,black_0%,black_70%,transparent_100%)] before:content-[''];
 }

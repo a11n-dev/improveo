@@ -123,6 +123,7 @@ const handleSave = (): void => {
   <CommonOverlay
     v-model:open="open"
     title="Goal"
+    description="Set habit frequency."
     :actions="[
       {
         label: 'Save',

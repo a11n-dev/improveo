@@ -164,7 +164,7 @@ watch(
 </script>
 
 <template>
-  <UContainer class="py-8">
+  <UContainer>
     <!-- Initial loading state (no cached habits yet) -->
     <div
       v-if="pending && habits.length === 0"

@@ -3,6 +3,9 @@ export default defineAppConfig({
     colors: {
       neutral: "neutral",
     },
+    container: {
+      base: "py-4 sm:py-6 lg:py-8",
+    },
     modal: {
       slots: {
         header: "pb-0!",
@@ -76,6 +79,11 @@ export default defineAppConfig({
       defaultVariants: {
         size: "lg",
         color: "neutral",
+      },
+    },
+    radioGroup: {
+      slots: {
+        item: "cursor-pointer",
       },
     },
     empty: {

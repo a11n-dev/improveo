@@ -114,11 +114,6 @@ const handleSave = async (): Promise<void> => {
   }
 };
 
-/** Closes the edit overlay without persisting changes. */
-const handleCancel = (): void => {
-  open.value = false;
-};
-
 /** Clears edit draft state after overlay transition completes. */
 const handleAfterLeave = (): void => {
   resetDraft();
@@ -129,6 +124,8 @@ const handleAfterLeave = (): void => {
 <template>
   <CommonOverlay
     v-model:open="open"
+    title="Edit Habit"
+    description="Update your habit details."
     :modal-props="modalProps"
     :actions="[
       {
@@ -141,10 +138,6 @@ const handleAfterLeave = (): void => {
     ]"
     @after:leave="handleAfterLeave"
   >
-    <template #header>
-      <HabitsEditHeader @close="handleCancel" />
-    </template>
-
     <template #body>
       <HabitsFormBase v-model:draft="draft" :goal-label="goalLabel" />
     </template>

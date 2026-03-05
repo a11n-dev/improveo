@@ -3,9 +3,9 @@ type ShellShiftVariant = "base" | "shifted";
 const REDUCED_MOTION_TRANSITION = { duration: 0 };
 const SPRING_TRANSITION = {
   type: "spring" as const,
-  stiffness: 340,
-  damping: 34,
-  mass: 0.9,
+  stiffness: 500,
+  damping: 30,
+  mass: 1.5,
 };
 
 const SHELL_SHIFT_VARIANTS = {

@@ -5,7 +5,7 @@ const SPRING_TRANSITION = {
   type: "spring" as const,
   stiffness: 500,
   damping: 30,
-  mass: 1.5,
+  mass: 0.3,
 };
 
 const SHELL_SHIFT_VARIANTS = {

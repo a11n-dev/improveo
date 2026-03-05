@@ -81,7 +81,7 @@ const handleCheckboxClick = (event: Event) => {
               }"
               :color="isChecked ? 'success' : 'neutral'"
               :ui="{
-                base: `size-11 rounded-md bg-(--habit-color-dimmed)`,
+                base: `size-11 cursor-pointer rounded-md bg-(--habit-color-dimmed)`,
                 icon: 'size-5.5',
                 indicator: `bg-(--habit-color)`,
               }"

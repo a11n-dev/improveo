@@ -183,6 +183,7 @@ const handleDateUpdate = (value: unknown): void => {
         header: 'hidden',
         headCell: 'text-(--habit-color)',
         cellTrigger: [
+          'cursor-pointer',
           'rounded-sm!',
           'hover:bg-(--habit-color-light)!',
           'data-selected:bg-(--habit-color-light)!',

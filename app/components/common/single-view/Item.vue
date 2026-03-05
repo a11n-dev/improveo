@@ -18,13 +18,15 @@ const {
   <div class="space-y-2">
     <div
       v-if="label || hint || !!$slots.hint"
-      class="flex content-center items-center justify-between gap-1 pl-2 text-sm"
+      class="flex content-center items-center justify-between gap-1 text-sm"
     >
-      <p v-if="label" class="text-muted">{{ label }}</p>
+      <p v-if="label" class="pl-2 text-muted">{{ label }}</p>
 
-      <slot name="hint">
-        <p v-if="hint" class="text-muted">{{ hint }}</p>
-      </slot>
+      <div v-if="hint || !!$slots.hint" class="pr-2">
+        <slot name="hint">
+          <p v-if="hint" class="text-muted">{{ hint }}</p>
+        </slot>
+      </div>
     </div>
 
     <UCard v-if="variant === 'card'" variant="subtle">

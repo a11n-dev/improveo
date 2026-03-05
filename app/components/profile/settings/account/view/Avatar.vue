@@ -77,7 +77,12 @@ const onRemoveAvatar = async (event: MouseEvent): Promise<void> => {
         class="flex cursor-pointer flex-col items-center gap-2"
         @click="!isBusy && open()"
       >
-        <UAvatar :src="avatarUrl" :alt="avatarAlt" size="xl" class="size-16" />
+        <UAvatar
+          :src="avatarUrl"
+          :alt="avatarAlt"
+          size="xl"
+          class="size-20 md:size-12"
+        />
 
         <span class="text-sm text-muted">{{ fileDescription }}</span>
 

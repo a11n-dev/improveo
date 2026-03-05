@@ -84,6 +84,7 @@ const lanes = computed<number>(() => (isDesktop.value ? 12 : 8));
   <CommonOverlay
     v-model:open="open"
     title="Choose Icon"
+    description="Find an icon for this habit."
     :modal-props="{ ui: { footer: 'justify-end pt-0' } }"
   >
     <template #body>

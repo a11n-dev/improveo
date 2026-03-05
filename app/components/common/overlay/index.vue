@@ -10,6 +10,7 @@ interface Props {
   title?: string;
   description?: string;
   icon?: string;
+  iconColor?: string;
   modalProps?: Record<string, unknown>;
   drawerProps?: Record<string, unknown>;
   actions?: FooterAction[];
@@ -19,6 +20,7 @@ const {
   title = undefined,
   description = undefined,
   icon = undefined,
+  iconColor = undefined,
   modalProps = {},
   drawerProps = {},
   actions = undefined,
@@ -58,6 +60,7 @@ useScrollGate(scrollGateEnabled, drawerBodyRef);
           :title="title"
           :description="description"
           :icon="icon"
+          :icon-color="iconColor"
           @close="open = false"
         />
       </template>
@@ -102,6 +105,7 @@ useScrollGate(scrollGateEnabled, drawerBodyRef);
           :title="title"
           :description="description"
           :icon="icon"
+          :icon-color="iconColor"
           @close="open = false"
         />
       </template>

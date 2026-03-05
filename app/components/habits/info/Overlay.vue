@@ -76,23 +76,18 @@ const confirmDelete = (): void => {
 const cancelDelete = (): void => {
   showDeleteConfirm.value = false;
 };
-
-/** Close overlay */
-const handleClose = (): void => {
-  open.value = false;
-};
 </script>
 
 <template>
   <CommonOverlay
     v-model:open="open"
+    :title="habit.title"
+    :description="habit.description || 'No description'"
+    :icon="habit.icon"
+    :icon-color="habit.color"
     :modal-props="modalProps"
     @after:leave="handleAfterLeave"
   >
-    <template #header>
-      <HabitsInfoHeader :habit="habit" @close="handleClose" />
-    </template>
-
     <template #body>
       <div
         class="flex flex-col gap-4"

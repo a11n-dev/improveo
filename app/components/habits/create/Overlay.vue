@@ -76,6 +76,8 @@ const handleCreate = async (): Promise<void> => {
 <template>
   <CommonOverlay
     v-model:open="isOpen"
+    title="Create Habit"
+    description="Add a new habit to track."
     :modal-props="modalProps"
     :actions="[
       {
@@ -88,10 +90,6 @@ const handleCreate = async (): Promise<void> => {
     ]"
     @after:leave="resetDraft"
   >
-    <template #header>
-      <HabitsCreateHeader @close="closeOverlay" />
-    </template>
-
     <template #body>
       <HabitsFormBase v-model:draft="draft" :goal-label="goalLabel" />
     </template>

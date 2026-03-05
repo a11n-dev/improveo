@@ -17,9 +17,9 @@ type PanelVariants = {
 const REDUCED_MOTION_TRANSITION = { duration: 0 };
 const SPRING_TRANSITION = {
   type: "spring" as const,
-  stiffness: 380,
-  damping: 36,
-  mass: 0.9,
+  stiffness: 500,
+  damping: 30,
+  mass: 0.1,
 };
 
 definePageMeta({
@@ -103,7 +103,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div>
-    <UContainer class="py-8">
+    <UContainer>
       <div
         v-if="isLoading"
         class="fixed inset-0 flex items-center justify-center"
@@ -142,7 +142,7 @@ onBeforeUnmount(() => {
     <Teleport to="body">
       <MotionConfig :reduced-motion="motionReducedPolicy">
         <AnimatePresence mode="wait">
-          <motion.section
+          <motion.div
             v-if="activeView"
             :key="activeView.key"
             class="fixed inset-0 z-70 bg-default transform-gpu will-change-transform"
@@ -158,7 +158,7 @@ onBeforeUnmount(() => {
             >
               <component :is="activeView.component" v-bind="activeViewProps" />
             </CommonSingleView>
-          </motion.section>
+          </motion.div>
         </AnimatePresence>
       </MotionConfig>
     </Teleport>

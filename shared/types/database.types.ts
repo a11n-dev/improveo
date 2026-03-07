@@ -11,27 +11,21 @@ export type Database = {
     Tables: {
       completions: {
         Row: {
-          bitmap: string;
+          bitmap: unknown;
           habit_id: string;
-          month_counts: string;
           updated_at: string;
-          week_counts: string;
           year: number;
         };
         Insert: {
-          bitmap: string;
+          bitmap?: unknown;
           habit_id: string;
-          month_counts?: string;
           updated_at?: string;
-          week_counts?: string;
           year: number;
         };
         Update: {
-          bitmap?: string;
+          bitmap?: unknown;
           habit_id?: string;
-          month_counts?: string;
           updated_at?: string;
-          week_counts?: string;
           year?: number;
         };
         Relationships: [
@@ -89,6 +83,7 @@ export type Database = {
           description: string | null;
           icon: string;
           id: string;
+          order: number;
           title: string;
           updated_at: string | null;
           user_id: string;
@@ -99,6 +94,7 @@ export type Database = {
           description?: string | null;
           icon: string;
           id?: string;
+          order: number;
           title: string;
           updated_at?: string | null;
           user_id?: string;
@@ -109,6 +105,7 @@ export type Database = {
           description?: string | null;
           icon?: string;
           id?: string;
+          order?: number;
           title?: string;
           updated_at?: string | null;
           user_id?: string;
@@ -182,35 +179,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      get_habits_overview: {
-        Args: { p_from: string; p_to: string };
-        Returns: {
-          color: string;
-          completion_bitmap: string;
-          completion_month_counts: string;
-          completion_week_counts: string;
-          completion_year: number;
-          created_at: string;
-          description: string;
-          goal_effective_from: string;
-          goal_effective_to: string;
-          goal_id: string;
-          goal_period_type: Database["public"]["Enums"]["goal_period_type"];
-          goal_target_count: number;
-          habit_id: string;
-          icon: string;
-          title: string;
-        }[];
-      };
-      set_habit_completion: {
-        Args: {
-          p_date: string;
-          p_habit_id: string;
-          p_value: number;
-          p_week_start?: number;
-        };
-        Returns: undefined;
-      };
+      [_ in never]: never;
     };
     Enums: {
       color_mode_preference: "light" | "dark" | "system";
